@@ -1,5 +1,5 @@
 import styles from "./profile.module.css";
-import { Button, Col, Row, Spinner } from "react-bootstrap";
+import { Button, Col, Row, Spinner, Card } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
 import Image from "react-bootstrap/Image";
 import { PersonBoundingBox } from "react-bootstrap-icons";
@@ -97,26 +97,30 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
             <Col></Col>
           </Row>
           <Row className={styles.rowSpace}>
-            <Col></Col>
             <Col>
-              <div>
-                It costs 0.01 LYX to get to the other page
-              </div>
-            </Col>
-            <Col>
-              {transactionInProgress ? ( // Display spinner if transaction is in progress
-                <div className={styles.spinnerContainer}>
-                  <Spinner animation="border" role="status" />
-                </div>
-              ) : (
-                <Button
-                  variant="dark"
-                  onClick={handlePayment}
-                  disabled={transactionInProgress}
-                >
-                  Go to Next Page
-                </Button>
-              )}
+              <Card>
+                <Card.Header>My Lukso story</Card.Header>
+                <Card.Body>
+                  <Card.Title>Why I support Lukso</Card.Title>
+                  <Card.Text>
+                    Preview of my story. I you want to read the full story it
+                    costs 0.01 LYX to read it on the next page.
+                  </Card.Text>
+                  {transactionInProgress ? ( // Display spinner if transaction is in progress
+                    <div className={styles.spinnerContainer}>
+                      <Spinner animation="border" role="status" />
+                    </div>
+                  ) : (
+                    <Button
+                      variant="dark"
+                      onClick={handlePayment}
+                      disabled={transactionInProgress}
+                    >
+                      Go to Next Page
+                    </Button>
+                  )}
+                </Card.Body>
+              </Card>
             </Col>
           </Row>
         </div>
