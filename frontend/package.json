@@ -1,0 +1,33 @@
+{
+  "name": "lukso_up",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@erc725/erc725.js": "^0.23.1",
+    "@lukso/lsp-smart-contracts": "^0.14.0",
+    "bootstrap": "^5.3.3",
+    "ethers": "^6.11.1",
+    "next": "14.1.1",
+    "react": "^18",
+    "react-bootstrap": "^2.10.2",
+    "react-bootstrap-icons": "^1.11.3",
+    "react-dom": "^18",
+    "siwe": "^2.1.4",
+    "web3": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-bootstrap": "^0.32.36",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.1.1",
+    "typescript": "^5"
+  }
+}

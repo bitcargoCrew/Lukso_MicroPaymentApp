@@ -1,0 +1,8 @@
+.background {
+  min-height: 100vh; /* 100% of the viewport height */
+  background-color: #fddce8;
+}
+
+.mainContainer {
+    padding: 5%;
+}
