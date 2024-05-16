@@ -25,7 +25,7 @@ const Overview: React.FC = () => {
       <Dashboard />
       {paid === "true" ? (
         <Row className={styles.rowSpace}>
-          <h1 className={styles.rowSpace}>This is the New Page</h1>
+          <h1 className={styles.rowSpace}>Congratulations, you have reached my Creator page</h1>
           <Col>
             <Link href={`/profile?account=${account}`}>
               <Button variant="dark">Go to Last Page</Button>

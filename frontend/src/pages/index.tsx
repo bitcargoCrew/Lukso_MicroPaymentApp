@@ -26,11 +26,13 @@ const Home: React.FC<HomeProps> = () => {
           <h1>Lukso Copyright Management</h1>
           <p>
             This Lukso demo app addresses the issue of intellectual property
-            rights, aiming to ensure fair compensation for content creators.
+            rights rights and aims to ensure fair compensation for content
+            creators. The app makes it possible to pay a small fee, known
+            as a micropayment, to the creator for visiting their page.
           </p>
         </Col>
       </Row>
-      <Row>
+      <Row className={styles.rowSpace}>
         <Col>
           <h3>Royalties and Compensation</h3>
           <p>
@@ -40,16 +42,26 @@ const Home: React.FC<HomeProps> = () => {
           </p>
         </Col>
       </Row>
-      <Row>
+      <Row className={styles.rowSpace}>
         <Col>
           <h3>Micropayments and Transactions</h3>
           <p>
             I envision a system of micropayments to facilitate the transfer of
             royalties between content creators and users. Whenever a user
-            accessed copyrighted content, a small payment would be made to the
-            author or rights holder. These micropayments would accumulate over
+            accessed copyrighted content, a small payment will be made to the
+            author or rights holder. These micropayments will accumulate over
             time, allowing authors to receive compensation for the ongoing usage
             of their work.
+          </p>
+        </Col>
+      </Row>
+      <Row className={styles.rowSpace}>
+        <Col>
+          <h3>Digital Idendity</h3>
+          <p>
+            Every creator and user requires a digital identity (e.g. a universal
+            profile). This identity is responsible for displaying the creator of
+            the page and managing micropayments in the background.
           </p>
         </Col>
       </Row>
