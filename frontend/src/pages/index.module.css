@@ -1,3 +1,28 @@
 .rowSpace {
-  padding-bottom: 2%;
+  padding-bottom: 5%;
+}
+
+.loginButton {
+  margin-left: auto !important;
+}
+
+.backgroundImage {
+	min-height: 1100px;
+  max-height: 1000px;
+	width: auto;
+	object-fit: cover;
+}
+
+.backgroundText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: grey; /* Text color */
+  font-weight: bold;
+}
+
+.solutionImage {
+  max-width: 100%;
+  height: auto; /* Ensure the image maintains its aspect ratio */
 }
