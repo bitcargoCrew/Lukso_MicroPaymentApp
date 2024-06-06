@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 
-const sendTransaction = async () => {
+const transactionModule = async () => {
   try {
     const provider = new ethers.BrowserProvider((window as any).lukso);
 
@@ -27,4 +27,7 @@ const sendTransaction = async () => {
   }
 };
 
-export default { sendTransaction };
+
+const sendTransaction = { transactionModule };
+
+export default sendTransaction;

@@ -1,5 +1,13 @@
 import styles from "./index.module.css";
-import { Button, Col, Container, Row, Nav, Navbar } from "react-bootstrap";
+import {
+  Button,
+  Col,
+  Container,
+  Row,
+  Nav,
+  Navbar,
+  Image,
+} from "react-bootstrap";
 import SignIn from "../components/SignIn";
 import React, { useState } from "react";
 import Link from "next/link";
@@ -61,16 +69,16 @@ const Home: React.FC<HomeProps> = () => {
         </Container>
       </Navbar>
       <div className={styles.backgroundContainer} id="home">
-        <img
+        <Image
           src="/background_image_creator.jpg"
           alt="Creator Background Image"
           className={styles.backgroundImage}
         />
         <p className={styles.backgroundText}>
-          “Web3 has struggled to drive consumer adoption. Quill enables the UX
-          of Web2 while offering the benefits of Web3. Quill gives creators
+          &quot;Web3 has struggled to drive consumer adoption. Quill enables the
+          UX of Web2 while offering the benefits of Web3. Quill gives creators
           ownership and control of their content distribution/monetization with
-          a direct view to their end consumer"
+          a direct view to their end consumer&quot;
         </p>
       </div>
 
@@ -118,16 +126,18 @@ const Home: React.FC<HomeProps> = () => {
         </Row>
       </RootLayout>
       <div className={styles.backgroundContainer}>
-        <img
+        <Image
           src="/quote_image.jpg"
           alt="Creator Quote Image"
           className={styles.backgroundImage}
         />
         <p className={styles.backgroundText}>
-          "Artists should own their own work for so many reasons, but the most
-          screamingly obvious one is that if you own what you create, you have
-          control over what happens to it." ​<p></p>
-          <p>Taylor Swift, World Renowned Performing Artist</p>
+          &quot;Artists should own their own work for so many reasons, but the
+          most screamingly obvious one is that if you own what you create, you
+          have control over what happens to it.&quot;
+          <br />
+          <br />
+          Taylor Swift, World Renowned Performing Artist
         </p>
       </div>
       <RootLayout>

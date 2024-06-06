@@ -48,7 +48,7 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
   const handlePayment = async () => {
     try {
       setTransactionInProgress(true);
-      await ChangePagePayment.sendTransaction();
+      await ChangePagePayment.transactionModule();
       setPaid(true);
       router.push(`/overview?account=${account}&paid=true`);
     } catch (error) {
