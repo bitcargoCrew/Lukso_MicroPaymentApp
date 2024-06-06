@@ -13,7 +13,7 @@ const FetchProfileData: React.FC<FetchProfileDataProps> = ({ account, onDataFetc
       const erc725js = new ERC725(
         lsp3ProfileSchema as ERC725JSONSchema[],
         account,
-        "https://rpc.lukso.gateway.fm",
+        "https://rpc.lukso.sigmacore.io",
         { ipfsGateway: "https://api.universalprofile.cloud/ipfs" }
       );
 
