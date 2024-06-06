@@ -1,3 +1,92 @@
 .rowSpace {
-  padding-bottom: 2%;
+  padding-bottom: 5%;
+}
+
+.loginButton {
+  margin-left: auto !important;
+}
+
+.backgroundContainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.backgroundImage {
+  top: 0;
+  left: 0;
+  width: 100%;
+  object-fit: cover;
+}
+
+.backgroundText {
+  position: absolute;
+  color: white; /* Text color */
+  font-weight: bold;
+}
+
+.centeredText {
+  padding-bottom: 5%;
+  text-align: center;
+}
+
+
+@media screen and (max-width: 4000px) {
+
+	.backgroundImage {
+		min-height: 800px;
+	}
+
+  .backgroundText {
+    top: 55%;
+    left: 45%;
+    transform: translate(-70%, -40%);
+    font-size: 40.5px;
+  }
+
+}
+
+@media screen and (max-width: 2500px) {
+
+	.backgroundImage {
+		min-height: 800px;
+	}
+
+  .backgroundText {
+    top: 55%;
+    left: 45%;
+    transform: translate(-70%, -40%);
+    font-size: 32.5px;
+  }
+
+}
+
+@media screen and (max-width: 1200px) {
+
+	.backgroundImage {
+		min-height: 400px;
+	}
+
+  .backgroundText {
+    top: 60%;
+    left: 45%;
+    transform: translate(-60%, -80%);
+    font-size: 20.5px;
+  }
+
+}
+
+@media screen and (max-width: 600px) {
+
+	.backgroundImage {
+		min-height: 400px;
+	}
+
+  .backgroundText {
+    top: 70%;
+    left: 45%;
+    transform: translate(-60%, -80%);
+    font-size: 14.5px;
+  }
+
 }
