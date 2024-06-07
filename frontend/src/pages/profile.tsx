@@ -142,7 +142,7 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
                           onClick={handlePayment}
                           disabled={transactionInProgress}
                         >
-                          Go to Next Page
+                          Read more
                         </Button>
                       )}
                     </Col>
@@ -181,7 +181,7 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
                           onClick={handlePayment}
                           disabled={transactionInProgress}
                         >
-                          Go to Next Page
+                          Read more
                         </Button>
                       )}
                     </Col>
