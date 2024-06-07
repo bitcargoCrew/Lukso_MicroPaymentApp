@@ -59,7 +59,7 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
 
   return (
     <div>
-      <NavBar></NavBar>
+      <NavBar account={account}></NavBar>
       <div className={styles.backgroundContainer}>
         <Image
           src="/profile_background.jpeg"

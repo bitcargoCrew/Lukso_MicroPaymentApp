@@ -2,7 +2,11 @@ import React from "react";
 import { Button, Container, Nav, Navbar } from "react-bootstrap";
 import Link from "next/link";
 
-const NavBar: React.FC = () => {
+interface NavBarProps {
+  account: string;
+}
+
+const NavBar: React.FC<NavBarProps> = ({ account }) => {
   return (
     <div>
       <Navbar expand="lg" bg="dark" data-bs-theme="dark" sticky="top">
@@ -12,38 +16,10 @@ const NavBar: React.FC = () => {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <Nav.Link>
-                <Link
-                  href={{
-                    pathname: "/profile",
-                    //query: { account: account }
-                  }}
-                  style={{ textDecoration: "none", color: 'white' }}
-                >
-                  Profile
-                </Link>
               </Nav.Link>
               <Nav.Link>
-                <Link
-                  href={{
-                    pathname: "/profile",
-                    //query: { account: account }
-                  }}
-                  style={{ textDecoration: "none", color: 'white' }}
-                >
-                  Content
-                </Link>
               </Nav.Link>
               <Nav.Link>
-                {" "}
-                <Link
-                  href={{
-                    pathname: "/profile",
-                    //query: { account: account }
-                  }}
-                  style={{ textDecoration: "none", color: 'white' }}
-                >
-                  Content Editor
-                </Link>
               </Nav.Link>
             </Nav>
             <div className="justify-content-end">

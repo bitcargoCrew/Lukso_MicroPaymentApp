@@ -22,7 +22,7 @@ const ContentPage: React.FC = () => {
 
   return (
     <div>
-      <NavBar></NavBar>
+      <NavBar account={account}></NavBar>
       <RootLayout>
         {paid === "true" ? (
           <div>
