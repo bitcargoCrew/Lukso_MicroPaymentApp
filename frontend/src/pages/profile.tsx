@@ -60,7 +60,7 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
   return (
     <div>
       <NavBar></NavBar>
-      <div className={styles.backgroundContainer} id="home">
+      <div className={styles.backgroundContainer}>
         <Image
           src="/profile_background.jpeg"
           alt="Profile Background Image"

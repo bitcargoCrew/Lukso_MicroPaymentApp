@@ -1,3 +1,44 @@
 .rowSpace {
-    padding-bottom: 2%;
+  padding-bottom: 2%;
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.contentImage {
+  top: 0;
+  left: 0;
+  width: 100%;
+  object-fit: cover;
+}
+
+.containerErrorPage {
+  min-height: 100vh;
+}
+
+@media screen and (max-width: 4000px) {
+  .contentImage {
+    max-height: 500px;
+  }
+}
+
+@media screen and (max-width: 2600px) {
+  .contentImage {
+    max-height: 350px;
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .contentImage {
+    max-height: 200px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .contentImage {
+    max-height: 150px;
+  }
 }
