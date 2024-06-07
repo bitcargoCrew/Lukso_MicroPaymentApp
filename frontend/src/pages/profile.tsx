@@ -8,6 +8,7 @@ import FetchProfileData from "../components/FetchProfileData";
 import ChangePagePayment from "../components/ChangePagePayment";
 import RootLayout from "../app/layout";
 import NavBar from "../components/NavBar";
+import CreatedBy from "@/components/CreatedBy";
 
 interface ProfileViewProps {}
 
@@ -42,6 +43,7 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
       setImageError(true);
     }
     const profilePicture = `https://api.universalprofile.cloud/ipfs/${ipfsHash}`;
+    console.log(profilePicture);
     return profilePicture;
   };
 
@@ -79,7 +81,10 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
               <h1 className={styles.rowSpace}>User Profile</h1>
               <Col xs={4}>
                 {imageError || !profileMetaData ? (
-                  <PersonBoundingBox size={200} className={styles.profileIcon}/>
+                  <PersonBoundingBox
+                    size={200}
+                    className={styles.profileIcon}
+                  />
                 ) : (
                   <Image
                     src={getProfileImageUrl(profileMetaData)}
@@ -127,7 +132,7 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
                       <Card.Title className={styles.cardTitleSpace}>
                         Why I support Lukso
                       </Card.Title>
-                      <Card.Text>Created by: Userprofile</Card.Text>
+                      <Card.Text><CreatedBy/></Card.Text>
                       <Card.Text>
                         Preview of my story. I you want to read the full story
                         it costs 0.01 LYX to read it on the next page.
@@ -166,7 +171,7 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
                       <Card.Title className={styles.cardTitleSpace}>
                         Why I support Lukso
                       </Card.Title>
-                      <Card.Text>Created by: Userprofile</Card.Text>
+                      <Card.Text> <CreatedBy/> </Card.Text>
                       <Card.Text>
                         Preview of my story. I you want to read the full story
                         it costs 0.01 LYX to read it on the next page.

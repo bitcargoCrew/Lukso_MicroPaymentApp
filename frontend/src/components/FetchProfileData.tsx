@@ -19,6 +19,7 @@ const FetchProfileData: React.FC<FetchProfileDataProps> = ({ account, onDataFetc
 
       try {
         const metaData = await erc725js.fetchData("LSP3Profile");
+        console.log(metaData)
         onDataFetched(metaData); // Pass fetched data back to parent component
       } catch (error) {
         console.error("Error fetching data:", error);
