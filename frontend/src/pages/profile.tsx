@@ -1,13 +1,13 @@
 import styles from "./profile.module.css";
-import { Button, Col, Row, Spinner, Card } from "react-bootstrap";
+import { Button, Col, Row, Spinner, Card, Image } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
-import Image from "react-bootstrap/Image";
 import { PersonBoundingBox } from "react-bootstrap-icons";
 import Balance from "../components/Balance";
 import { useRouter } from "next/router";
 import FetchProfileData from "../components/FetchProfileData";
 import ChangePagePayment from "../components/ChangePagePayment";
 import RootLayout from "../app/layout";
+import NavBar from "../components/NavBar";
 
 interface ProfileViewProps {}
 
@@ -50,7 +50,7 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
       setTransactionInProgress(true);
       await ChangePagePayment.transactionModule();
       setPaid(true);
-      router.push(`/overview?account=${account}&paid=true`);
+      router.push(`/contentPage?account=${account}&paid=true`);
     } catch (error) {
       console.error("Payment failed:", error);
       setTransactionInProgress(false);
@@ -58,74 +58,141 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
   };
 
   return (
-    <RootLayout>
-      <FetchProfileData account={account} onDataFetched={handleProfileData} />
-      {isLoading ? ( // Show spinner if loading
-        <div className={styles.spinnerContainer}>
-          <Spinner animation="border" role="status" />
-        </div>
-      ) : (
-        <div>
-          <Row className={styles.rowSpace}>
-            <h1 className={styles.rowSpace}>User Profile</h1>
-            <Col>
-              {imageError || !profileMetaData ? (
-                <PersonBoundingBox size={200} />
-              ) : (
-                <Image
-                  src={getProfileImageUrl(profileMetaData)}
-                  fluid
-                  rounded
-                  alt="Profile"
-                  onError={() => setImageError(true)}
-                />
-              )}
-            </Col>
-            <Col>
-              {profileMetaData && (
-                <div>
-                  <div>Name: {profileMetaData?.value?.LSP3Profile?.name}</div>
+    <div>
+      <NavBar></NavBar>
+      <div className={styles.backgroundContainer} id="home">
+        <Image
+          src="/profile_background.jpeg"
+          alt="Profile Background Image"
+          className={styles.backgroundImage}
+        />
+      </div>
+      <RootLayout>
+        <FetchProfileData account={account} onDataFetched={handleProfileData} />
+        {isLoading ? ( // Show spinner if loading
+          <div className={styles.spinnerContainer}>
+            <Spinner animation="border" role="status" />
+          </div>
+        ) : (
+          <div>
+            <Row className={styles.rowSpace}>
+              <h1 className={styles.rowSpace}>User Profile</h1>
+              <Col xs={4}>
+                {imageError || !profileMetaData ? (
+                  <PersonBoundingBox size={200} className={styles.profileIcon}/>
+                ) : (
+                  <Image
+                    src={getProfileImageUrl(profileMetaData)}
+                    fluid
+                    rounded
+                    alt="Profile"
+                    onError={() => setImageError(true)}
+                  />
+                )}
+              </Col>
+              <Col xs={8}>
+                {profileMetaData && (
                   <div>
-                    Description:{" "}
-                    {profileMetaData?.value?.LSP3Profile?.description}
-                  </div>
-                </div>
-              )}
-              <div>Account: {account}</div>
-              <Balance account={account} />
-            </Col>
-            <Col></Col>
-          </Row>
-          <Row className={styles.rowSpace}>
-            <Col>
-              <Card>
-                <Card.Header>My Lukso story</Card.Header>
-                <Card.Body>
-                  <Card.Title>Why I support Lukso</Card.Title>
-                  <Card.Text>
-                    Preview of my story. I you want to read the full story it
-                    costs 0.01 LYX to read it on the next page.
-                  </Card.Text>
-                  {transactionInProgress ? ( // Display spinner if transaction is in progress
-                    <div className={styles.spinnerContainer}>
-                      <Spinner animation="border" role="status" />
+                    <div>Name: {profileMetaData?.value?.LSP3Profile?.name}</div>
+                    <div>
+                      Description:{" "}
+                      {profileMetaData?.value?.LSP3Profile?.description}
                     </div>
-                  ) : (
-                    <Button
-                      variant="dark"
-                      onClick={handlePayment}
-                      disabled={transactionInProgress}
-                    >
-                      Go to Next Page
-                    </Button>
-                  )}
+                  </div>
+                )}
+                <div>Account: {account}</div>
+                <Balance account={account} />
+              </Col>
+            </Row>
+            <Row className={styles.rowSpace}>
+              <h1>Your purchased content</h1>
+              <div>We will add this section soon</div>
+            </Row>
+            <Row className={styles.rowSpace}>
+              <h1>Explore more content</h1>
+            </Row>
+            <Row className={styles.rowSpace}>
+              <Card className={styles.customCard}>
+                <Card.Body>
+                  <Row>
+                    <Col xs={4}>
+                      <Image
+                        src="/quote_image.jpg"
+                        alt="Creator Quote Image"
+                        fluid
+                        className={styles.contentImage}
+                      />
+                    </Col>
+                    <Col xs={8}>
+                      <Card.Title className={styles.cardTitleSpace}>
+                        Why I support Lukso
+                      </Card.Title>
+                      <Card.Text>Created by: Userprofile</Card.Text>
+                      <Card.Text>
+                        Preview of my story. I you want to read the full story
+                        it costs 0.01 LYX to read it on the next page.
+                      </Card.Text>
+                      {transactionInProgress ? ( // Display spinner if transaction is in progress
+                        <div className={styles.spinnerContainer}>
+                          <Spinner animation="border" role="status" />
+                        </div>
+                      ) : (
+                        <Button
+                          variant="dark"
+                          onClick={handlePayment}
+                          disabled={transactionInProgress}
+                        >
+                          Go to Next Page
+                        </Button>
+                      )}
+                    </Col>
+                  </Row>
                 </Card.Body>
               </Card>
-            </Col>
-          </Row>
-        </div>
-      )}
-    </RootLayout>
+            </Row>
+            <Row className={styles.rowSpace}>
+              <Card className={styles.customCard}>
+                <Card.Body>
+                  <Row>
+                    <Col xs={4}>
+                      <Image
+                        src="/quote_image.jpg"
+                        alt="Creator Quote Image"
+                        fluid
+                        className={styles.contentImage}
+                      />
+                    </Col>
+                    <Col xs={8}>
+                      <Card.Title className={styles.cardTitleSpace}>
+                        Why I support Lukso
+                      </Card.Title>
+                      <Card.Text>Created by: Userprofile</Card.Text>
+                      <Card.Text>
+                        Preview of my story. I you want to read the full story
+                        it costs 0.01 LYX to read it on the next page.
+                      </Card.Text>
+                      {transactionInProgress ? ( // Display spinner if transaction is in progress
+                        <div className={styles.spinnerContainer}>
+                          <Spinner animation="border" role="status" />
+                        </div>
+                      ) : (
+                        <Button
+                          variant="dark"
+                          onClick={handlePayment}
+                          disabled={transactionInProgress}
+                        >
+                          Go to Next Page
+                        </Button>
+                      )}
+                    </Col>
+                  </Row>
+                </Card.Body>
+              </Card>
+            </Row>
+          </div>
+        )}
+      </RootLayout>
+    </div>
   );
 };
 

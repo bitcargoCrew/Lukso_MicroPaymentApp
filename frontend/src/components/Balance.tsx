@@ -11,7 +11,7 @@ const Balance: React.FC<BalanceProps> = ({ account }) => {
   useEffect(() => {
     async function getWalletBalance() {
       try {
-        const RPC_ENDPOINT = "https://rpc.lukso.gateway.fm";
+        const RPC_ENDPOINT = "https://rpc.lukso.sigmacore.io";
         const provider = new ethers.JsonRpcProvider(RPC_ENDPOINT);
         const walletBalance = await provider.getBalance(account);
         const walletBalanceConverted = ethers.formatEther(walletBalance);

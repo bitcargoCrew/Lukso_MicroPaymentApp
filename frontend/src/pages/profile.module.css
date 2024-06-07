@@ -1,10 +1,70 @@
 .rowSpace {
-    padding-bottom: 2%;
+  padding-bottom: 2%;
+}
+
+.backgroundContainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.backgroundImage {
+  top: 0;
+  left: 0;
+  width: 100%;
+  object-fit: cover;
+}
+
+.profileIcon {
+  width: 100%; /* Ensures the icon fits within the column width */
+  height: auto; /* Maintains the aspect ratio */
+  display: block; /* Removes any extra space around the icon */
+  max-width: 200px; /* Optional: Set a maximum width to control the size */
+}
+
+.customCard {
+  background-color: #e9ecef; /* Light grey color */
+  border: none; /* Optional: Remove the border for a cleaner look */
+}
+
+.cardTitleSpace {
+  padding-bottom: 2%;
 }
 
 .spinnerContainer {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.contentImage {
+  max-width: 100%; /* Ensures the image doesn't exceed the column size */
+  height: auto; /* Maintains the aspect ratio */
+  display: block; /* Removes any extra space around the image */
+  margin: 0 auto; /* Centers the image within the column */
+}
+
+@media screen and (max-width: 4000px) {
+  .backgroundImage {
+    max-height: 400px;
   }
+}
+
+@media screen and (max-width: 2600px) {
+  .backgroundImage {
+    max-height: 300px;
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .backgroundImage {
+    max-height: 200px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .backgroundImage {
+    max-height: 150px;
+  }
+}
