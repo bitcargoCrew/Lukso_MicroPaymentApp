@@ -11,9 +11,40 @@ const NavBar: React.FC = () => {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              <Nav.Link href="#solution">Profile</Nav.Link>
-              <Nav.Link href="#solution">Content</Nav.Link>
-              <Nav.Link href="#story">Content Editor</Nav.Link>
+              <Nav.Link>
+                <Link
+                  href={{
+                    pathname: "/profile",
+                    //query: { account: account }
+                  }}
+                  style={{ textDecoration: "none", color: 'white' }}
+                >
+                  Profile
+                </Link>
+              </Nav.Link>
+              <Nav.Link>
+                <Link
+                  href={{
+                    pathname: "/profile",
+                    //query: { account: account }
+                  }}
+                  style={{ textDecoration: "none", color: 'white' }}
+                >
+                  Content
+                </Link>
+              </Nav.Link>
+              <Nav.Link>
+                {" "}
+                <Link
+                  href={{
+                    pathname: "/profile",
+                    //query: { account: account }
+                  }}
+                  style={{ textDecoration: "none", color: 'white' }}
+                >
+                  Content Editor
+                </Link>
+              </Nav.Link>
             </Nav>
             <div className="justify-content-end">
               <Link
