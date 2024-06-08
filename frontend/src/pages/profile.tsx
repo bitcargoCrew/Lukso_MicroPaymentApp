@@ -9,6 +9,7 @@ import ChangePagePayment from "../components/ChangePagePayment";
 import RootLayout from "../app/layout";
 import NavBar from "../components/NavBar";
 import CreatedBy from "@/components/CreatedBy";
+import Link from "next/link";
 
 interface ProfileViewProps {}
 
@@ -109,6 +110,24 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
                 <Balance account={account} />
               </Col>
             </Row>
+                  {/* 
+
+            <Row className={styles.rowSpace}>
+              <h1>Create content</h1>
+              <div>You can create a new post here
+              <span style={{ paddingLeft: "1%" }}>
+              <Link
+                href={{
+                  pathname: "/createContentPage",
+                  query: { account: account },
+                }}
+              >
+                <Button variant="dark">Create a post</Button>
+              </Link>
+              </span>
+              </div>
+            </Row>
+                 */}
             <Row className={styles.rowSpace}>
               <h1>Your purchased content</h1>
               <div>We will add this section soon</div>
@@ -132,7 +151,9 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
                       <Card.Title className={styles.cardTitleSpace}>
                         Why I support Lukso
                       </Card.Title>
-                      <Card.Text><CreatedBy/></Card.Text>
+                      <Card.Text>
+                        <CreatedBy />
+                      </Card.Text>
                       <Card.Text>
                         Preview of my story. I you want to read the full story
                         it costs 0.01 LYX to read it on the next page.
@@ -171,7 +192,10 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
                       <Card.Title className={styles.cardTitleSpace}>
                         Why I support Lukso
                       </Card.Title>
-                      <Card.Text> <CreatedBy/> </Card.Text>
+                      <Card.Text>
+                        {" "}
+                        <CreatedBy />{" "}
+                      </Card.Text>
                       <Card.Text>
                         Preview of my story. I you want to read the full story
                         it costs 0.01 LYX to read it on the next page.

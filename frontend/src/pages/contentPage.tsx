@@ -2,7 +2,6 @@ import styles from "./contentPage.module.css";
 import { Button, Col, Container, Row, Image, Card } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
 import RootLayout from "../app/layout";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import NavBar from "../components/NavBar";
 
@@ -36,7 +35,7 @@ const ContentPage: React.FC = () => {
               <div className={styles.imageContainer}>
                 <Image
                   src="/quote_image.jpg"
-                  alt="Profile Background Image"
+                  alt=" Content Image"
                   className={styles.contentImage}
                 />
               </div>

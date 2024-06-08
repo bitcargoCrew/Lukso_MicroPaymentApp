@@ -34,7 +34,18 @@ const main = async () => {
     res.send("Hello World!");
   });
 
-  app.get("/content", async (req: Request, res: Response) => {
+  app.post("/content", async (req: Request, res: Response) => {
+    const {
+      contentCreator,
+      contentCosts,
+      creatorMessage,
+      contentTitle,
+      contentMedia,
+      contentShortDescription,
+      contentLongDescription,
+      contentTags,
+    } = req.body;
+
     // Automatically generate a unique ID for a new document in the "content" collection
     const uniqueId = uuidv4();
     const contentRef = db.collection("content").doc(uniqueId);
@@ -42,20 +53,44 @@ const main = async () => {
     try {
       await contentRef.set({
         contentID: uniqueId,
-        contentTitle: "title",
-        contentMedia: "image",
-        contentCreator: "sandro",
-        contentShortDescription: "Short Description",
-        creatorMessage: "Thank you",
-        contentLongDescription: "Long Description",
-        numberOfRead: 5,
-        numberofLikes: 5,
-        numberOfComments: 5,
-        contentComments: "This are a few comments",
+        contentCreator,
+        contentCosts,
+        creatorMessage,
+        contentTitle,
+        contentMedia,
+        contentShortDescription,
+        contentLongDescription,
+        contentTags,
+        numberOfRead: 0, // Assuming initial values
+        numberofLikes: 0,
+        numberOfComments: 0,
+        contentComments: [],
       });
-      res.status(200).send({ message: "Content created successfully", id: uniqueId });
+      res
+        .status(201)
+        .json({ message: "Content created successfully", id: uniqueId });
     } catch (error) {
       console.error("Error setting document:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.get("/content/:id", async (req, res) => {
+    const contentId = req.params.id;
+  
+    try {
+      const contentRef = db.collection("content").doc(contentId);
+      const doc = await contentRef.get();
+  
+      if (!doc.exists) {
+        return res.status(404).json({ error: "Content not found" });
+      }
+  
+      const contentData = doc.data();
+      res.status(200).json(contentData);
+    } catch (error) {
+      console.error("Error fetching document:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   });
 
