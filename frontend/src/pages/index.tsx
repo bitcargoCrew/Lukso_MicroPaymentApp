@@ -124,6 +124,9 @@ const Home: React.FC<HomeProps> = () => {
             </p>
           </Col>
         </Row>
+        <Row>
+          <h3>Interested? Create your Universal Profile (Digital Identity) here: https://universalprofile.cloud/</h3>
+        </Row>
       </RootLayout>
       <div className={styles.backgroundContainer}>
         <Image
