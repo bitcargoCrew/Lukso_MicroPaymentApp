@@ -1,104 +1,73 @@
-import cors from "cors";
-import express, { Request, Response } from "express";
-import dotenv from "dotenv";
-import { initializeApp, applicationDefault, cert } from "firebase-admin/app";
-import {
-  getFirestore,
-  Timestamp,
-  FieldValue,
-  Filter,
-} from "firebase-admin/firestore";
-import { v4 as uuidv4 } from "uuid";
+import express, { Request, Response } from 'express';
+import admin from 'firebase-admin';
+import cors from 'cors';
 
-dotenv.config();
+const app = express();
+app.use(express.json());
+app.use(cors());
 
-const main = async () => {
-  const app = express();
+// Initialize Firestore (make sure to set your Firebase credentials correctly)
+admin.initializeApp({
+  credential: admin.credential.applicationDefault()
+});
+const db = admin.firestore();
 
-  // Firebase initialization
-  const serviceAccount = require("../serviceAccountKey.json");
+// Endpoint to post new content
+app.post('/content', async (req: Request, res: Response) => {
+  try {
+    const contentData = req.body;
+    const contentRef = await db.collection('content').add(contentData);
+    res.status(201).json({ id: contentRef.id });
+  } catch (error) {
+    console.error("Error adding document:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
-  initializeApp({
-    credential: cert(serviceAccount),
-  });
+// Endpoint to get all content
+app.get('/content', async (req: Request, res: Response) => {
+  try {
+    const contentRef = db.collection('content');
+    const snapshot = await contentRef.get();
 
-  const db = getFirestore();
-
-  // Middleware
-  app.use(express.json());
-  app.use(cors());
-  app.disable("x-powered-by");
-
-  // Routes
-  app.get("/", (req, res) => {
-    res.send("Hello World!");
-  });
-
-  app.post("/content", async (req: Request, res: Response) => {
-    const {
-      contentCreator,
-      contentCosts,
-      creatorMessage,
-      contentTitle,
-      contentMedia,
-      contentShortDescription,
-      contentLongDescription,
-      contentTags,
-    } = req.body;
-
-    // Automatically generate a unique ID for a new document in the "content" collection
-    const uniqueId = uuidv4();
-    const contentRef = db.collection("content").doc(uniqueId);
-
-    try {
-      await contentRef.set({
-        contentID: uniqueId,
-        contentCreator,
-        contentCosts,
-        creatorMessage,
-        contentTitle,
-        contentMedia,
-        contentShortDescription,
-        contentLongDescription,
-        contentTags,
-        numberOfRead: 0, // Assuming initial values
-        numberofLikes: 0,
-        numberOfComments: 0,
-        contentComments: [],
-      });
-      res
-        .status(201)
-        .json({ message: "Content created successfully", id: uniqueId });
-    } catch (error) {
-      console.error("Error setting document:", error);
-      res.status(500).json({ error: "Internal server error" });
+    if (snapshot.empty) {
+      return res.status(404).json({ error: "No content found" });
     }
-  });
 
-  app.get("/content/:id", async (req, res) => {
-    const contentId = req.params.id;
-  
-    try {
-      const contentRef = db.collection("content").doc(contentId);
-      const doc = await contentRef.get();
-  
-      if (!doc.exists) {
-        return res.status(404).json({ error: "Content not found" });
-      }
-  
-      const contentData = doc.data();
-      res.status(200).json(contentData);
-    } catch (error) {
-      console.error("Error fetching document:", error);
-      res.status(500).json({ error: "Internal server error" });
+    const contentList: { id: string, [key: string]: any }[] = [];
+    snapshot.forEach((doc: FirebaseFirestore.DocumentSnapshot) => {
+      contentList.push({ id: doc.id, ...doc.data() });
+    });
+
+    res.status(200).json(contentList);
+  } catch (error) {
+    console.error("Error fetching content:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Endpoint to get specific content by ID
+app.get('/content/:id', async (req: Request, res: Response) => {
+  const contentId = req.params.id;
+
+  try {
+    const contentRef = db.collection('content').doc(contentId);
+    const doc = await contentRef.get();
+
+    if (!doc.exists) {
+      return res.status(404).json({ error: "Content not found" });
     }
-  });
 
-  // Start the server
-  const port = 3001;
-  app.listen(port, () => {
-    console.log(`Server is listening at http://localhost:${port}`);
-  });
-};
+    const contentData = doc.data();
+    res.status(200).json(contentData);
+  } catch (error) {
+    console.error("Error fetching document:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
-main();
+// Start the server
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

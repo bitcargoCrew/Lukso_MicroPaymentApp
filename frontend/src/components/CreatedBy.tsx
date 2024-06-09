@@ -7,7 +7,7 @@ const CreatedBy: React.FC = () => {
   const contentCreatorPicture = `https://api.universalprofile.cloud/ipfs/bafkreifzajflcehakjdl3rjupdkstc57nx7hvhbwucjqlhylpzhusa2dji`;
   return (
     <div>
-      Created by:
+      <span>Created by:</span>
       <span style={{ paddingLeft: "1%" }}>
         {imageError ? (
           <PersonBoundingBox size={30} />

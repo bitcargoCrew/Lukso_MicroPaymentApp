@@ -14,9 +14,12 @@ import RootLayout from "../app/layout";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import NavBar from "../components/NavBar";
-import ContentDetails from "@/components/ContentDetails";
 
-const CreateContentPage: React.FC = () => {
+interface createCardProps {
+  account: string;
+}
+
+const CreateContentPage: React.FC<createCardProps> = ({account}) => {
   interface FormData {
     contentCreator: string;
     contentCosts: string;
@@ -29,7 +32,7 @@ const CreateContentPage: React.FC = () => {
   }
 
 const [formData, setFormData] = useState<FormData>({
-  contentCreator: "",
+  contentCreator: account,
   contentCosts: "",
   creatorMessage: "",
   contentTitle: "",
@@ -86,6 +89,7 @@ const [formData, setFormData] = useState<FormData>({
 
   return (
     <div>
+      <NavBar account={account}></NavBar>
       <RootLayout>
         <div className={styles.containerHeight}>
           <h1 className={styles.rowSpace}>Create your post</h1>
@@ -205,7 +209,6 @@ const [formData, setFormData] = useState<FormData>({
             </Button>
           </Form>
         </div>
-        <ContentDetails contentId="2beb70eb-ac25-4518-89c5-80251cde84e7" />
       </RootLayout>
     </div>
   );

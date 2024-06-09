@@ -110,8 +110,7 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
                 <Balance account={account} />
               </Col>
             </Row>
-                  {/* 
-
+            {}
             <Row className={styles.rowSpace}>
               <h1>Create content</h1>
               <div>You can create a new post here
@@ -127,7 +126,6 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
               </span>
               </div>
             </Row>
-                 */}
             <Row className={styles.rowSpace}>
               <h1>Your purchased content</h1>
               <div>We will add this section soon</div>
@@ -193,8 +191,7 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
                         Why I support Lukso
                       </Card.Title>
                       <Card.Text>
-                        {" "}
-                        <CreatedBy />{" "}
+                        <CreatedBy />
                       </Card.Text>
                       <Card.Text>
                         Preview of my story. I you want to read the full story
