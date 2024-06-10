@@ -15,11 +15,17 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import NavBar from "../components/NavBar";
 
-interface createCardProps {
-  account: string;
-}
+const CreateContentPage: React.FC = () => {
+  const router = useRouter();
+  const [account, setAccount] = useState("");
 
-const CreateContentPage: React.FC<createCardProps> = ({account}) => {
+  useEffect(() => {
+    const accountQuery = router.query.account;
+    if (accountQuery && accountQuery !== account) {
+      setAccount(accountQuery as string);
+    }
+  }, [router.query, account]);
+
   interface FormData {
     contentCreator: string;
     contentCosts: string;
@@ -31,16 +37,16 @@ const CreateContentPage: React.FC<createCardProps> = ({account}) => {
     contentTags: string;
   }
 
-const [formData, setFormData] = useState<FormData>({
-  contentCreator: account,
-  contentCosts: "",
-  creatorMessage: "",
-  contentTitle: "",
-  contentMedia: null,
-  contentShortDescription: "",
-  contentLongDescription: "",
-  contentTags: "",
-});
+  const [formData, setFormData] = useState<FormData>({
+    contentCreator: "",
+    contentCosts: "",
+    creatorMessage: "",
+    contentTitle: "",
+    contentMedia: null,
+    contentShortDescription: "",
+    contentLongDescription: "",
+    contentTags: "",
+  });
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -50,6 +56,7 @@ const [formData, setFormData] = useState<FormData>({
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
+      contentCreator: account,
       [name]: value,
     }));
   };
@@ -66,19 +73,24 @@ const [formData, setFormData] = useState<FormData>({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     try {
-      const response = await fetch("http://localhost:3001/content", {
+      const response = await fetch("http://localhost:3001/postContent", {
         method: "POST",
         body: JSON.stringify(formData),
         headers: {
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json",
+        },
       });
-  
+
       if (response.ok) {
-        const data = await response.json();
+        await response.json();
         console.log("Form submitted successfully!");
+        // Redirect to profile page after successful form submission
+        router.push({
+          pathname: "/profile",
+          query: { account: account },
+        });
       } else {
         console.error("Form submission failed:", response.statusText);
       }
@@ -101,11 +113,12 @@ const [formData, setFormData] = useState<FormData>({
               <Form.Control
                 type="text"
                 name="contentCreator"
-                value={formData.contentCreator}
+                value={account}
                 onChange={handleChange}
                 placeholder="Your Universal Profile Public Key e.g. 0xfAdAE19e2ed0EA36D2c2B482E0882d2bFC8Be532"
                 aria-label="contentCreator"
                 aria-describedby="basic-addon1"
+                required
               />
             </InputGroup>
 
@@ -119,6 +132,7 @@ const [formData, setFormData] = useState<FormData>({
                 placeholder="Enter the amount of LYX costs for the content"
                 aria-label="contentCosts"
                 aria-describedby="basic-addon1"
+                required
               />
             </InputGroup>
 
@@ -135,6 +149,7 @@ const [formData, setFormData] = useState<FormData>({
                 placeholder="Enter a personalized message for your readers"
                 aria-label="creatorMessage"
                 aria-describedby="basic-addon1"
+                required
               />
             </InputGroup>
 
@@ -148,6 +163,7 @@ const [formData, setFormData] = useState<FormData>({
                 placeholder="Enter a post title"
                 aria-label="contentTitle"
                 aria-describedby="basic-addon1"
+                required
               />
             </InputGroup>
 
@@ -175,6 +191,7 @@ const [formData, setFormData] = useState<FormData>({
                 placeholder="Enter a short description for your post"
                 aria-label="contentShortDescription"
                 aria-describedby="basic-addon1"
+                required
               />
             </InputGroup>
 
@@ -189,6 +206,7 @@ const [formData, setFormData] = useState<FormData>({
                 placeholder="Enter the post content"
                 aria-label="contentLongDescription"
                 aria-describedby="basic-addon1"
+                required
               />
             </InputGroup>
 
@@ -202,6 +220,7 @@ const [formData, setFormData] = useState<FormData>({
                 placeholder="Enter tags for your content"
                 aria-label="contentTags"
                 aria-describedby="basic-addon1"
+                required
               />
             </InputGroup>
             <Button variant="dark" type="submit">

@@ -12,12 +12,11 @@ const ContentPage: React.FC = () => {
   const { paid } = query;
 
   useEffect(() => {
-    const { account } = router.query;
-    if (account) {
-      setAccount(account as string);
-      console.log(account);
+    const accountQuery = router.query.account;
+    if (accountQuery && accountQuery !== account) {
+      setAccount(accountQuery as string);
     }
-  }, [router.query]);
+  }, [router.query, account]);
 
   return (
     <div>

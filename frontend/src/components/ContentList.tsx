@@ -1,6 +1,10 @@
+import styles from "./ContentList.module.css";
 import React, { useEffect, useState } from "react";
 import { Row, Col, Spinner, Card, Image, Button } from "react-bootstrap";
 import { useRouter } from "next/router";
+import ChangePagePayment from "@/components/ChangePagePayment";
+import CreatedBy from "./CreatedBy";
+
 
 interface ContentData {
   id: string;
@@ -23,12 +27,23 @@ const ContentList: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [transactionInProgress, setTransactionInProgress] = useState(false);
+  const [paid, setPaid] = useState(false);
+  const [account, setAccount] = useState("");
   const router = useRouter();
 
   useEffect(() => {
+    const accountQuery = router.query.account;
+    if (accountQuery && accountQuery !== account) {
+      setAccount(accountQuery as string);
+    }
+
+    if (paid) {
+      router.push(`/contentPage?account=${account}&paid=true`);
+    }
+
     const fetchContentData = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/content`);
+        const response = await fetch(`http://localhost:3001/allContent`);
         if (response.ok) {
           const data = await response.json();
           setContentList(data);
@@ -47,14 +62,14 @@ const ContentList: React.FC = () => {
     };
 
     fetchContentData();
-  }, []);
+  }, [router.query, account, paid]);
 
-  const handlePayment = async (contentId: string) => {
+  const handlePayment = async (contentId: string, contentCreator: string, contentCosts: number) => {
     try {
       setTransactionInProgress(true);
-      // Simulate a payment transaction, replace with your actual payment logic
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      router.push(`/contentPage?contentId=${contentId}&paid=true`);
+      await ChangePagePayment.transactionModule(contentCreator, contentCosts);
+      setPaid(true)
+      setTransactionInProgress(false); // Reset transaction state
     } catch (error) {
       console.error("Payment failed:", error);
       setTransactionInProgress(false);
@@ -66,75 +81,54 @@ const ContentList: React.FC = () => {
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return <div>{error}</div>;
   }
 
   return (
-    <Row>
-      {contentList.map((content) => (
-        <Col key={content.id} xs={12} className="mb-4">
-          <Card className="customCard">
-            <Card.Body>
-              <Row>
-                <Col xs={4}>
-                  <Image
-                    src={content.contentMedia}
-                    alt="Content Media"
-                    fluid
-                    className="contentImage"
-                  />
-                </Col>
-                <Col xs={8}>
-                  <Card.Title className="cardTitleSpace">
-                    {content.contentTitle}
-                  </Card.Title>
-                  <Card.Text>Creator: {content.contentCreator}</Card.Text>
-                  <Card.Text>Costs: {content.contentCosts}</Card.Text>
-                  <Card.Text>
-                    <strong>Creator Message:</strong> {content.creatorMessage}
-                  </Card.Text>
-                  <Card.Text>
-                    <strong>Short Description:</strong>{" "}
-                    {content.contentShortDescription}
-                  </Card.Text>
-                  <Card.Text>
-                    <strong>Long Description:</strong>{" "}
-                    {content.contentLongDescription}
-                  </Card.Text>
-                  <Card.Text>
-                    <strong>Tags:</strong> {content.contentTags}
-                  </Card.Text>
-                  <Card.Text>
-                    <strong>Number of Reads:</strong> {content.numberOfRead}
-                  </Card.Text>
-                  <Card.Text>
-                    <strong>Number of Likes:</strong> {content.numberofLikes}
-                  </Card.Text>
-                  <Card.Text>
-                    <strong>Number of Comments:</strong>{" "}
-                    {content.numberOfComments}
-                  </Card.Text>
-                  <Card.Text>
-                    <strong>Comments:</strong> {content.contentComments}
-                  </Card.Text>
-                  {transactionInProgress ? (
-                    <Spinner animation="border" role="status" />
-                  ) : (
-                    <Button
+    <div>
+      <Row>
+        {contentList.map((content) => (
+          <Col key={content.id} xs={12} className="mb-4">
+            <Card className="customCard">
+              <Card.Body>
+                <Row>
+                  <Col xs={4}>
+                    <Image
+                      //src={content.contentMedia}
+                      src="/quote_image.jpg"
+                      alt="Creator Quote Image"
+                      fluid
+                      className={styles.contentImage}
+                    />
+                  </Col>
+                  <Col xs={8}>
+                    <Card.Title className="cardTitleSpace">
+                      {content.contentTitle}
+                    </Card.Title>
+                      <CreatedBy />
+                    <Card.Text><strong>Costs:</strong> {content.contentCosts} LYX</Card.Text>
+                    <Card.Text>
+                      <strong>Short Description:</strong>{" "}
+                      {content.contentShortDescription}
+                    </Card.Text>
+                    <Card.Text>
+                      <strong>Tags:</strong> {content.contentTags}
+                    </Card.Text>
+                      <Button
                       variant="dark"
-                      onClick={() => handlePayment(content.id)}
+                      onClick={() => handlePayment(content.id, content.contentCreator, content.contentCosts)}
                       disabled={transactionInProgress}
                     >
-                      Read more
+                      {transactionInProgress ? "Processing..." : "Read More"}
                     </Button>
-                  )}
-                </Col>
-              </Row>
-            </Card.Body>
-          </Card>
-        </Col>
-      ))}
-    </Row>
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </div>
   );
 };
 

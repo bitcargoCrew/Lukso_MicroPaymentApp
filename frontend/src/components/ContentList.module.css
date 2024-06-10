@@ -1,0 +1,10 @@
+.rowSpace {
+  padding-bottom: 2%;
+}
+
+.contentImage {
+  max-width: 100%; /* Ensures the image doesn't exceed the column size */
+  height: auto; /* Maintains the aspect ratio */
+  display: block; /* Removes any extra space around the image */
+  margin: 0 auto; /* Centers the image within the column */
+}

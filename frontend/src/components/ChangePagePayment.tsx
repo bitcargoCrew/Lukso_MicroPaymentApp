@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 
-const transactionModule = async () => {
+const transactionModule = async (contentCreator: string, contentCosts: number) => {
   try {
     const provider = new ethers.BrowserProvider((window as any).lukso);
 
@@ -9,8 +9,10 @@ const transactionModule = async () => {
     const signer = await provider.getSigner();
     const account = await signer.getAddress();
 
-    const receiver = '0x1C0b106cB4189FaCA9Ab34B6bf5CF86b7979342C';
-    const amount = '0.01';
+    const receiver = contentCreator;
+    console.log(receiver)
+    const amount = contentCosts.toString();
+    console.log(amount)
 
     // Send transaction
     const tx = await signer.sendTransaction({

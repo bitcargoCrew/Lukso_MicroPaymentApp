@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { ERC725, ERC725JSONSchema } from "@erc725/erc725.js";
 import lsp3ProfileSchema from "@erc725/erc725.js/schemas/LSP3ProfileMetadata.json";
 
 interface FetchProfileDataProps {
   account: string;
-  onDataFetched: (data: any) => void; // Callback function to pass fetched data back to parent
+  onDataFetched: (data: any) => void;
 }
 
 const FetchProfileData: React.FC<FetchProfileDataProps> = ({ account, onDataFetched }) => {
@@ -19,7 +19,8 @@ const FetchProfileData: React.FC<FetchProfileDataProps> = ({ account, onDataFetc
 
       try {
         const metaData = await erc725js.fetchData("LSP3Profile");
-        onDataFetched(metaData); // Pass fetched data back to parent component
+        onDataFetched(metaData);
+        console.log(metaData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }

@@ -1,22 +1,26 @@
 import express, { Request, Response } from 'express';
-import admin from 'firebase-admin';
 import cors from 'cors';
+import { v4 as uuidv4 } from 'uuid';
+const { initializeApp, applicationDefault, cert } = require('firebase-admin/app');
+const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
+const serviceAccount = require('../serviceAccountKey.json');
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
 // Initialize Firestore (make sure to set your Firebase credentials correctly)
-admin.initializeApp({
-  credential: admin.credential.applicationDefault()
+initializeApp({
+  credential: cert(serviceAccount)
 });
-const db = admin.firestore();
+const db = getFirestore();
 
 // Endpoint to post new content
-app.post('/content', async (req: Request, res: Response) => {
+app.post('/postContent', async (req: Request, res: Response) => {
   try {
     const contentData = req.body;
-    const contentRef = await db.collection('content').add(contentData);
+    const uniqueContentId = uuidv4()
+    const contentRef = await db.collection('content').doc(uniqueContentId).set(contentData);
     res.status(201).json({ id: contentRef.id });
   } catch (error) {
     console.error("Error adding document:", error);
@@ -25,17 +29,19 @@ app.post('/content', async (req: Request, res: Response) => {
 });
 
 // Endpoint to get all content
-app.get('/content', async (req: Request, res: Response) => {
+app.get('/allContent', async (req: Request, res: Response) => {
   try {
     const contentRef = db.collection('content');
     const snapshot = await contentRef.get();
+    console.log(snapshot)
 
     if (snapshot.empty) {
       return res.status(404).json({ error: "No content found" });
     }
 
     const contentList: { id: string, [key: string]: any }[] = [];
-    snapshot.forEach((doc: FirebaseFirestore.DocumentSnapshot) => {
+    snapshot.forEach((doc: any) => {
+      console.log(doc.id, '=>', doc.data());
       contentList.push({ id: doc.id, ...doc.data() });
     });
 
