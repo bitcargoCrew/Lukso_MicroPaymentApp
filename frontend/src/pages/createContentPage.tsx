@@ -14,6 +14,7 @@ import RootLayout from "../app/layout";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import NavBar from "../components/NavBar";
+import ContentDataInterface from "@/components/ContentDataInterface";
 
 const CreateContentPage: React.FC = () => {
   const router = useRouter();
@@ -26,26 +27,20 @@ const CreateContentPage: React.FC = () => {
     }
   }, [router.query, account]);
 
-  interface FormData {
-    contentCreator: string;
-    contentCosts: string;
-    creatorMessage: string;
-    contentTitle: string;
-    contentMedia: File | null; // Adjusted type to allow File or null
-    contentShortDescription: string;
-    contentLongDescription: string;
-    contentTags: string;
-  }
-
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<ContentDataInterface>({
+    contentId: "",
     contentCreator: "",
-    contentCosts: "",
+    contentCosts: 0,
     creatorMessage: "",
     contentTitle: "",
     contentMedia: null,
     contentShortDescription: "",
     contentLongDescription: "",
     contentTags: "",
+    numberOfRead: 0,
+    numberofLikes: 0,
+    numberOfComments: 0,
+    contentComments: ""
   });
 
   const handleChange = (
@@ -64,7 +59,7 @@ const CreateContentPage: React.FC = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      setFormData((prevState: FormData) => ({
+      setFormData((prevState: ContentDataInterface) => ({
         ...prevState,
         contentMedia: files[0],
       }));

@@ -93,19 +93,6 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
               </Col>
             </Row>
             <Row className={styles.rowSpace}>
-              <h1>Create content</h1>
-              <div>
-                <Link
-                  href={{
-                    pathname: "/createContentPage",
-                    query: { account: account },
-                  }}
-                >
-                  <Button variant="dark">Create a post</Button>
-                </Link>
-              </div>
-            </Row>
-            <Row className={styles.rowSpace}>
               <h1>Your purchased content</h1>
               <div>We will add this section soon</div>
             </Row>

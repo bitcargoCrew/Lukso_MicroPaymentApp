@@ -1,6 +1,7 @@
 import React from "react";
 import { Button, Container, Nav, Navbar } from "react-bootstrap";
 import Link from "next/link";
+import styles from "./NavBar.module.css"
 
 interface NavBarProps {
   account: string;
@@ -14,13 +15,23 @@ const NavBar: React.FC<NavBarProps> = ({ account }) => {
           <Navbar.Brand href="#home">Quill</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="me-auto">
-              <Nav.Link>
-              </Nav.Link>
-              <Nav.Link>
-              </Nav.Link>
-              <Nav.Link>
-              </Nav.Link>
+            <Nav className="me-auto justify-content-center">
+              <Link
+                href={{
+                  pathname: "/profile",
+                  query: { account: account },
+                }}
+              >
+                <div className={styles.navLink}>User Profile</div>
+              </Link>
+              <Link
+                href={{
+                  pathname: "/createContentPage",
+                  query: { account: account },
+                }}
+              >
+                <Button variant="light">Create Post</Button>
+              </Link>
             </Nav>
             <div className="justify-content-end">
               <Link

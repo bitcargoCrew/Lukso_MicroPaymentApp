@@ -4,26 +4,10 @@ import { Row, Col, Spinner, Card, Image, Button } from "react-bootstrap";
 import { useRouter } from "next/router";
 import ChangePagePayment from "@/components/ChangePagePayment";
 import CreatedBy from "./CreatedBy";
-
-
-interface ContentData {
-  id: string;
-  contentTitle: string;
-  contentMedia: string;
-  contentCreator: string;
-  contentCosts: number;
-  creatorMessage: string;
-  contentShortDescription: string;
-  contentLongDescription: string;
-  contentTags: string;
-  numberOfRead: number;
-  numberofLikes: number;
-  numberOfComments: number;
-  contentComments: string;
-}
+import ContentDataInterface from "./ContentDataInterface";
 
 const ContentList: React.FC = () => {
-  const [contentList, setContentList] = useState<ContentData[]>([]);
+  const [contentList, setContentList] = useState<ContentDataInterface[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [transactionInProgress, setTransactionInProgress] = useState(false);
@@ -35,10 +19,6 @@ const ContentList: React.FC = () => {
     const accountQuery = router.query.account;
     if (accountQuery && accountQuery !== account) {
       setAccount(accountQuery as string);
-    }
-
-    if (paid) {
-      router.push(`/contentPage?account=${account}&paid=true`);
     }
 
     const fetchContentData = async () => {
@@ -68,10 +48,12 @@ const ContentList: React.FC = () => {
     try {
       setTransactionInProgress(true);
       await ChangePagePayment.transactionModule(contentCreator, contentCosts);
-      setPaid(true)
-      setTransactionInProgress(false); // Reset transaction state
+      setPaid(true);
+      router.push(`/contentPage?account=${account}&paid=true&contentId=${contentId}`)
     } catch (error) {
       console.error("Payment failed:", error);
+      setError("Payment failed. Please try again.");
+    } finally {
       setTransactionInProgress(false);
     }
   };
@@ -88,7 +70,7 @@ const ContentList: React.FC = () => {
     <div>
       <Row>
         {contentList.map((content) => (
-          <Col key={content.id} xs={12} className="mb-4">
+          <Col key={content.contentId} xs={12} className="mb-4">
             <Card className="customCard">
               <Card.Body>
                 <Row>
@@ -116,10 +98,10 @@ const ContentList: React.FC = () => {
                     </Card.Text>
                       <Button
                       variant="dark"
-                      onClick={() => handlePayment(content.id, content.contentCreator, content.contentCosts)}
+                      onClick={() => handlePayment(content.contentId, content.contentCreator, content.contentCosts)}
                       disabled={transactionInProgress}
                     >
-                      {transactionInProgress ? "Processing..." : "Read More"}
+                      {transactionInProgress ? "Processing... Waiting for confirmation" : "Read More"}
                     </Button>
                   </Col>
                 </Row>

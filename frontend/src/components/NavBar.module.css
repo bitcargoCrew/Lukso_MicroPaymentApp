@@ -1,0 +1,13 @@
+/* NavBar.module.css */
+.navLink {
+    color: #fff;
+    margin-right: 20px;
+  }
+  
+  @media (max-width: 768px) {
+    .navLink {
+      margin-right: 0;
+      margin-bottom: 10px;
+    }
+  }
+  
