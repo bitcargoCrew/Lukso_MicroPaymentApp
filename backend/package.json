@@ -2,7 +2,7 @@
   "name": "backend_up_app",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "app/index.ts",
   "scripts": {
     "start": "dotenv -- ts-node-dev --respawn --exit-child --quiet app/index.ts",
     "build": "rm -rf build; npm run check && tsup app/index.ts --clean --sourcemap --format cjs --out-dir build",
