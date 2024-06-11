@@ -57,6 +57,7 @@ const CreatedBy: React.FC = () => {
                 rounded
                 alt="Profile"
                 onError={() => setImageError(true)}
+                className={styles.creatorImage}
               />
             )}
           </span>

@@ -8,3 +8,9 @@
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+.creatorImage {
+  width: 20px; /* Set the width */
+  height: 20px; /* Set the height */
+  margin-right: 5px; /* Adjust margin if necessary */
+}
