@@ -106,7 +106,7 @@ const ContentList: React.FC = () => {
                     <Card.Title className="cardTitleSpace">
                       {content.contentDetails.contentTitle}
                     </Card.Title>
-                    <CreatedBy />
+                    <CreatedBy contentCreator={content.contentDetails.contentCreator}/>
                     <Card.Text>
                       <strong>Costs:</strong>{" "}
                       {content.contentDetails.contentCosts} LYX

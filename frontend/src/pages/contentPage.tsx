@@ -70,7 +70,7 @@ const ContentPage: React.FC = () => {
     <div>
       <NavBar account={account}></NavBar>
       <RootLayout>
-        <div>
+        <div className={styles.containerContentPage}>
           <Row className={styles.rowSpace}>
             <h1>{contentData.contentDetails.creatorMessage}</h1>
           </Row>
@@ -87,7 +87,7 @@ const ContentPage: React.FC = () => {
             <h1>{contentData.contentDetails.contentTitle}</h1>
           </Row>
           <Row className={styles.rowSpace}>
-            <CreatedBy />
+            <CreatedBy contentCreator={contentData.contentDetails.contentCreator}/>
           </Row>
           <Row className={styles.rowSpace}>
             <div>{contentData.contentDetails.contentLongDescription}</div>

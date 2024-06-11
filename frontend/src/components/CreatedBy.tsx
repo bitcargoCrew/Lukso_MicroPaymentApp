@@ -1,35 +1,31 @@
+// CreatedBy.tsx
 import styles from "./CreatedBy.module.css";
 import React, { useEffect, useState, useCallback } from "react";
 import { Image, Spinner, Card } from "react-bootstrap";
 import { PersonBoundingBox } from "react-bootstrap-icons";
-import FetchProfileData from "./FetchProfileData";
-import { useRouter } from "next/router";
+import FetchCreatorData from "./FetchCreatorData";
 
-const CreatedBy: React.FC = () => {
+const CreatedBy: React.FC<{ contentCreator: string }> = ({ contentCreator }) => {
   const [imageError, setImageError] = useState(false);
   const [profileMetaData, setProfileMetaData] = useState<any>(null);
-  const [account, setAccount] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
 
-  useEffect(() => {
-    const accountQuery = router.query.account;
-    if (accountQuery && accountQuery !== account) {
-      setAccount(accountQuery as string);
-      setIsLoading(true); // Reset loading state when account changes
-    }
-  }, [router.query, account]);
-
-  const handleProfileData = useCallback((data: any) => {
+  const handleCreatorData = useCallback((data: any) => {
     setProfileMetaData(data);
     setIsLoading(false);
   }, []);
 
+  useEffect(() => {
+    if (contentCreator) {
+      setIsLoading(true);
+      setImageError(false);
+      FetchCreatorData({ contentCreator, onDataFetched: handleCreatorData });
+    }
+  }, [contentCreator, handleCreatorData]);
+
   const getProfileImageUrl = useCallback((profileMetaData: any) => {
     const ipfsHash =
-      profileMetaData?.value?.LSP3Profile?.profileImage?.[0]?.url.split(
-        "://"
-      )[1];
+      profileMetaData?.value?.LSP3Profile?.profileImage?.[0]?.url.split("://")[1];
     if (!ipfsHash) {
       setImageError(true);
       return "";
@@ -39,7 +35,6 @@ const CreatedBy: React.FC = () => {
 
   return (
     <div>
-      <FetchProfileData account={account} onDataFetched={handleProfileData} />
       {isLoading ? (
         <div className={styles.spinnerContainer}>
           <Spinner animation="border" role="status" />
