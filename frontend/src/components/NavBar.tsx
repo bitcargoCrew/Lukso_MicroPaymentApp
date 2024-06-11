@@ -16,14 +16,15 @@ const NavBar: React.FC<NavBarProps> = ({ account }) => {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto justify-content-center">
-              <Link
+              {/*               <Link
                 href={{
                   pathname: "/profile",
                   query: { account: account },
                 }}
               >
                 <div className={styles.navLink}>User Profile</div>
-              </Link>
+              </Link> */}
+
               <Link
                 href={{
                   pathname: "/createContentPage",
