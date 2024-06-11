@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import NavBar from "../components/NavBar";
 import CreatedBy from "@/components/CreatedBy";
 import ContentDataInterface from "@/components/ContentDataInterface";
+import config from "../../config";
 
 const ContentPage: React.FC = () => {
   const [account, setAccount] = useState("");
@@ -25,7 +26,7 @@ const ContentPage: React.FC = () => {
       if (contentId) {
         try {
           const response = await fetch(
-            `http://localhost:3001/content/${contentId}`
+            `${config.apiUrl}/content/${contentId}`
           );
           if (response.ok) {
             const data = await response.json();
@@ -71,7 +72,7 @@ const ContentPage: React.FC = () => {
       <RootLayout>
         <div>
           <Row className={styles.rowSpace}>
-            <h1>{contentData.creatorMessage}</h1>
+            <h1>{contentData.contentDetails.creatorMessage}</h1>
           </Row>
           <Row className={styles.rowSpace}>
             <div className={styles.imageContainer}>
@@ -83,13 +84,13 @@ const ContentPage: React.FC = () => {
             </div>
           </Row>
           <Row className={styles.rowSpace}>
-            <h1>{contentData.contentTitle}</h1>
+            <h1>{contentData.contentDetails.contentTitle}</h1>
           </Row>
           <Row className={styles.rowSpace}>
             <CreatedBy />
           </Row>
           <Row className={styles.rowSpace}>
-            <div>{contentData.contentLongDescription}</div>
+            <div>{contentData.contentDetails.contentLongDescription}</div>
           </Row>
         </div>
       </RootLayout>

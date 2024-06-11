@@ -29,6 +29,7 @@ app.post('/postContent', async (req: Request, res: Response) => {
   try {
     const contentData = req.body;
     const uniqueContentId = uuidv4()
+    contentData.contentId = uniqueContentId; // Assign uniqueContentId to contentId in contentData
     const contentRef = await db.collection('content').doc(uniqueContentId).set(contentData);
     res.status(201).json({ id: contentRef.id });
   } catch (error) {

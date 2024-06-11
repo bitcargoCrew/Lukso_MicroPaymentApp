@@ -7,7 +7,6 @@ import { useRouter } from "next/router";
 import FetchProfileData from "../components/FetchProfileData";
 import RootLayout from "../app/layout";
 import NavBar from "../components/NavBar";
-import Link from "next/link";
 import ContentList from "@/components/ContentList";
 
 interface ProfileViewProps {}

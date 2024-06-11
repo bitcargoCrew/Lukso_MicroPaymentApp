@@ -1,20 +1,11 @@
 import styles from "./createContentPage.module.css";
-import {
-  Button,
-  Col,
-  Container,
-  Row,
-  Image,
-  Card,
-  Form,
-  InputGroup,
-} from "react-bootstrap";
+import { Button, Form, InputGroup} from "react-bootstrap";
 import React, { useEffect, useState } from "react";
 import RootLayout from "../app/layout";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import NavBar from "../components/NavBar";
 import ContentDataInterface from "@/components/ContentDataInterface";
+import config from "../../config";
 
 const CreateContentPage: React.FC = () => {
   const router = useRouter();
@@ -29,30 +20,35 @@ const CreateContentPage: React.FC = () => {
 
   const [formData, setFormData] = useState<ContentDataInterface>({
     contentId: "",
-    contentCreator: "",
-    contentCosts: 0,
-    creatorMessage: "",
-    contentTitle: "",
-    contentMedia: null,
-    contentShortDescription: "",
-    contentLongDescription: "",
-    contentTags: "",
-    numberOfRead: 0,
-    numberofLikes: 0,
-    numberOfComments: 0,
-    contentComments: ""
+    contentDetails: {
+      contentTitle: "",
+      contentMedia: null,
+      contentCreator: "",
+      contentCosts: 0,
+      creatorMessage: "",
+      contentShortDescription: "",
+      contentLongDescription: "",
+      contentTags: [""],
+      numberOfRead: 0,
+      numberOfLikes: 0,
+      numberOfComments: 0,
+      contentComments: [""],
+    }
   });
 
   const handleChange = (
     e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLInputElement
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
-      contentCreator: account,
-      [name]: value,
+      contentDetails: {
+        ...prevState.contentDetails,
+        contentCreator: account,
+        [name]: value,
+      },
     }));
   };
 
@@ -61,16 +57,20 @@ const CreateContentPage: React.FC = () => {
     if (files && files.length > 0) {
       setFormData((prevState: ContentDataInterface) => ({
         ...prevState,
-        contentMedia: files[0],
+        contentDetails: {
+          ...prevState.contentDetails,
+          contentMedia: files[0],
+        }
       }));
     }
   };
+  
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:3001/postContent", {
+      const response = await fetch(`${config.apiUrl}/postContent`, {
         method: "POST",
         body: JSON.stringify(formData),
         headers: {
@@ -122,7 +122,7 @@ const CreateContentPage: React.FC = () => {
               <Form.Control
                 type="number"
                 name="contentCosts"
-                value={formData.contentCosts}
+                value={formData.contentDetails.contentCosts}
                 onChange={handleChange}
                 placeholder="Enter the amount of LYX costs for the content"
                 aria-label="contentCosts"
@@ -139,7 +139,7 @@ const CreateContentPage: React.FC = () => {
                 as="textarea"
                 type="text"
                 name="creatorMessage"
-                value={formData.creatorMessage}
+                value={formData.contentDetails.creatorMessage}
                 onChange={handleChange}
                 placeholder="Enter a personalized message for your readers"
                 aria-label="creatorMessage"
@@ -153,7 +153,7 @@ const CreateContentPage: React.FC = () => {
               <Form.Control
                 type="text"
                 name="contentTitle"
-                value={formData.contentTitle}
+                value={formData.contentDetails.contentTitle}
                 onChange={handleChange}
                 placeholder="Enter a post title"
                 aria-label="contentTitle"
@@ -181,7 +181,7 @@ const CreateContentPage: React.FC = () => {
                 as="textarea"
                 type="text"
                 name="contentShortDescription"
-                value={formData.contentShortDescription}
+                value={formData.contentDetails.contentShortDescription}
                 onChange={handleChange}
                 placeholder="Enter a short description for your post"
                 aria-label="contentShortDescription"
@@ -196,7 +196,7 @@ const CreateContentPage: React.FC = () => {
                 as="textarea"
                 type="text"
                 name="contentLongDescription"
-                value={formData.contentLongDescription}
+                value={formData.contentDetails.contentLongDescription}
                 onChange={handleChange}
                 placeholder="Enter the post content"
                 aria-label="contentLongDescription"
@@ -210,7 +210,7 @@ const CreateContentPage: React.FC = () => {
               <Form.Control
                 type="text"
                 name="contentTags"
-                value={formData.contentTags}
+                value={formData.contentDetails.contentTags}
                 onChange={handleChange}
                 placeholder="Enter tags for your content"
                 aria-label="contentTags"

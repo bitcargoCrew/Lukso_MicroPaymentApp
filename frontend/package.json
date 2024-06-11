@@ -2,6 +2,7 @@
   "name": "lukso_up",
   "version": "0.1.0",
   "private": true,
+  "author": "Sandro Ruettimann",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

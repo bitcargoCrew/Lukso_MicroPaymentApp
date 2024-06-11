@@ -11,4 +11,7 @@ npm run dev
 
 Backend:
 
-Not used atm, I used it only for testing.
+cd backend
+npm install
+npm run start
+
