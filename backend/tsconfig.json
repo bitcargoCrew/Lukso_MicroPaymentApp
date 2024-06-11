@@ -2,12 +2,13 @@
     "compilerOptions": {
       "target": "ES6",
       "module": "commonjs",
-      "outDir": "./app",
+      "outDir": "./build",
       "rootDir": "./app",
       "strict": true,
       "esModuleInterop": true,
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true
     },
-    "include": ["app"]
+    "include": ["app/**/*.ts"],
+    "exclude": ["node_modules", "build"]
 }  
