@@ -11,7 +11,7 @@
     "start-db": "",
     "deploy-db": ""
   },
-  "author": "",
+  "author": "Sandro Ruettimann",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",

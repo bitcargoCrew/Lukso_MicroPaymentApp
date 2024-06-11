@@ -1,9 +1,18 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { v4 as uuidv4 } from 'uuid';
+import fs from 'fs';
+import path from 'path';
+
 const { initializeApp, applicationDefault, cert } = require('firebase-admin/app');
 const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
-const serviceAccount = require('../serviceAccountKey.json');
+
+// Determine the path to the service account key file
+const isRender = process.env.RENDER || false;
+const serviceAccountPath = isRender ? '/etc/secrets/serviceAccountKey.json' : path.resolve(__dirname, 'serviceAccountKey.json');
+
+// Read the service account key file
+const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
 
 const app = express();
 app.use(express.json());
