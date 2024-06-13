@@ -15,14 +15,6 @@
   object-fit: cover;
 }
 
-.containerContentPage {
-  min-height: 100vh;
-}
-
-.containerErrorPage {
-  min-height: 100vh;
-}
-
 .spinnerContainer {
   position: fixed;
   top: 50%;
