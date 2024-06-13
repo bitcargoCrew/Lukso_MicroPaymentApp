@@ -3,9 +3,21 @@ import cors from 'cors';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import path from 'path';
+import multer, { Multer } from 'multer';
 
-const { initializeApp, applicationDefault, cert } = require('firebase-admin/app');
-const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
+const { initializeApp, cert } = require('firebase-admin/app');
+const { getFirestore } = require('firebase-admin/firestore');
+const { getStorage } = require('firebase-admin/storage');
+
+// Extend the Request interface to include file properties for multer
+declare global {
+  namespace Express {
+    interface Request {
+      file?: Express.Multer.File; // Ensure this matches the type from multer
+      files?: { [fieldname: string]: Express.Multer.File[] } | Express.Multer.File[] | undefined;
+    }
+  }
+}
 
 // Determine the path to the service account key file
 const isRender = process.env.RENDER || false;
@@ -18,47 +30,82 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Initialize Firestore (make sure to set your Firebase credentials correctly)
+// Initialize Firebase
 initializeApp({
-  credential: cert(serviceAccount)
+  credential: cert(serviceAccount),
+  storageBucket: 'gs://contentplatform-d4755.appspot.com'
 });
 const db = getFirestore();
+const storage = getStorage();
+const bucket = storage.bucket();
 
-// Endpoint to post new content
-app.post('/postContent', async (req: Request, res: Response) => {
+// Configure multer for file uploads
+const upload: Multer = multer({
+  storage: multer.memoryStorage(), // Store files in memory temporarily
+  limits: { fileSize: 20 * 1024 * 1024 } // Limit file size to 20MB
+});
+
+// Endpoint to post new content with an image
+app.post('/postContent', upload.single('contentMedia'), async (req: Request, res: Response) => {
   try {
     const contentData = req.body;
-    const uniqueContentId = uuidv4()
+    const uniqueContentId = uuidv4();
     contentData.contentId = uniqueContentId; // Assign uniqueContentId to contentId in contentData
-    const contentRef = await db.collection('content').doc(uniqueContentId).set(contentData);
-    res.status(201).json({ id: contentRef.id });
+
+    if (req.file) {
+      const blob = bucket.file(`images/${uniqueContentId}`);
+      const blobStream = blob.createWriteStream({
+        metadata: {
+          contentType: req.file.mimetype,
+        },
+        gzip: true // Enable compression if needed
+      });
+
+      blobStream.on('error', (error: Error) => {
+        console.error('Blob stream error:', error);
+        res.status(500).json({ error: 'Failed to upload image' });
+      });
+
+      blobStream.on('finish', async () => {
+        await db.collection('content').doc(uniqueContentId).set(contentData);
+        res.status(201).json({ id: uniqueContentId});
+      });
+
+      blobStream.end(req.file.buffer);
+    } else {
+      await db.collection('content').doc(uniqueContentId).set(contentData);
+      res.status(201).json({ id: uniqueContentId });
+    }
   } catch (error) {
-    console.error("Error adding document:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error('Error adding document:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Endpoint to get all content
+// Endpoint to get all content with picture URL
 app.get('/allContent', async (req: Request, res: Response) => {
   try {
     const contentRef = db.collection('content');
     const snapshot = await contentRef.get();
-    console.log(snapshot)
 
     if (snapshot.empty) {
-      return res.status(404).json({ error: "No content found" });
+      return res.status(404).json({ error: 'No content found' });
     }
 
-    const contentList: { id: string, [key: string]: any }[] = [];
-    snapshot.forEach((doc: any) => {
-      console.log(doc.id, '=>', doc.data());
-      contentList.push({ id: doc.id, ...doc.data() });
-    });
+    const contentList: { id: string; [key: string]: any }[] = [];
+    await Promise.all(snapshot.docs.map(async (doc: any) => {
+      const contentData = doc.data();
+        // Construct the storage path and get signed URL
+      const file = bucket.file(`images/${contentData.contentId}`); 
+      const [url] = await file.getSignedUrl({ action: 'read', expires: '01-01-2500' });
+      contentData.contentMedia = url;
+      contentList.push({ id: contentData.contentId, ...contentData });
+    }));
 
     res.status(200).json(contentList);
   } catch (error) {
-    console.error("Error fetching content:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error('Error fetching content:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -75,12 +122,16 @@ app.get('/content/:id', async (req: Request, res: Response) => {
     }
 
     const contentData = doc.data();
+    const file = bucket.file(`images/${contentData.contentId}`); 
+    const [url] = await file.getSignedUrl({ action: 'read', expires: '01-01-2500' });
+    contentData.contentMedia = url;
     res.status(200).json(contentData);
   } catch (error) {
     console.error("Error fetching document:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 // Start the server
 const PORT = process.env.PORT || 3001;

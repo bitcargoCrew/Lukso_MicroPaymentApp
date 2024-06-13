@@ -1,5 +1,5 @@
 import styles from "./createContentPage.module.css";
-import { Button, Form, InputGroup} from "react-bootstrap";
+import { Button, Form, InputGroup } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
 import RootLayout from "../app/layout";
 import { useRouter } from "next/router";
@@ -9,31 +9,29 @@ import config from "../../config";
 
 const CreateContentPage: React.FC = () => {
   const router = useRouter();
-  const [account, setAccount] = useState("");
+  const [account, setAccount] = useState<string>("");
 
   useEffect(() => {
-    const accountQuery = router.query.account;
+    const accountQuery = router.query.account as string;
     if (accountQuery && accountQuery !== account) {
-      setAccount(accountQuery as string);
+      setAccount(accountQuery);
     }
-  }, [router.query, account]);
+  }, [router.query.account, account]);
 
   const [formData, setFormData] = useState<ContentDataInterface>({
     contentId: "",
-    contentDetails: {
-      contentTitle: "",
-      contentMedia: null,
-      contentCreator: "",
-      contentCosts: 0,
-      creatorMessage: "",
-      contentShortDescription: "",
-      contentLongDescription: "",
-      contentTags: [""],
-      numberOfRead: 0,
-      numberOfLikes: 0,
-      numberOfComments: 0,
-      contentComments: [""],
-    }
+    contentTitle: "",
+    contentMedia: null,
+    contentCreator: account,
+    contentCosts: 0,
+    creatorMessage: "",
+    contentShortDescription: "",
+    contentLongDescription: "",
+    contentTags: [""],
+    numberOfRead: 0,
+    numberOfLikes: 0,
+    numberOfComments: 0,
+    contentComments: [""],
   });
 
   const handleChange = (
@@ -42,45 +40,72 @@ const CreateContentPage: React.FC = () => {
     >
   ) => {
     const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      contentDetails: {
-        ...prevState.contentDetails,
+    if (name === "contentTags") {
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: value.split(","),
+      }));
+    } else {
+      setFormData((prevState) => ({
+        ...prevState,
         contentCreator: account,
         [name]: value,
-      },
-    }));
+      }));
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      setFormData((prevState: ContentDataInterface) => ({
+      setFormData((prevState) => ({
         ...prevState,
-        contentDetails: {
-          ...prevState.contentDetails,
-          contentMedia: files[0],
-        }
+        contentMedia: files[0],
       }));
     }
   };
-  
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const formDataToSend = new FormData();
+    formDataToSend.append("contentId", formData.contentId);
+    formDataToSend.append("contentTitle", formData.contentTitle);
+    formDataToSend.append("contentCreator", formData.contentCreator);
+    formDataToSend.append("contentCosts", String(formData.contentCosts));
+    formDataToSend.append("creatorMessage", formData.creatorMessage);
+    formDataToSend.append(
+      "contentShortDescription",
+      formData.contentShortDescription
+    );
+    formDataToSend.append(
+      "contentLongDescription",
+      formData.contentLongDescription
+    );
+    formDataToSend.append("contentTags", formData.contentTags.join(","));
+    formDataToSend.append("numberOfRead", String(formData.numberOfRead));
+    formDataToSend.append("numberOfLikes", String(formData.numberOfLikes));
+    formDataToSend.append(
+      "numberOfComments",
+      String(formData.numberOfComments)
+    );
+    formDataToSend.append(
+      "contentComments",
+      formData.contentComments.join(",")
+    );
+
+    if (formData.contentMedia) {
+      formDataToSend.append("contentMedia", formData.contentMedia);
+    }
+
     try {
       const response = await fetch(`${config.apiUrl}/postContent`, {
         method: "POST",
-        body: JSON.stringify(formData),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        body: formDataToSend,
       });
 
       if (response.ok) {
-        await response.json();
-        console.log("Form submitted successfully!");
+        const result = await response.json();
+        console.log("Form submitted successfully!", result);
         // Redirect to profile page after successful form submission
         router.push({
           pathname: "/profile",
@@ -96,9 +121,9 @@ const CreateContentPage: React.FC = () => {
 
   return (
     <div>
-      <NavBar account={account}></NavBar>
+      <NavBar account={account} />
       <RootLayout>
-        <div className={styles.containerHeight}>
+        <div>
           <h1 className={styles.rowSpace}>Create your post</h1>
           <Form onSubmit={handleSubmit}>
             <InputGroup className="mb-3">
@@ -122,7 +147,7 @@ const CreateContentPage: React.FC = () => {
               <Form.Control
                 type="number"
                 name="contentCosts"
-                value={formData.contentDetails.contentCosts}
+                value={formData.contentCosts}
                 onChange={handleChange}
                 placeholder="Enter the amount of LYX costs for the content"
                 aria-label="contentCosts"
@@ -139,10 +164,23 @@ const CreateContentPage: React.FC = () => {
                 as="textarea"
                 type="text"
                 name="creatorMessage"
-                value={formData.contentDetails.creatorMessage}
+                value={formData.creatorMessage}
                 onChange={handleChange}
                 placeholder="Enter a personalized message for your readers"
                 aria-label="creatorMessage"
+                aria-describedby="basic-addon1"
+                required
+              />
+            </InputGroup>
+
+            <InputGroup className="mb-3">
+              <InputGroup.Text id="basic-addon1">Post Picture</InputGroup.Text>
+              <Form.Control
+                type="file"
+                name="contentMedia"
+                onChange={handleFileChange}
+                placeholder="Add an image"
+                aria-label="contentMedia"
                 aria-describedby="basic-addon1"
                 required
               />
@@ -153,23 +191,12 @@ const CreateContentPage: React.FC = () => {
               <Form.Control
                 type="text"
                 name="contentTitle"
-                value={formData.contentDetails.contentTitle}
+                value={formData.contentTitle}
                 onChange={handleChange}
                 placeholder="Enter a post title"
                 aria-label="contentTitle"
                 aria-describedby="basic-addon1"
                 required
-              />
-            </InputGroup>
-
-            <InputGroup className="mb-3">
-              <Form.Control
-                type="file"
-                name="contentMedia"
-                onChange={handleFileChange}
-                placeholder="Add an image"
-                aria-label="contentMedia"
-                aria-describedby="basic-addon1"
               />
             </InputGroup>
 
@@ -181,7 +208,7 @@ const CreateContentPage: React.FC = () => {
                 as="textarea"
                 type="text"
                 name="contentShortDescription"
-                value={formData.contentDetails.contentShortDescription}
+                value={formData.contentShortDescription}
                 onChange={handleChange}
                 placeholder="Enter a short description for your post"
                 aria-label="contentShortDescription"
@@ -196,7 +223,7 @@ const CreateContentPage: React.FC = () => {
                 as="textarea"
                 type="text"
                 name="contentLongDescription"
-                value={formData.contentDetails.contentLongDescription}
+                value={formData.contentLongDescription}
                 onChange={handleChange}
                 placeholder="Enter the post content"
                 aria-label="contentLongDescription"
@@ -210,7 +237,7 @@ const CreateContentPage: React.FC = () => {
               <Form.Control
                 type="text"
                 name="contentTags"
-                value={formData.contentDetails.contentTags}
+                value={formData.contentTags.join(",")}
                 onChange={handleChange}
                 placeholder="Enter tags for your content"
                 aria-label="contentTags"
@@ -218,6 +245,7 @@ const CreateContentPage: React.FC = () => {
                 required
               />
             </InputGroup>
+
             <Button variant="dark" type="submit">
               Submit
             </Button>

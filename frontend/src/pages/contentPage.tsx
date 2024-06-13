@@ -10,7 +10,9 @@ import config from "../../config";
 
 const ContentPage: React.FC = () => {
   const [account, setAccount] = useState("");
-  const [contentData, setContentData] = useState<ContentDataInterface | null>(null);
+  const [contentData, setContentData] = useState<ContentDataInterface | null>(
+    null
+  );
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { query } = router;
@@ -25,11 +27,10 @@ const ContentPage: React.FC = () => {
     const fetchContentData = async () => {
       if (contentId) {
         try {
-          const response = await fetch(
-            `${config.apiUrl}/content/${contentId}`
-          );
+          const response = await fetch(`${config.apiUrl}/content/${contentId}`);
           if (response.ok) {
             const data = await response.json();
+            console.log("Fetched data:", data); // Log the fetched data
             setContentData(data);
           } else {
             setError(`Failed to fetch content data: ${response.statusText}`);
@@ -50,7 +51,7 @@ const ContentPage: React.FC = () => {
   if (!paid || paid !== "true") {
     return (
       <RootLayout>
-        <div className={styles.containerErrorPage}>
+        <div>
           <h1>You are not authorized to view this page.</h1>
           <h1>Please make a payment to access this page.</h1>
         </div>
@@ -70,27 +71,34 @@ const ContentPage: React.FC = () => {
     <div>
       <NavBar account={account}></NavBar>
       <RootLayout>
-        <div className={styles.containerContentPage}>
+        <div>
           <Row className={styles.rowSpace}>
-            <h1>{contentData.contentDetails.creatorMessage}</h1>
+            <h1>{contentData.creatorMessage}</h1>
           </Row>
           <Row className={styles.rowSpace}>
             <div className={styles.imageContainer}>
               <Image
-                src={"/quote_image.jpg"}
-                alt="Content Image"
+                src={
+                  typeof contentData.contentMedia === "string"
+                    ? contentData.contentMedia
+                    : contentData.contentMedia instanceof File
+                    ? URL.createObjectURL(contentData.contentMedia)
+                    : undefined
+                }
+                alt="Creator Quote Image"
+                fluid
                 className={styles.contentImage}
               />
             </div>
           </Row>
           <Row className={styles.rowSpace}>
-            <h1>{contentData.contentDetails.contentTitle}</h1>
+            <h1>{contentData.contentTitle}</h1>
           </Row>
           <Row className={styles.rowSpace}>
-            <CreatedBy contentCreator={contentData.contentDetails.contentCreator}/>
+            <CreatedBy contentCreator={contentData.contentCreator} />
           </Row>
           <Row className={styles.rowSpace}>
-            <div>{contentData.contentDetails.contentLongDescription}</div>
+            <div>{contentData.contentLongDescription}</div>
           </Row>
         </div>
       </RootLayout>
