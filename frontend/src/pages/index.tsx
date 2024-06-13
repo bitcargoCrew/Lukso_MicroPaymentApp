@@ -125,7 +125,14 @@ const Home: React.FC<HomeProps> = () => {
           </Col>
         </Row>
         <Row>
-          <h3>Interested? Create your Universal Profile (Digital Identity) here: https://universalprofile.cloud/</h3>
+          <div className={styles.centeredText}>
+            <strong>
+              Interested? Create your Universal Profile (Digital Identity) here:{" "}
+              <a href="https://universalprofile.cloud/">
+                https://universalprofile.cloud/
+              </a>
+            </strong>
+          </div>
         </Row>
       </RootLayout>
       <div className={styles.backgroundContainer}>
