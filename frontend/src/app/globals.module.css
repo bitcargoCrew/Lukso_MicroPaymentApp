@@ -1,12 +1,13 @@
 .background {
   display: flex;
   flex-direction: column;
-  background-color: #FFEBEE; /* Your desired background color */
+  background-color: #ffebee; /* Your desired background color */
+  min-height: 100vh;
 }
 
 .mainContainer {
-    padding: 5%;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+  padding: 5%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }

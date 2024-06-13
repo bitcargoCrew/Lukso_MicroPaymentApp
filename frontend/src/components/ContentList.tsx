@@ -15,6 +15,7 @@ const ContentList: React.FC = () => {
   const [paid, setPaid] = useState(false);
   const [account, setAccount] = useState("");
   const [selectedContent, setSelectedContent] = useState<string | null>(null); // State to track selected content
+  const [contentMedia, setContentMedia] = useState<File | undefined>(undefined);
   const router = useRouter();
 
   useEffect(() => {
@@ -28,6 +29,7 @@ const ContentList: React.FC = () => {
         const response = await fetch(`${config.apiUrl}/allContent`);
         if (response.ok) {
           const data = await response.json();
+          console.log("Fetched data:", data); // Log the fetched data
           setContentList(data);
         } else {
           setError(`Failed to fetch content data: ${response.statusText}`);
@@ -48,9 +50,9 @@ const ContentList: React.FC = () => {
 
   const handlePayment = async (
     contentId: string,
-    contentDetails: { contentCreator: string; contentCosts: number }
+    contentCreator: string,
+    contentCosts: number
   ) => {
-    const { contentCreator, contentCosts } = contentDetails;
     try {
       setTransactionInProgress(true);
       await ChangePagePayment.transactionModule(contentCreator, contentCosts);
@@ -70,11 +72,19 @@ const ContentList: React.FC = () => {
 
   const handleButtonClick = (contentId: string) => {
     setSelectedContent(contentId); // Update selected content
-    handlePayment(
-      contentId,
-      contentList.find((content) => content.contentId === contentId)
-        ?.contentDetails || { contentCreator: "", contentCosts: 0 }
+    const selectedContent = contentList.find(
+      (content) => content.contentId === contentId
     );
+
+    if (selectedContent) {
+      handlePayment(
+        contentId,
+        selectedContent.contentCreator,
+        selectedContent.contentCosts
+      );
+    } else {
+      setError("Content details not found for the selected content.");
+    }
   };
 
   if (loading) {
@@ -93,10 +103,15 @@ const ContentList: React.FC = () => {
             <Card className="customCard">
               <Card.Body>
                 <Row>
-                  <Col xs={4}>
+                  <Col xs={4} className={styles.customCol}>
                     <Image
-                      //src={content.contentDetails.contentMedia}
-                      src="/quote_image.jpg"
+                      src={
+                        typeof content.contentMedia === "string"
+                          ? content.contentMedia
+                          : content.contentMedia instanceof File
+                          ? URL.createObjectURL(content.contentMedia)
+                          : undefined
+                      }
                       alt="Creator Quote Image"
                       fluid
                       className={styles.contentImage}
@@ -104,21 +119,23 @@ const ContentList: React.FC = () => {
                   </Col>
                   <Col xs={8}>
                     <Card.Title className="cardTitleSpace">
-                      {content.contentDetails.contentTitle}
+                      {content.contentTitle ?? "No Title Available"}
                     </Card.Title>
-                    <CreatedBy contentCreator={content.contentDetails.contentCreator}/>
-                    <Card.Text>
-                      <strong>Costs:</strong>{" "}
-                      {content.contentDetails.contentCosts} LYX
-                    </Card.Text>
-                    <Card.Text>
-                      <strong>Short Description:</strong>{" "}
-                      {content.contentDetails.contentShortDescription}
-                    </Card.Text>
-                    <Card.Text>
-                      <strong>Tags:</strong>{" "}
-                      {content.contentDetails.contentTags}
-                    </Card.Text>
+                    {content && (
+                      <>
+                        <CreatedBy contentCreator={content.contentCreator} />
+                        <Card.Text>
+                          <strong>Costs:</strong> {content.contentCosts} LYX
+                        </Card.Text>
+                        <Card.Text>
+                          <strong>Short Description:</strong>{" "}
+                          {content.contentShortDescription}
+                        </Card.Text>
+                        <Card.Text>
+                          <strong>Tags:</strong> {content.contentTags}
+                        </Card.Text>
+                      </>
+                    )}
                     <Button
                       variant="dark"
                       onClick={() => handleButtonClick(content.contentId)}
