@@ -2,6 +2,11 @@
   padding-bottom: 2%;
 }
 
+.rowSpaceLike {
+  padding-bottom: 2%;
+  padding-top: 1%;
+}
+
 .imageContainer {
   position: relative;
   width: 100%;
@@ -20,6 +25,39 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.heartButton {
+  width: 2em; /* Adjust width and height as needed */
+  height: 2em; /* Ensure equal width and height for square shape */
+  padding: 0; /* Adjust padding for spacing around the icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%; /* Make the button round */
+  background: none; /* No background to avoid any black screen issue */
+}
+
+/* Optional: Ensure button inside heartButton fills the container */
+.heartButton button {
+  width: 100%;
+  height: 100%;
+  padding: 5px; /* Add padding for spacing around the icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #6c757d; /* Dark outline */
+}
+
+/* Ensure heart icon inherits text color and is centered */
+.heartIcon {
+  fill: none; /* Ensures the heart icon is not filled initially */
+  stroke: currentColor; /* Sets the stroke to current color (dark by default) */
+}
+
+.heartIcon.liked {
+  fill: white; /* Changes the heart icon fill to red when liked */
+  stroke: white; /* Sets the stroke to red */
 }
 
 @media screen and (max-width: 4000px) {

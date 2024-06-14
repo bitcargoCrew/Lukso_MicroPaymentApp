@@ -7,6 +7,9 @@ import NavBar from "../components/NavBar";
 import CreatedBy from "@/components/CreatedBy";
 import ContentDataInterface from "@/components/ContentDataInterface";
 import config from "../../config";
+import Link from "next/link";
+import { Heart } from "react-bootstrap-icons";
+import LikePayment from "../components/LikePayment"
 
 const ContentPage: React.FC = () => {
   const [account, setAccount] = useState("");
@@ -14,6 +17,9 @@ const ContentPage: React.FC = () => {
     null
   );
   const [error, setError] = useState<string | null>(null);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isLikeButtonDisabled, setIsLikeButtonDisabled] = useState(false);
+  const [transactionInProgress, setTransactionInProgress] = useState(false);
   const router = useRouter();
   const { query } = router;
   const { paid, contentId } = query;
@@ -47,6 +53,37 @@ const ContentPage: React.FC = () => {
 
     fetchContentData();
   }, [router.query, account, contentId]);
+
+  const handleLike = async () => {
+    if (isLikeButtonDisabled || !contentData) return;
+    setIsLikeButtonDisabled(true); // Disable the button
+    try {
+        const likeCost = 0.001
+        console.log(contentData.contentCreator)
+        await LikePayment.transactionModule(contentData.contentCreator, likeCost);
+        const updatedNumberOfLikes = (contentData.numberOfLikes || 0) + 1;
+        setContentData({ ...contentData, numberOfLikes: updatedNumberOfLikes });
+        
+        // Send the updated numberOfLikes to backend
+        const response = await fetch(`${config.apiUrl}/content/${contentId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+            body: JSON.stringify({ numberOfLikes: updatedNumberOfLikes }),
+          });
+        
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+      setIsLiked(true); // Optional: Update local state to indicate that the content is liked
+    } catch (error) {
+      console.error("Error updating like:", error);
+      setError("Failed to update like. Please try again.");
+    } finally {
+      setTimeout(() => setIsLikeButtonDisabled(false), 100000); // Re-enable after 10 seconds
+    }
+  };
 
   if (!paid || paid !== "true") {
     return (
@@ -98,10 +135,41 @@ const ContentPage: React.FC = () => {
             <CreatedBy contentCreator={contentData.contentCreator} />
           </Row>
           <Row className={styles.rowSpace}>
-          <div><strong>Number of Reads:</strong> {contentData.numberOfRead}</div>
+            <div>
+              <strong>Number of Reads:</strong> {contentData.numberOfRead}
+            </div>
           </Row>
           <Row className={styles.rowSpace}>
             <div>{contentData.contentLongDescription}</div>
+          </Row>
+          <Row className={styles.rowSpace}>
+            <div>
+              <div className={styles.heartButton}>
+                <Button
+                  variant={isLiked ? "dark" : "outline-dark"}
+                  className={`text-dark ${styles.heartButton}`}
+                  onClick={handleLike}
+                  disabled={isLikeButtonDisabled}
+                >
+                  <Heart
+                    size={16}
+                    className={`${styles.heartIcon} ${
+                      isLiked ? styles.liked : ""
+                    }`}
+                  />
+                </Button>
+              </div>
+            </div>
+          </Row>
+          <Row style={{ paddingTop: "20px" }}>
+            <Link
+              href={{
+                pathname: "/profile",
+                query: { account: account },
+              }}
+            >
+              <Button variant="dark">Back</Button>
+            </Link>
           </Row>
         </div>
       </RootLayout>
