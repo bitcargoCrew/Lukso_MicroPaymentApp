@@ -15,7 +15,6 @@ const ContentList: React.FC = () => {
   const [paid, setPaid] = useState(false);
   const [account, setAccount] = useState("");
   const [selectedContent, setSelectedContent] = useState<string | null>(null); // State to track selected content
-  const [contentMedia, setContentMedia] = useState<File | undefined>(undefined);
   const router = useRouter();
 
   useEffect(() => {
@@ -58,10 +57,32 @@ const ContentList: React.FC = () => {
       await ChangePagePayment.transactionModule(contentCreator, contentCosts);
       setPaid(true);
       console.log(contentId);
-      router.push({
-        pathname: "/contentPage",
-        query: { account, paid: true, contentId },
-      });
+
+      // Fetch the current content data to get numberOfRead
+      const response = await fetch(`${config.apiUrl}/content/${contentId}`);
+      if (response.ok) {
+        const data = await response.json();
+
+        // Increment the numberOfRead
+        data.numberOfRead = (data.numberOfRead || 0) + 1;
+
+        // Send the update to the server
+        await fetch(`${config.apiUrl}/content/${contentId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ numberOfRead: data.numberOfRead }),
+        });
+
+        // Redirect to the content page
+        router.push({
+          pathname: "/contentPage",
+          query: { account, paid: "true", contentId },
+        });
+      } else {
+        setError(`Failed to fetch content data: ${response.statusText}`);
+      }
     } catch (error) {
       console.error("Payment failed:", error);
       setError("Payment failed. Please try again.");

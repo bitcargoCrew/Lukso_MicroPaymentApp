@@ -94,8 +94,11 @@ const ContentPage: React.FC = () => {
           <Row className={styles.rowSpace}>
             <h1>{contentData.contentTitle}</h1>
           </Row>
-          <Row className={styles.rowSpace}>
+          <Row>
             <CreatedBy contentCreator={contentData.contentCreator} />
+          </Row>
+          <Row className={styles.rowSpace}>
+          <div><strong>Number of Reads:</strong> {contentData.numberOfRead}</div>
           </Row>
           <Row className={styles.rowSpace}>
             <div>{contentData.contentLongDescription}</div>
