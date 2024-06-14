@@ -1,13 +1,29 @@
 /* NavBar.module.css */
 .navLink {
     color: #fff;
-    margin-right: 20px;
+    cursor: pointer;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 30px;
+    padding-right: 40px;
+    text-decoration: none; /* Remove underline */
+  }
+
+  .centeredButton {
+    margin-top: 4px; /* Adjust margin as needed */
   }
   
-  @media (max-width: 768px) {
+  @media (max-width: 1000px) {
     .navLink {
-      margin-right: 0;
-      margin-bottom: 10px;
+      color: #fff;
+      cursor: pointer;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      padding-left: 0px;
+      padding-right: 40px;
+    }
+    .centeredButton {
+      margin-top: 0px; /* Adjust margin as needed */
+      margin-bottom: 8px; /* Adjust margin as needed */
     }
   }
-  
