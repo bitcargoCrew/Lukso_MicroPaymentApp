@@ -14,7 +14,7 @@ const ContentList: React.FC = () => {
   const [transactionInProgress, setTransactionInProgress] = useState(false);
   const [paid, setPaid] = useState(false);
   const [account, setAccount] = useState("");
-  const [selectedContent, setSelectedContent] = useState<string | null>(null); // State to track selected content
+  const [selectedContent, setSelectedContent] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -50,30 +50,26 @@ const ContentList: React.FC = () => {
   const handlePayment = async (
     contentId: string,
     contentCreator: string,
-    contentCosts: number
+    contentCosts: number,
+    numberOfRead: number
   ) => {
     try {
       setTransactionInProgress(true);
       await ChangePagePayment.transactionModule(contentCreator, contentCosts);
       setPaid(true);
-      console.log(contentId);
+      const updatedNumberOfRead = (numberOfRead || 0) + 1;
 
-      // Fetch the current content data to get numberOfRead
-      const response = await fetch(`${config.apiUrl}/content/${contentId}`);
+      // Send the update to the server
+      const response = await fetch(`${config.apiUrl}/content/${contentId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ numberOfRead: updatedNumberOfRead }),
+      });
+
       if (response.ok) {
-        const data = await response.json();
-
-        // Increment the numberOfRead
-        data.numberOfRead = (data.numberOfRead || 0) + 1;
-
-        // Send the update to the server
-        await fetch(`${config.apiUrl}/content/${contentId}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ numberOfRead: data.numberOfRead }),
-        });
+        console.log("Updated content data:", await response.json());
 
         // Redirect to the content page
         router.push({
@@ -81,7 +77,7 @@ const ContentList: React.FC = () => {
           query: { account, paid: "true", contentId },
         });
       } else {
-        setError(`Failed to fetch content data: ${response.statusText}`);
+        setError(`Failed to update content data: ${response.statusText}`);
       }
     } catch (error) {
       console.error("Payment failed:", error);
@@ -92,7 +88,7 @@ const ContentList: React.FC = () => {
   };
 
   const handleButtonClick = (contentId: string) => {
-    setSelectedContent(contentId); // Update selected content
+    setSelectedContent(contentId);
     const selectedContent = contentList.find(
       (content) => content.contentId === contentId
     );
@@ -101,7 +97,8 @@ const ContentList: React.FC = () => {
       handlePayment(
         contentId,
         selectedContent.contentCreator,
-        selectedContent.contentCosts
+        selectedContent.contentCosts,
+        selectedContent.numberOfRead
       );
     } else {
       setError("Content details not found for the selected content.");

@@ -158,7 +158,7 @@ app.get("/content/:id", async (req: Request, res: Response) => {
 // Endpoint to update numberOfRead or numberOfLikes for specific content by ID
 app.put("/content/:id", async (req: Request, res: Response) => {
   const contentId = req.params.id;
-  const { numberOfLikes, numberOfReads } = req.body;
+  const { numberOfLikes, numberOfRead } = req.body;
 
   try {
     const contentRef = db.collection("content").doc(contentId);
@@ -169,13 +169,13 @@ app.put("/content/:id", async (req: Request, res: Response) => {
       return;
     }
 
-    // Update the document with the provided numberOfLikes or numberOfReads
-    let updateFields: { numberOfLikes?: number; numberOfReads?: number } = {};
+    // Update the document with the provided numberOfLikes or numberOfRead
+    let updateFields: { numberOfLikes?: number; numberOfRead?: number } = {};
+    if (numberOfRead !== undefined) {
+      updateFields.numberOfRead = numberOfRead;
+    }
     if (numberOfLikes !== undefined) {
       updateFields.numberOfLikes = numberOfLikes;
-    }
-    if (numberOfReads !== undefined) {
-      updateFields.numberOfReads = numberOfReads;
     }
 
     // Ensure there is at least one field to update
