@@ -9,7 +9,7 @@ import ContentDataInterface from "@/components/ContentDataInterface";
 import config from "../../config";
 import Link from "next/link";
 import { Heart } from "react-bootstrap-icons";
-import LikePayment from "../components/LikePayment"
+import LikePayment from "../components/LikePayment";
 
 const ContentPage: React.FC = () => {
   const [account, setAccount] = useState("");
@@ -20,6 +20,7 @@ const ContentPage: React.FC = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [isLikeButtonDisabled, setIsLikeButtonDisabled] = useState(false);
   const [transactionInProgress, setTransactionInProgress] = useState(false);
+  const [transactionMessage, setTransactionMessage] = useState("");
   const router = useRouter();
   const { query } = router;
   const { paid, contentId } = query;
@@ -57,31 +58,36 @@ const ContentPage: React.FC = () => {
   const handleLike = async () => {
     if (isLikeButtonDisabled || !contentData) return;
     setIsLikeButtonDisabled(true); // Disable the button
+    setTransactionInProgress(true);
+    setTransactionMessage("Like processing... Waiting for confirmation");
     try {
-        const likeCost = 0.001
-        console.log(contentData.contentCreator)
-        await LikePayment.transactionModule(contentData.contentCreator, likeCost);
-        const updatedNumberOfLikes = (contentData.numberOfLikes || 0) + 1;
-        setContentData({ ...contentData, numberOfLikes: updatedNumberOfLikes });
-        
-        // Send the updated numberOfLikes to backend
-        const response = await fetch(`${config.apiUrl}/content/${contentId}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-            body: JSON.stringify({ numberOfLikes: updatedNumberOfLikes }),
-          });
-        
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
+      const likeCost = 0.001;
+      await LikePayment.transactionModule(contentData.contentCreator, likeCost);
+      const updatedNumberOfLikes = (contentData.numberOfLikes || 0) + 1;
+      setContentData({ ...contentData, numberOfLikes: updatedNumberOfLikes });
+
+      // Send the updated numberOfLikes to backend
+      const response = await fetch(`${config.apiUrl}/content/${contentId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ numberOfLikes: updatedNumberOfLikes }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
       setIsLiked(true); // Optional: Update local state to indicate that the content is liked
+      setTransactionMessage("Like added successfully!");
     } catch (error) {
       console.error("Error updating like:", error);
       setError("Failed to update like. Please try again.");
+      setTransactionMessage("Failed to add like. Please try again.");
     } finally {
-      setTimeout(() => setIsLikeButtonDisabled(false), 100000); // Re-enable after 10 seconds
+      setIsLikeButtonDisabled(false);
+      setTransactionInProgress(false);
+      setTimeout(() => setTransactionMessage(""), 5000); // Clear the message after 5 seconds
     }
   };
 
@@ -159,6 +165,7 @@ const ContentPage: React.FC = () => {
                   />
                 </Button>
               </div>
+              <div style={{paddingTop: "5px"}}>{transactionMessage && <p>{transactionMessage}</p>}</div>
             </div>
           </Row>
           <Row style={{ paddingTop: "20px" }}>

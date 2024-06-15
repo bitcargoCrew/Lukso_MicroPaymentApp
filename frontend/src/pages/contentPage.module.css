@@ -27,6 +27,11 @@
   transform: translate(-50%, -50%);
 }
 
+.transactionMessage {
+  margin-top: 10px;
+  color: #555;
+}
+
 .heartButton {
   width: 2em; /* Adjust width and height as needed */
   height: 2em; /* Ensure equal width and height for square shape */
