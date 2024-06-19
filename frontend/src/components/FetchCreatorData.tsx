@@ -8,10 +8,12 @@ interface FetchContentDataProps {
 }
 
 const fetchCreatorData = async ({ contentCreator, onDataFetched }: FetchContentDataProps) => {
+  const RPC_ENDPOINT = "https://rpc.lukso.sigmacore.io"; //Mainnet
+  const RPC_ENDPOINT_Testnet = "https://rpc.testnet.lukso.network"; //Testnet
   const erc725js = new ERC725(
     lsp3ProfileSchema as ERC725JSONSchema[],
     contentCreator,
-    "https://rpc.lukso.sigmacore.io",
+    RPC_ENDPOINT_Testnet,
     { ipfsGateway: "https://api.universalprofile.cloud/ipfs" }
   );
 
