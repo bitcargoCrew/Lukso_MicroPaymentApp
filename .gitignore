@@ -3,3 +3,4 @@ backend/node_modules/
 backend/.env
 backend/app/serviceAccountKey.json
 backend/build
+smart-contracts

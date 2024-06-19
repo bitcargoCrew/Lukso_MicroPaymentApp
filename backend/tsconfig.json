@@ -6,9 +6,10 @@
       "rootDir": "./app",
       "strict": true,
       "esModuleInterop": true,
+      "resolveJsonModule": true,
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true
     },
-    "include": ["app/**/*.ts"],
+    "include": ["app/**/*.ts, app/services/*.ts"],
     "exclude": ["node_modules", "build"]
 }  

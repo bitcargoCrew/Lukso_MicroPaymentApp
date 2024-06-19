@@ -4,6 +4,8 @@ import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import path from "path";
 import multer, { Multer } from "multer";
+import transferTokenRead from "./services/transferTokenRead";
+import transferTokenLike from "./services/transferTokenLike";
 
 const { initializeApp, cert } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
@@ -158,7 +160,9 @@ app.get("/content/:id", async (req: Request, res: Response) => {
 // Endpoint to update numberOfRead or numberOfLikes for specific content by ID
 app.put("/content/:id", async (req: Request, res: Response) => {
   const contentId = req.params.id;
-  const { numberOfLikes, numberOfRead } = req.body;
+  const { numberOfLikes, numberOfRead, contentCreator, contentCosts } = req.body;
+  console.log("Request body:", req.body);
+  console.log("req", contentCreator, contentCosts)
 
   try {
     const contentRef = db.collection("content").doc(contentId);
@@ -171,11 +175,15 @@ app.put("/content/:id", async (req: Request, res: Response) => {
 
     // Update the document with the provided numberOfLikes or numberOfRead
     let updateFields: { numberOfLikes?: number; numberOfRead?: number } = {};
+    console.log("index", contentCreator, contentCosts)
     if (numberOfRead !== undefined) {
       updateFields.numberOfRead = numberOfRead;
+      console.log("index", contentCreator, contentCosts)
+      transferTokenRead(contentCreator, contentCosts) //send token to the UP who paid for a post
     }
     if (numberOfLikes !== undefined) {
       updateFields.numberOfLikes = numberOfLikes;
+      transferTokenLike(contentCreator) //send token to the UP who like a post
     }
 
     // Ensure there is at least one field to update
