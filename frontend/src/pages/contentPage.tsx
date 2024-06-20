@@ -21,6 +21,7 @@ const ContentPage: React.FC = () => {
   const [isLikeButtonDisabled, setIsLikeButtonDisabled] = useState(false);
   const [transactionInProgress, setTransactionInProgress] = useState(false);
   const [transactionMessage, setTransactionMessage] = useState("");
+  const [supporterAddress, setSupporterAddress] = useState<string | null>(null);
   const router = useRouter();
   const { query } = router;
   const { paid, contentId } = query;
@@ -61,8 +62,9 @@ const ContentPage: React.FC = () => {
     setTransactionInProgress(true);
     setTransactionMessage("Like processing... Waiting for confirmation");
     try {
-      const likeCost = 0.001;
-      await LikePayment.transactionModule(contentData.contentCreator, likeCost);
+      const likeCost = 0.01;
+      const { txHash, contentSupporter } = await LikePayment.transactionModule(contentData.contentCreator, likeCost);
+      setSupporterAddress(contentSupporter);
       const updatedNumberOfLikes = (contentData.numberOfLikes || 0) + 1;
       setContentData({ ...contentData, numberOfLikes: updatedNumberOfLikes });
 
@@ -72,7 +74,7 @@ const ContentPage: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ numberOfLikes: updatedNumberOfLikes, contentCreator: contentData.contentCreator }),
+        body: JSON.stringify({ numberOfLikes: updatedNumberOfLikes, contentCreator: contentData.contentCreator, contentSupporter }),
       });
 
       if (!response.ok) {

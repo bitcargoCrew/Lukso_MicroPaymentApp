@@ -7,15 +7,14 @@ const transactionModule = async (contentCreator: string, likeCosts: number) => {
     // Request access to the user's Ethereum accounts
     await provider.send("eth_requestAccounts", []);
     const signer = await provider.getSigner();
-    const account = await signer.getAddress();
+    const contentSupporter = await signer.getAddress();
 
-    const receiver = contentCreator;
     const amount = likeCosts.toString();
 
     // Send transaction
     const tx = await signer.sendTransaction({
-      from: account,
-      to: receiver,
+      from: contentSupporter,
+      to: contentCreator,
       value: ethers.parseEther(amount),
     });
 
@@ -24,7 +23,10 @@ const transactionModule = async (contentCreator: string, likeCosts: number) => {
 
     if (receipt && receipt.status === 1) { // Check if the transaction was successful
       console.log("Transaction successful with hash:", tx.hash);
-      return tx.hash; // Return transaction hash
+      return {
+        txHash: tx.hash, // Return transaction hash
+        contentSupporter: contentSupporter // Return content supporter address
+      };
     } else {
       throw new Error("Transaction failed");
     }
