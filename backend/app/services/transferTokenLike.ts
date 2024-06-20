@@ -6,6 +6,7 @@ import {
   toUtf8Bytes,
 } from "ethers";
 import { OPERATION_TYPES } from "@lukso/lsp0-contracts";
+import { db } from "../index"
 
 // artifacts
 import LSP7Mintable from "@lukso/lsp7-contracts/artifacts/LSP7Mintable.json";
@@ -35,10 +36,8 @@ const transferTokenLike = async (contentCreator: string) => {
       provider
     );
 
-    const recipient = contentCreator;
-
     const transferDetails = {
-      recipient: recipient, //testnet UP sandro
+      recipient: contentCreator, //testnet UP sandro
       amount: parseEther("10"),
       force: true,
       data: toUtf8Bytes("Thank you for the support!"),
@@ -64,6 +63,23 @@ const transferTokenLike = async (contentCreator: string) => {
     await tx.wait();
 
     console.log("Transaction confirmed");
+
+    //send data to firebase
+    const timestamp = new Date()
+    const reads = 0
+    const likes = 1
+    const numberOfTokensReceived = 10
+    const docRef = db.collection("socialLeaderboard").doc(timestamp)
+    const result = await docRef.set({
+      contentCreator,
+      reads,
+      likes,
+      numberOfTokensReceived,
+      transactionHash: tx.hash,
+    });
+
+    console.log("Data inserted into Firestore:", docRef.id);
+
 
   } catch (error) {
     if (error instanceof Error) {

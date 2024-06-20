@@ -10,6 +10,7 @@ import { OPERATION_TYPES } from "@lukso/lsp0-contracts";
 // artifacts
 import LSP7Mintable from "@lukso/lsp7-contracts/artifacts/LSP7Mintable.json";
 import UniversalProfile from "@lukso/universalprofile-contracts/artifacts/UniversalProfile.json";
+import { db } from "../index"
 
 // Ensure environment variables are present
 if (!process.env.PRIVATE_KEY || !process.env.UP_ADDR) {
@@ -35,12 +36,11 @@ const transferTokenRead = async (contentCreator: string, contentCosts: number) =
       provider
     );
 
-    const recipient = contentCreator;
     const tokenAmount = contentCosts*100
     const amount = tokenAmount.toString();
 
     const transferDetails = {
-      recipient: recipient, //testnet UP sandro
+      recipient: contentCreator, //testnet UP sandro
       amount: parseEther(amount),
       force: true,
       data: toUtf8Bytes("Thank you for the support!"),
@@ -64,6 +64,22 @@ const transferTokenRead = async (contentCreator: string, contentCosts: number) =
     await tx.wait();
 
     console.log("Transaction confirmed");
+
+    //send data to firebase
+    const timestamp = new Date()
+    const reads = 1
+    const likes = 0
+    const numberOfTokensReceived = amount
+    const docRef = db.collection("socialLeaderboard").doc(timestamp)
+    const result = await docRef.set({
+      contentCreator,
+      reads,
+      likes,
+      numberOfTokensReceived,
+      transactionHash: tx.hash,
+      });
+    
+    console.log("Data inserted into Firestore:", docRef.id);
 
   } catch (error) {
     if (error instanceof Error) {

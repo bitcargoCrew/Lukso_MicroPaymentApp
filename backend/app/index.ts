@@ -47,6 +47,9 @@ const db = getFirestore();
 const storage = getStorage();
 const bucket = storage.bucket();
 
+// Export db for use in other modules
+export { db };
+
 // Configure multer for file uploads
 const upload: Multer = multer({
   storage: multer.memoryStorage(), // Store files in memory temporarily
@@ -203,7 +206,7 @@ app.put("/content/:id", async (req: Request, res: Response) => {
   }
 });
 
-// get all token holders from Quill
+// get all token holders from Quill - Does not work so far..
 app.get("/getAllTokenHolders", async (req: Request, res: Response) => {
   try {
       const data = await getAllTokenHolder();
