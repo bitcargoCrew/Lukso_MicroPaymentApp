@@ -15,6 +15,7 @@ const ContentList: React.FC = () => {
   const [paid, setPaid] = useState(false);
   const [account, setAccount] = useState("");
   const [selectedContent, setSelectedContent] = useState<string | null>(null);
+  const [supporterAddress, setSupporterAddress] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -55,7 +56,8 @@ const ContentList: React.FC = () => {
   ) => {
     try {
       setTransactionInProgress(true);
-      await ChangePagePayment.transactionModule(contentCreator, contentCosts);
+      const { txHash, contentSupporter } = await ChangePagePayment.transactionModule(contentCreator, contentCosts);
+      setSupporterAddress(contentSupporter);
       setPaid(true);
       const updatedNumberOfRead = (numberOfRead || 0) + 1;
 
@@ -65,7 +67,7 @@ const ContentList: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ numberOfRead: updatedNumberOfRead, contentCreator, contentCosts }),
+        body: JSON.stringify({ numberOfRead: updatedNumberOfRead, contentCreator, contentCosts, contentSupporter }),
       });
 
       if (response.ok) {

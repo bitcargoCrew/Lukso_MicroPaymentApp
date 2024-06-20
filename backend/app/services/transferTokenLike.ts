@@ -17,7 +17,7 @@ if (!process.env.PRIVATE_KEY || !process.env.UP_ADDR) {
   throw new Error("Environment variables PRIVATE_KEY or UP_ADDR are missing");
 }
 
-const transferTokenLike = async (contentCreator: string) => {
+const transferTokenLike = async (contentSupporter: string) => {
   try {
     const provider = new JsonRpcProvider("https://rpc.testnet.lukso.network"); //testnet
     const privateKey: string = process.env.PRIVATE_KEY || "";
@@ -37,7 +37,7 @@ const transferTokenLike = async (contentCreator: string) => {
     );
 
     const transferDetails = {
-      recipient: contentCreator, //testnet UP sandro
+      recipient: contentSupporter, //testnet UP sandro
       amount: parseEther("10"),
       force: true,
       data: toUtf8Bytes("Thank you for the support!"),
@@ -65,13 +65,13 @@ const transferTokenLike = async (contentCreator: string) => {
     console.log("Transaction confirmed");
 
     //send data to firebase
-    const timestamp = new Date()
+    const timestamp = new Date().toISOString()
     const reads = 0
     const likes = 1
     const numberOfTokensReceived = 10
     const docRef = db.collection("socialLeaderboard").doc(timestamp)
     const result = await docRef.set({
-      contentCreator,
+      contentSupporter,
       reads,
       likes,
       numberOfTokensReceived,
