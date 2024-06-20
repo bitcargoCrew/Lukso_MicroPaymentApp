@@ -202,6 +202,49 @@ app.put("/content/:id", async (req: Request, res: Response) => {
   }
 });
 
+// Endpoint to get aggregated data for all contentSupporters
+app.get("/aggregateSocialLeaderboard", async (req: Request, res: Response) => {
+  try {
+    const contentRef = db.collection("socialLeaderboard");
+    const snapshot = await contentRef.get();
+
+    if (snapshot.empty) {
+      return res.status(404).json({ error: "No content found" });
+    }
+
+    // Object to hold aggregated data
+    const aggregation: { [key: string]: { totalLikes: number; totalReads: number; totalTokensReceived: number } } = {};
+
+    snapshot.docs.forEach((doc: any) => {
+      const data = doc.data();
+      const supporter = data.contentSupporter;
+
+      if (!aggregation[supporter]) {
+        aggregation[supporter] = {
+          totalLikes: 0,
+          totalReads: 0,
+          totalTokensReceived: 0,
+        };
+      }
+
+      aggregation[supporter].totalLikes += data.likes || 0;
+      aggregation[supporter].totalReads += data.reads || 0;
+      aggregation[supporter].totalTokensReceived += parseInt(data.numberOfTokensReceived) || 0;
+    });
+
+    // Convert aggregation object to an array
+    const aggregatedList = Object.keys(aggregation).map(supporter => ({
+      contentSupporter: supporter,
+      ...aggregation[supporter],
+    }));
+
+    res.status(200).json(aggregatedList);
+  } catch (error) {
+    console.error("Error fetching content:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // get all token holders from Quill - Does not work so far..
 app.get("/getAllTokenHolders", async (req: Request, res: Response) => {
   try {

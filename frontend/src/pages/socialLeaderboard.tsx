@@ -1,13 +1,15 @@
 import styles from "./socialLeaderboard.module.css";
-import { Button, Col, Row, Spinner, Image } from "react-bootstrap";
+import { Button, Col, Row, Spinner, Image, Table } from "react-bootstrap";
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import RootLayout from "../app/layout";
 import NavBar from "../components/NavBar";
-
+import config from "../../config";
 
 const SocialLeaderboard: React.FC = ({}) => {
   const [account, setAccount] = useState("");
+  const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -17,11 +19,58 @@ const SocialLeaderboard: React.FC = ({}) => {
     }
   }, [router.query, account]);
 
+  const fetchSocialLeaderboardData = useCallback(async () => {
+    try {
+      const response = await fetch(`${config.apiUrl}/aggregateSocialLeaderboard`);
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Fetched data:", data); // Log the fetched data
+        setLeaderboardData(data);
+      } else {
+        setError(`Failed to fetch content data: ${response.statusText}`);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(`An error occurred: ${error.message}`);
+      } else {
+        setError("An unknown error occurred.");
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSocialLeaderboardData();
+  }, [fetchSocialLeaderboardData]);
+
   return (
     <div>
       <NavBar account={account} />
       <RootLayout>
-        <div>Work in progress</div>
+        <div>
+          <Table striped bordered hover className={styles.customTable}>
+            <thead>
+              <tr>
+                <th>Ranking</th>
+                <th>Universal Profile</th>
+                <th>Number of Reads</th>
+                <th>Number of Likes</th>
+                <th>Amount of Quill Tokens received</th>
+              </tr>
+            </thead>
+            <tbody>
+              {leaderboardData.map((item, index) => (
+                <tr key={item.contentSupporter}>
+                  <td>{index + 1}</td>
+                  <td>{item.contentSupporter}</td>
+                  <td>{item.totalReads}</td>
+                  <td>{item.totalLikes}</td>
+                  <td>{item.totalTokensReceived}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+          {error && <p className="text-danger">{error}</p>}
+        </div>
       </RootLayout>
     </div>
   );

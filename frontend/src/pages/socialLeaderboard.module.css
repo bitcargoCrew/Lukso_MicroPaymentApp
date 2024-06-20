@@ -1,3 +1,16 @@
 .rowSpace {
   padding-bottom: 2%;
 }
+
+.customTable {
+  background-color: #e9ecef;
+}
+
+.customTable thead {
+  background-color: #dee2e6;
+}
+
+.customTable th,
+.customTable td {
+  border: 1px solid #dee2e6;
+}
