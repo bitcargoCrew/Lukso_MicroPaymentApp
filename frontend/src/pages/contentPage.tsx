@@ -72,7 +72,7 @@ const ContentPage: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ numberOfLikes: updatedNumberOfLikes }),
+        body: JSON.stringify({ numberOfLikes: updatedNumberOfLikes, contentCreator: contentData.contentCreator }),
       });
 
       if (!response.ok) {

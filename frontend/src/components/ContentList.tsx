@@ -65,7 +65,7 @@ const ContentList: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ numberOfRead: updatedNumberOfRead }),
+        body: JSON.stringify({ numberOfRead: updatedNumberOfRead, contentCreator, contentCosts }),
       });
 
       if (response.ok) {
