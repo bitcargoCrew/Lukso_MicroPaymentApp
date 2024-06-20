@@ -1,5 +1,5 @@
 import styles from "./profile.module.css";
-import { Button, Col, Row, Spinner, Image } from "react-bootstrap";
+import { Button, Col, Row, Spinner, Image, Modal } from "react-bootstrap";
 import React, { useEffect, useState, useCallback } from "react";
 import { PersonBoundingBox } from "react-bootstrap-icons";
 import Balance from "../components/Balance";
@@ -16,6 +16,7 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
   const [account, setAccount] = useState("");
   const [profileMetaData, setProfileMetaData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showModal, setShowModal] = useState(true); // State to control the modal visibility
   const router = useRouter();
 
   useEffect(() => {
@@ -33,7 +34,10 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
   }, []);
 
   const getProfileImageUrl = useCallback((profileMetaData: any) => {
-    const ipfsHash = profileMetaData?.value?.LSP3Profile?.profileImage?.[0]?.url.split("://")[1];
+    const ipfsHash =
+      profileMetaData?.value?.LSP3Profile?.profileImage?.[0]?.url.split(
+        "://"
+      )[1];
     if (!ipfsHash) {
       setImageError(true);
       return ""; // Return empty string if no valid IPFS hash
@@ -44,6 +48,17 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
   return (
     <div>
       <NavBar account={account} />
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Important</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>We are currently in development. Please use the application with your Lukso testnet UP</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={() => setShowModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <div className={styles.backgroundContainer}>
         <Image
           src="/profile_background.jpeg"
@@ -99,7 +114,7 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
               <h1>Explore more content</h1>
             </Row>
             <Row className={styles.rowSpace}>
-              <ContentList/>
+              <ContentList />
             </Row>
           </div>
         )}
