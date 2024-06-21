@@ -10,6 +10,8 @@ import config from "../../config";
 import Link from "next/link";
 import { Heart } from "react-bootstrap-icons";
 import LikePayment from "../components/LikePayment";
+import { Editor, EditorState, convertFromRaw } from "draft-js";
+import 'draft-js/dist/Draft.css';
 
 const ContentPage: React.FC = () => {
   const [account, setAccount] = useState("");
@@ -112,6 +114,10 @@ const ContentPage: React.FC = () => {
     return <Spinner animation="border" role="status" />;
   }
 
+  // Convert the raw content state to EditorState
+  const contentState = convertFromRaw(JSON.parse(contentData.contentLongDescription));
+  const editorState = EditorState.createWithContent(contentState);
+
   return (
     <div>
       <NavBar account={account}></NavBar>
@@ -148,7 +154,13 @@ const ContentPage: React.FC = () => {
             </div>
           </Row>
           <Row className={styles.rowSpace}>
-            <div>{contentData.contentLongDescription}</div>
+            <div className={styles.draftEditorWrapper}>
+              <Editor
+                editorState={editorState}
+                readOnly={true}
+                onChange={() => {}}
+              />
+            </div>
           </Row>
           <Row className={styles.rowSpace}>
             <div>
