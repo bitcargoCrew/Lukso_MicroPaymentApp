@@ -6,6 +6,8 @@ import { useRouter } from "next/router";
 import NavBar from "../components/NavBar";
 import ContentDataInterface from "@/components/ContentDataInterface";
 import config from "../../config";
+import { Editor, EditorState, convertToRaw, convertFromRaw } from "draft-js";
+import 'draft-js/dist/Draft.css';
 
 const CreateContentPage: React.FC = () => {
   const router = useRouter();
@@ -34,11 +36,21 @@ const CreateContentPage: React.FC = () => {
     contentComments: [""],
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
+  // Draft.js editor state
+  const [editorState, setEditorState] = useState(EditorState.createEmpty());
+
+  // Convert content state to raw JSON format
+  const handleEditorChange = (state: any) => {
+    setEditorState(state);
+    const contentState = state.getCurrentContent();
+    const rawContent = convertToRaw(contentState);
+    setFormData((prevState) => ({
+      ...prevState,
+      contentLongDescription: JSON.stringify(rawContent),
+    }));
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     if (name === "contentTags") {
       setFormData((prevState) => ({
@@ -73,25 +85,13 @@ const CreateContentPage: React.FC = () => {
     formDataToSend.append("contentCreator", formData.contentCreator);
     formDataToSend.append("contentCosts", String(formData.contentCosts));
     formDataToSend.append("creatorMessage", formData.creatorMessage);
-    formDataToSend.append(
-      "contentShortDescription",
-      formData.contentShortDescription
-    );
-    formDataToSend.append(
-      "contentLongDescription",
-      formData.contentLongDescription
-    );
+    formDataToSend.append("contentShortDescription", formData.contentShortDescription);
+    formDataToSend.append("contentLongDescription", formData.contentLongDescription);
     formDataToSend.append("contentTags", formData.contentTags.join(","));
     formDataToSend.append("numberOfRead", String(formData.numberOfRead));
     formDataToSend.append("numberOfLikes", String(formData.numberOfLikes));
-    formDataToSend.append(
-      "numberOfComments",
-      String(formData.numberOfComments)
-    );
-    formDataToSend.append(
-      "contentComments",
-      formData.contentComments.join(",")
-    );
+    formDataToSend.append("numberOfComments", String(formData.numberOfComments));
+    formDataToSend.append("contentComments", formData.contentComments.join(","));
 
     if (formData.contentMedia) {
       formDataToSend.append("contentMedia", formData.contentMedia);
@@ -106,7 +106,6 @@ const CreateContentPage: React.FC = () => {
       if (response.ok) {
         const result = await response.json();
         console.log("Form submitted successfully!", result);
-        // Redirect to profile page after successful form submission
         router.push({
           pathname: "/profile",
           query: { account: account },
@@ -127,9 +126,7 @@ const CreateContentPage: React.FC = () => {
           <h1 className={styles.rowSpace}>Create your post</h1>
           <Form onSubmit={handleSubmit}>
             <InputGroup className="mb-3">
-              <InputGroup.Text id="basic-addon1">
-                Content Creator
-              </InputGroup.Text>
+              <InputGroup.Text id="basic-addon1" className={styles.inputGroupText}>Content Creator</InputGroup.Text>
               <Form.Control
                 type="text"
                 name="contentCreator"
@@ -143,7 +140,7 @@ const CreateContentPage: React.FC = () => {
             </InputGroup>
 
             <InputGroup className="mb-3">
-              <InputGroup.Text id="basic-addon1">Content Price</InputGroup.Text>
+              <InputGroup.Text id="basic-addon1" className={styles.inputGroupText}>Content Price</InputGroup.Text>
               <Form.Control
                 type="number"
                 name="contentCosts"
@@ -157,9 +154,7 @@ const CreateContentPage: React.FC = () => {
             </InputGroup>
 
             <InputGroup className="mb-3">
-              <InputGroup.Text id="basic-addon1">
-                Creator Message
-              </InputGroup.Text>
+              <InputGroup.Text id="basic-addon1" className={styles.inputGroupText}>Creator Message</InputGroup.Text>
               <Form.Control
                 as="textarea"
                 type="text"
@@ -174,7 +169,7 @@ const CreateContentPage: React.FC = () => {
             </InputGroup>
 
             <InputGroup className="mb-3">
-              <InputGroup.Text id="basic-addon1">Post Picture</InputGroup.Text>
+              <InputGroup.Text id="basic-addon1" className={styles.inputGroupText}>Post Picture</InputGroup.Text>
               <Form.Control
                 type="file"
                 name="contentMedia"
@@ -187,7 +182,7 @@ const CreateContentPage: React.FC = () => {
             </InputGroup>
 
             <InputGroup className="mb-3">
-              <InputGroup.Text id="basic-addon1">Post Title</InputGroup.Text>
+              <InputGroup.Text id="basic-addon1" className={styles.inputGroupText}>Post Title</InputGroup.Text>
               <Form.Control
                 type="text"
                 name="contentTitle"
@@ -201,9 +196,7 @@ const CreateContentPage: React.FC = () => {
             </InputGroup>
 
             <InputGroup className="mb-3">
-              <InputGroup.Text id="basic-addon1">
-                Short Description Content
-              </InputGroup.Text>
+              <InputGroup.Text id="basic-addon1" className={styles.inputGroupText}>Short Description Content</InputGroup.Text>
               <Form.Control
                 as="textarea"
                 type="text"
@@ -218,22 +211,18 @@ const CreateContentPage: React.FC = () => {
             </InputGroup>
 
             <InputGroup className="mb-3">
-              <InputGroup.Text id="basic-addon1">Post Content</InputGroup.Text>
-              <Form.Control
-                as="textarea"
-                type="text"
-                name="contentLongDescription"
-                value={formData.contentLongDescription}
-                onChange={handleChange}
-                placeholder="Enter the post content"
-                aria-label="contentLongDescription"
-                aria-describedby="basic-addon1"
-                required
-              />
+              <InputGroup.Text id="basic-addon1" className={styles.inputGroupText}>Post Content</InputGroup.Text>
+              <div className={styles.draftEditorWrapper}>
+                <Editor
+                  editorState={editorState}
+                  onChange={handleEditorChange}
+                  placeholder="Enter the post content"
+                />
+              </div>
             </InputGroup>
 
             <InputGroup className="mb-3">
-              <InputGroup.Text id="basic-addon1">Post Tags</InputGroup.Text>
+              <InputGroup.Text id="basic-addon1" className={styles.inputGroupText}>Post Tags</InputGroup.Text>
               <Form.Control
                 type="text"
                 name="contentTags"

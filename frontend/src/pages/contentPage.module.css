@@ -65,6 +65,13 @@
   stroke: white; /* Sets the stroke to red */
 }
 
+.draftEditorWrapper {
+  padding: 10px;
+  min-height: 100px;
+  background-color: #ffebee; /* Your desired background color */
+}
+
+
 @media screen and (max-width: 4000px) {
   .contentImage {
     max-height: 500px;

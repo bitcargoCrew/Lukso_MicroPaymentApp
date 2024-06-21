@@ -1,3 +1,15 @@
 .rowSpace {
   padding-bottom: 2%;
 }
+
+.inputGroupText {
+  width: 20%; /* Adjust the width as per your design */
+}
+
+.draftEditorWrapper {
+  border: 1px solid #ccc;
+  padding: 10px;
+  min-height: 300px;
+  width: 80%;
+  background-color: #fff;
+}
