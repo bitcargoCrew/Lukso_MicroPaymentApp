@@ -6,6 +6,11 @@
   width: 20%; /* Adjust the width as per your design */
 }
 
+.inputGroupTextShort {
+  width: 20%; /* Adjust the width as per your design */
+  min-height: 100px;
+}
+
 .draftEditorWrapper {
   border: 1px solid #ccc;
   padding: 10px;

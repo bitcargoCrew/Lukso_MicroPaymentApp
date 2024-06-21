@@ -196,7 +196,7 @@ const CreateContentPage: React.FC = () => {
             </InputGroup>
 
             <InputGroup className="mb-3">
-              <InputGroup.Text id="basic-addon1" className={styles.inputGroupText}>Short Description Content</InputGroup.Text>
+              <InputGroup.Text id="basic-addon1" className={styles.inputGroupTextShort}>Short Description Content</InputGroup.Text>
               <Form.Control
                 as="textarea"
                 type="text"

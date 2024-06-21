@@ -107,32 +107,36 @@ const Home: React.FC<HomeProps> = () => {
             </p>
           </Col>
           <Col>
-            <h3>Low Transaction Fees</h3>
+            <h3>Flexible Payment Options</h3>
             <p>
               Traditional payment methods involve high transaction fees that
               reduce the overall profit for creators. We avoid this by using the
-              Lukso blockchain as a payment layer.
-            </p>
-          </Col>
-          <Col>
-            <h3>Avoiding Hefty Subscriptions</h3>
-            <p>
-              Users are deterred by expensive monthly subscriptions for content
-              they find interesting but may not consume regularly. We offer a
-              flexible way to consume content with a pay-what-you-read
+              Lukso blockchain as a payment layer. Additionally, we offer a
+              flexible way for users to consume content with a pay-what-you-read
               mechanism.
             </p>
           </Col>
         </Row>
         <Row>
-          <div className={styles.centeredText}>
-            <strong>
-              Interested? Create your Universal Profile (Digital Identity) here:{" "}
-              <a href="https://universalprofile.cloud/">
-                https://universalprofile.cloud/
-              </a>
-            </strong>
-          </div>
+          <Col className="d-flex justify-content-center">
+            <div className={styles.centeredTextUPCreationBox}>
+              <p className={styles.centeredTextUPCreationTitle}>
+                Interested? Create your Universal Profile (Digital Identity)
+                <Image
+                src="/UP_logo.png"
+                alt="UP Logo"
+                className={styles.centeredTextUPCreationImage}
+              />
+              </p>
+              <Link href="https://universalprofile.cloud/" passHref>
+                <Button
+                  variant="dark"
+                >
+                  Create your profile
+                </Button>
+              </Link>
+            </div>
+          </Col>
         </Row>
       </RootLayout>
       <div className={styles.backgroundContainer}>

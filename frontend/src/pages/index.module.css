@@ -30,6 +30,25 @@
   text-align: center;
 }
 
+.centeredTextUPCreationBox {
+  padding: 20px;
+  margin: 20px 0;
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.centeredTextUPCreationTitle {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.centeredTextUPCreationImage {
+  max-width: 100px;
+  margin-left: 20px;
+}
+
 @media screen and (max-width: 4000px) {
 
 	.backgroundImage {
