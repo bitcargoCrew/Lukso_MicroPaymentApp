@@ -12,6 +12,7 @@ import SignIn from "../components/SignIn";
 import React, { useState } from "react";
 import Link from "next/link";
 import RootLayout from "../app/layout";
+import ContentCarousel from "@/components/ContentCarousel";
 
 interface HomeProps {}
 
@@ -117,11 +118,11 @@ const Home: React.FC<HomeProps> = () => {
             </p>
           </Col>
         </Row>
-        <Row>
+        <Row className={styles.rowSpace}>
           <Col className="d-flex justify-content-center">
             <div className={styles.centeredTextUPCreationBox}>
               <p className={styles.centeredTextUPCreationTitle}>
-                Interested? Create your Universal Profile (Digital Identity)
+                Interested in using our DApp? Create your Universal Profile (Digital Identity)
                 <Image
                 src="/UP_logo.png"
                 alt="UP Logo"
@@ -155,11 +156,9 @@ const Home: React.FC<HomeProps> = () => {
         </p>
       </div>
       <RootLayout>
-        <Row className={styles.centeredText} id="story">
-          <h1>How can Quill achieve this?</h1>
-        </Row>
-        <Row className={styles.centeredText}>
-          <p>Our explanation video will be published soon.</p>
+      <Row>
+        <h3 className={styles.centeredText}>Explore different content posts of Quill</h3>
+          <ContentCarousel/>
         </Row>
       </RootLayout>
     </div>

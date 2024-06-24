@@ -1,0 +1,23 @@
+.carouselContainer {
+  background-color: #f8f9fa;
+  padding: 20px;
+}
+
+.rowSpace {
+  padding-bottom: 2%;
+}
+
+.contentImage {
+  max-width: 100%; /* Ensures the image doesn't exceed the column size */
+  max-height: 220px;
+  height: auto; /* Maintains the aspect ratio */
+  display: block; /* Removes any extra space around the image */
+  margin: 0 auto; /* Centers the image within the column */
+}
+
+.customCol {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 0;
+}
