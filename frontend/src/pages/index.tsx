@@ -7,9 +7,10 @@ import {
   Nav,
   Navbar,
   Image,
+  Modal
 } from "react-bootstrap";
 import SignIn from "../components/SignIn";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import RootLayout from "../app/layout";
 import ContentCarousel from "@/components/ContentCarousel";
@@ -19,6 +20,11 @@ interface HomeProps {}
 const Home: React.FC<HomeProps> = () => {
   const [buttonClicked, setButtonClicked] = useState(false);
   const [account, setAccount] = useState(""); // State to store account
+  const [showModal, setShowModal] = useState(false); // State to control the modal visibility
+
+  useEffect(() => {
+    setShowModal(true);
+  }, []);
 
   const handleButtonClick = () => {
     setButtonClicked(true);
@@ -84,6 +90,20 @@ const Home: React.FC<HomeProps> = () => {
       </div>
 
       <RootLayout>
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Important</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            We are currently in development. Please use the application with
+            your Lukso testnet UP
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="primary" onClick={() => setShowModal(false)}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
         <Row className={styles.centeredText} id="solution">
           <h1>
             Quill is a content platform that integrates micropayments for the
@@ -122,19 +142,16 @@ const Home: React.FC<HomeProps> = () => {
           <Col className="d-flex justify-content-center">
             <div className={styles.centeredTextUPCreationBox}>
               <p className={styles.centeredTextUPCreationTitle}>
-                Interested in using our DApp? Create your Universal Profile (Digital Identity)
+                Interested in using our DApp? Create your Universal Profile
+                (Digital Identity)
                 <Image
-                src="/UP_logo.png"
-                alt="UP Logo"
-                className={styles.centeredTextUPCreationImage}
-              />
+                  src="/UP_logo.png"
+                  alt="UP Logo"
+                  className={styles.centeredTextUPCreationImage}
+                />
               </p>
               <Link href="https://universalprofile.cloud/" passHref>
-                <Button
-                  variant="dark"
-                >
-                  Create your profile
-                </Button>
+                <Button variant="dark">Create your profile</Button>
               </Link>
             </div>
           </Col>
@@ -156,9 +173,11 @@ const Home: React.FC<HomeProps> = () => {
         </p>
       </div>
       <RootLayout>
-      <Row>
-        <h3 className={styles.centeredText}>Explore different content posts of Quill</h3>
-          <ContentCarousel/>
+        <Row>
+          <h3 className={styles.centeredText}>
+            Explore different content posts of Quill
+          </h3>
+          <ContentCarousel />
         </Row>
       </RootLayout>
     </div>
