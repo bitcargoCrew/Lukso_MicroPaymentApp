@@ -238,7 +238,59 @@ app.get("/aggregateSocialLeaderboard", async (req: Request, res: Response) => {
       ...aggregation[supporter],
     }));
 
+    // Sort the aggregated list by totalTokensReceived in descending order
+    aggregatedList.sort((a, b) => b.totalTokensReceived - a.totalTokensReceived);
+
     res.status(200).json(aggregatedList);
+  } catch (error) {
+    console.error("Error fetching content:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Endpoint to get top 3 entries based on totalTokensReceived
+app.get("/top3Supporters", async (req: Request, res: Response) => {
+  try {
+    const contentRef = db.collection("socialLeaderboard");
+    const snapshot = await contentRef.get();
+
+    if (snapshot.empty) {
+      return res.status(404).json({ error: "No content found" });
+    }
+
+    // Object to hold aggregated data
+    const aggregation: { [key: string]: { totalLikes: number; totalReads: number; totalTokensReceived: number } } = {};
+
+    snapshot.docs.forEach((doc: any) => {
+      const data = doc.data();
+      const supporter = data.contentSupporter;
+
+      if (!aggregation[supporter]) {
+        aggregation[supporter] = {
+          totalLikes: 0,
+          totalReads: 0,
+          totalTokensReceived: 0,
+        };
+      }
+
+      aggregation[supporter].totalLikes += data.likes || 0;
+      aggregation[supporter].totalReads += data.reads || 0;
+      aggregation[supporter].totalTokensReceived += parseInt(data.numberOfTokensReceived) || 0;
+    });
+
+    // Convert aggregation object to an array
+    const aggregatedList = Object.keys(aggregation).map(supporter => ({
+      contentSupporter: supporter,
+      ...aggregation[supporter],
+    }));
+
+    // Sort the aggregated list by totalTokensReceived in descending order
+    aggregatedList.sort((a, b) => b.totalTokensReceived - a.totalTokensReceived);
+
+    // Get the top 3 entries
+    const top3 = aggregatedList.slice(0, 3);
+
+    res.status(200).json(top3);
   } catch (error) {
     console.error("Error fetching content:", error);
     res.status(500).json({ error: "Internal server error" });

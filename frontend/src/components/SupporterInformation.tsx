@@ -1,4 +1,4 @@
-import styles from "./CreatedBy.module.css";
+import styles from "./SupporterInformation.module.css";
 import React, { useEffect, useState, useCallback } from "react";
 import { Image, Spinner, Card } from "react-bootstrap";
 import { PersonBoundingBox } from "react-bootstrap-icons";
@@ -42,7 +42,7 @@ const SupporterInformation: React.FC<{ contentSupporter: string }> = ({ contentS
         <Card.Text className={styles.rowSpace}>
           <span>
             {imageError || !profileMetaData ? (
-              <PersonBoundingBox size={20} />
+              <PersonBoundingBox size={40} />
             ) : (
               <Image
                 src={getProfileImageUrl(profileMetaData)}
@@ -50,7 +50,7 @@ const SupporterInformation: React.FC<{ contentSupporter: string }> = ({ contentS
                 rounded
                 alt="Profile"
                 onError={() => setImageError(true)}
-                className={styles.creatorImage}
+                className={styles.supporterImage}
               />
             )}
           </span>

@@ -14,6 +14,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import RootLayout from "../app/layout";
 import ContentCarousel from "@/components/ContentCarousel";
+import CardsTop3Supporters from "@/components/CardsTop3Supporters";
 
 interface HomeProps {}
 
@@ -173,11 +174,17 @@ const Home: React.FC<HomeProps> = () => {
         </p>
       </div>
       <RootLayout>
-        <Row>
+        <Row className={styles.rowSpace}>
           <h3 className={styles.centeredText}>
             Explore different content posts of Quill
           </h3>
           <ContentCarousel />
+        </Row>
+        <Row>
+          <h3 className={styles.centeredText}>
+            Checkout the Quill Leaderboard
+          </h3>
+          <CardsTop3Supporters />
         </Row>
       </RootLayout>
     </div>
