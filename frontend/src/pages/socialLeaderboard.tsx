@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import RootLayout from "../app/layout";
 import NavBar from "../components/NavBar";
 import config from "../../config";
+import SupporterInformation from "@/components/SupporterInformation";
 
 const SocialLeaderboard: React.FC = ({}) => {
   const [account, setAccount] = useState("");
@@ -47,6 +48,7 @@ const SocialLeaderboard: React.FC = ({}) => {
       <NavBar account={account} />
       <RootLayout>
         <div>
+        <h1 className={styles.rowSpace}>This is the Social Leaderboard of Quill</h1>
           <Table striped bordered hover className={styles.customTable}>
             <thead>
               <tr>
@@ -61,7 +63,7 @@ const SocialLeaderboard: React.FC = ({}) => {
               {leaderboardData.map((item, index) => (
                 <tr key={item.contentSupporter}>
                   <td>{index + 1}</td>
-                  <td>{item.contentSupporter}</td>
+                  <td><SupporterInformation contentSupporter={item.contentSupporter} /></td>
                   <td>{item.totalReads}</td>
                   <td>{item.totalLikes}</td>
                   <td>{item.totalTokensReceived}</td>

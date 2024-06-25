@@ -17,7 +17,7 @@ if (!process.env.PRIVATE_KEY || !process.env.UP_ADDR) {
   throw new Error("Environment variables PRIVATE_KEY or UP_ADDR are missing");
 }
 
-const transferTokenLike = async (contentSupporter: string) => {
+const transferTokenLike = async (contentSupporter: string, contentId: string) => {
   try {
     const provider = new JsonRpcProvider("https://rpc.testnet.lukso.network"); //testnet
     const privateKey: string = process.env.PRIVATE_KEY || "";
@@ -72,6 +72,7 @@ const transferTokenLike = async (contentSupporter: string) => {
     const docRef = db.collection("socialLeaderboard").doc(timestamp)
     const result = await docRef.set({
       contentSupporter,
+      contentId: contentId,
       reads,
       likes,
       numberOfTokensReceived,

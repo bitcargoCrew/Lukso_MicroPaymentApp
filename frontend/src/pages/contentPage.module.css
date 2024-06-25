@@ -61,7 +61,7 @@
 }
 
 .heartIcon.liked {
-  fill: white; /* Changes the heart icon fill to red when liked */
+  fill: black; /* Changes the heart icon fill to red when liked */
   stroke: white; /* Sets the stroke to red */
 }
 

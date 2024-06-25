@@ -65,7 +65,7 @@ const ContentCarousel: React.FC = () => {
   ) => {
     try {
       setTransactionInProgress(true);
-      const { txHash, contentSupporter } =
+      const { contentSupporter } =
         await ChangePagePayment.transactionModule(contentCreator, contentCosts);
       setSupporterAddress(contentSupporter);
       setPaid(true);

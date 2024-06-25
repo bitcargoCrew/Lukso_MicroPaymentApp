@@ -65,7 +65,7 @@ const ContentPage: React.FC = () => {
     setTransactionMessage("Like processing... Waiting for confirmation");
     try {
       const likeCost = 0.01;
-      const { txHash, contentSupporter } = await LikePayment.transactionModule(contentData.contentCreator, likeCost);
+      const { contentSupporter } = await LikePayment.transactionModule(contentData.contentCreator, likeCost);
       setSupporterAddress(contentSupporter);
       const updatedNumberOfLikes = (contentData.numberOfLikes || 0) + 1;
       setContentData({ ...contentData, numberOfLikes: updatedNumberOfLikes });
