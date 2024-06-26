@@ -47,7 +47,7 @@ const CardsTop3Supporters: React.FC = () => {
   }
 
   return (
-    <Row>
+    <Row className={styles.rowSpace}>
       {top3SupportersData.map((top3Supporter, index) => (
         <Col key={index} xs={12} md={4} className="mb-4">
           <Card className={styles.customCard}>

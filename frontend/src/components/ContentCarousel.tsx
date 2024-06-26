@@ -138,7 +138,7 @@ const ContentCarousel: React.FC = () => {
   }
 
   return (
-    <div className="carouselContainer">
+    <div className={styles.carouselContainer}>
       <Carousel activeIndex={index} onSelect={handleSelect}>
         {contentList.map((content) => (
           <Carousel.Item key={String(content.contentId)}>

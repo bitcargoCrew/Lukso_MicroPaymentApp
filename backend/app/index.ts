@@ -297,6 +297,30 @@ app.get("/top3Supporters", async (req: Request, res: Response) => {
   }
 });
 
+// Endpoint to get the last 20 transactions/entries
+app.get("/last20Transactions", async (req: Request, res: Response) => {
+  try {
+    const contentRef = db.collection("socialLeaderboard").orderBy("timestamp", "desc").limit(20);
+    const snapshot = await contentRef.get();
+    console.log(snapshot)
+
+    if (snapshot.empty) {
+      return res.status(404).json({ error: "No transactions found" });
+    }
+
+    // Map the documents to their data
+    const transactions = snapshot.docs.map((doc: any) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    res.status(200).json(transactions);
+  } catch (error) {
+    console.error("Error fetching transactions:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // get all token holders from Quill - Does not work so far..
 app.get("/getAllTokenHolders", async (req: Request, res: Response) => {
   try {

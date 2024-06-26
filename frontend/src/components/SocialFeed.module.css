@@ -1,0 +1,11 @@
+.stylingContainer {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  width: 70%;
+}
+
+.stylingCard {
+  margin: 0 auto; /* Center the card horizontally */
+  padding: 0.5rem; /* Adjust the padding as needed */
+  border-bottom: 2px solid #ccc; /* Add a bottom border with desired color and thickness */
+}

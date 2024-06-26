@@ -7,7 +7,7 @@ import {
   Nav,
   Navbar,
   Image,
-  Modal
+  Modal,
 } from "react-bootstrap";
 import SignIn from "../components/SignIn";
 import React, { useState, useEffect } from "react";
@@ -15,6 +15,7 @@ import Link from "next/link";
 import RootLayout from "../app/layout";
 import ContentCarousel from "@/components/ContentCarousel";
 import CardsTop3Supporters from "@/components/CardsTop3Supporters";
+import SocialFeed from "@/components/SocialFeed";
 
 interface HomeProps {}
 
@@ -91,7 +92,7 @@ const Home: React.FC<HomeProps> = () => {
       </div>
 
       <RootLayout>
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal show={showModal} onHide={() => setShowModal(false)}>
           <Modal.Header closeButton>
             <Modal.Title>Important</Modal.Title>
           </Modal.Header>
@@ -108,8 +109,12 @@ const Home: React.FC<HomeProps> = () => {
         <Row className={styles.centeredText} id="solution">
           <h1>
             Quill is a content platform that integrates micropayments for the
-            consumption of content (SocialFi). Why should you join?
+            consumption of content (SocialFi).
           </h1>
+        </Row>
+        <ContentCarousel />
+        <Row className={styles.centeredText} id="solution">
+          <h1>Why should you join Quill?</h1>
         </Row>
         <Row className={styles.rowSpace}>
           <Col>
@@ -174,19 +179,26 @@ const Home: React.FC<HomeProps> = () => {
         </p>
       </div>
       <RootLayout>
-        <Row className={styles.rowSpace}>
-          <h3 className={styles.centeredText}>
-            Explore different content posts of Quill
-          </h3>
-          <ContentCarousel />
-        </Row>
         <Row>
           <h3 className={styles.centeredText}>
             Checkout the Quill Leaderboard
           </h3>
           <CardsTop3Supporters />
         </Row>
+        <Row>
+          <h3 className={styles.centeredTextFeed}>Social Feed of Quill</h3>
+          <SocialFeed />
+        </Row>
       </RootLayout>
+      <Navbar expand="lg" bg="dark" data-bs-theme="dark">
+        <Container>
+          <Nav className="me-auto">
+            <Nav.Link>Contact</Nav.Link>
+            <Nav.Link>Social Media</Nav.Link>
+            <Nav.Link>Legal information</Nav.Link>
+          </Nav>
+        </Container>
+      </Navbar>
     </div>
   );
 };

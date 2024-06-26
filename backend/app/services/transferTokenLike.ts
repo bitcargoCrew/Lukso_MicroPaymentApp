@@ -69,8 +69,11 @@ const transferTokenLike = async (contentSupporter: string, contentId: string) =>
     const reads = 0
     const likes = 1
     const numberOfTokensReceived = 10
+    const event = "Like"
     const docRef = db.collection("socialLeaderboard").doc(timestamp)
     const result = await docRef.set({
+      timestamp,
+      event,
       contentSupporter,
       contentId: contentId,
       reads,

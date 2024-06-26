@@ -14,6 +14,11 @@ const SignIn: React.FC<SignInProps> = ({ onSignInSuccess }) => {
   useEffect(() => {
     async function connectToLukso() {
       try {
+        // Ensure 'ethereum' is available
+        if (!(window as any).lukso) {
+          console.error("Lukso provider is not available.");
+          return;
+        }
         // Initialize ethers provider with the injected Ethereum provider
         const provider = new ethers.BrowserProvider((window as any).lukso);
 
@@ -49,8 +54,11 @@ const SignIn: React.FC<SignInProps> = ({ onSignInSuccess }) => {
         // Create the message's hash for verification purposes
         const hashedMessage = ethers.hashMessage(siweMessage);
 
-        const isValidSignature = await universalProfileContract
-          .isValidSignature(hashedMessage, signature)
+        const isValidSignature =
+          await universalProfileContract.isValidSignature(
+            hashedMessage,
+            signature
+          );
 
         // Check if the response is equal to the magic value
         if (isValidSignature === "0x1626ba7e") {
@@ -67,8 +75,6 @@ const SignIn: React.FC<SignInProps> = ({ onSignInSuccess }) => {
       } catch (error) {
         console.error("Error getting user accounts:", error);
       }
-
-
     }
 
     connectToLukso();
@@ -84,6 +90,6 @@ const SignIn: React.FC<SignInProps> = ({ onSignInSuccess }) => {
       )}
     </div>
   );
-}
+};
 
 export default SignIn;
