@@ -48,7 +48,7 @@ const SocialLeaderboard: React.FC = ({}) => {
       <RootLayout>
         <div>
         <h1 className={styles.rowSpace}>This is the Social Leaderboard of Quill</h1>
-          <Table striped bordered hover className={styles.customTable}>
+          <Table striped hover style={{ border: 'none' }}>
             <thead>
               <tr>
                 <th>Ranking</th>

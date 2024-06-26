@@ -12,7 +12,16 @@ const NavBar: React.FC<NavBarProps> = ({ account }) => {
     <div>
       <Navbar expand="lg" bg="dark" data-bs-theme="dark" sticky="top">
         <Container>
-          <Navbar.Brand>Quill</Navbar.Brand>
+          <Navbar.Brand>
+          <Link
+                href={{
+                  pathname: "/",
+                }}
+                style={{ textDecoration: 'none' }}
+              >
+                <div className={styles.navLink}>Quill</div>
+              </Link>
+          </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">

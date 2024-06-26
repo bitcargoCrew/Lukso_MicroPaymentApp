@@ -65,12 +65,12 @@ const SocialFeed: React.FC = () => {
             <Card style={{ border: 'none' }}>
               <Card.Body>
                 <Row className="align-items-center">
-                  <Col>
+                  <Col xs={4}>
                     <SupporterInformation
                       contentSupporter={interaction.contentSupporter}
                     />
                   </Col>
-                  <Col>
+                  <Col xs={8}>
                     <div className={styles.stylingEvent}>
                       {getEventText(interaction.event)} {timeSince(interaction.timestamp)} and received{" "}
                       {interaction.numberOfTokensReceived} Quill Tokens.

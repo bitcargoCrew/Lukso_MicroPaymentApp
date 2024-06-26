@@ -143,7 +143,7 @@ const Home: React.FC<HomeProps> = () => {
             </p>
           </Col>
         </Row>
-        <Row className={styles.rowSpace}>
+        <Row>
           <Col className="d-flex justify-content-center">
             <div className={styles.centeredTextUPCreationBox}>
               <p className={styles.centeredTextUPCreationTitle}>
