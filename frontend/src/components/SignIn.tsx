@@ -14,7 +14,7 @@ const SignIn: React.FC<SignInProps> = ({ onSignInSuccess }) => {
   useEffect(() => {
     async function connectToLukso() {
       try {
-        // Ensure 'ethereum' is available
+        // Ensure 'lukso' is available
         if (!(window as any).lukso) {
           console.error("Lukso provider is not available.");
           return;

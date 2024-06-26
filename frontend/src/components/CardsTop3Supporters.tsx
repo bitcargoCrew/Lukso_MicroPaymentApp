@@ -17,7 +17,6 @@ const CardsTop3Supporters: React.FC = () => {
       const response = await fetch(`${config.apiUrl}/top3Supporters`);
       if (response.ok) {
         const data = await response.json();
-        console.log("Fetched data:", data); // Log the fetched data
         setTop3SupportersData(data);
         setError(null); // Clear any previous error
       } else {

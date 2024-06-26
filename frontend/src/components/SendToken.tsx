@@ -21,7 +21,6 @@ const SendToken: React.FC<SendTokenProps> = ({ onClose }) => {
       await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
       const account = await signer.getAddress();
-      console.log(amount)
 
       // Send transaction
       const tx = await signer.sendTransaction({

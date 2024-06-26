@@ -84,10 +84,10 @@ const Home: React.FC<HomeProps> = () => {
           className={styles.backgroundImage}
         />
         <p className={styles.backgroundText}>
-          &quot;Web3 has struggled to drive consumer adoption. Quill enables the
-          UX of Web2 while offering the benefits of Web3. Quill gives creators
-          ownership and control of their content distribution/monetization with
-          a direct view to their end consumer&quot;
+          &quot;Quill revolutionizes content creation by combining the seamless
+          experience of Web2 with the empowering benefits of Web3. Creators,
+          take control of your content distribution and monetization while
+          connecting directly with your audience.&quot;
         </p>
       </div>
 
@@ -97,8 +97,8 @@ const Home: React.FC<HomeProps> = () => {
             <Modal.Title>Important</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            We are currently in development. Please use the application with
-            your Lukso testnet UP
+            We are currently in development. Dive into Quill with your Lukso
+            testnet UP and be part of the future of content creation.
           </Modal.Body>
           <Modal.Footer>
             <Button variant="primary" onClick={() => setShowModal(false)}>
@@ -108,39 +108,38 @@ const Home: React.FC<HomeProps> = () => {
         </Modal>
         <Row className={styles.centeredText} id="solution">
           <h1>
-            Quill is a content platform that integrates micropayments for the
-            consumption of content (SocialFi).
+            Welcome to Quill - The Ultimate Content Platform Integrating
+            Micropayments (SocialFi).
           </h1>
         </Row>
         <ContentCarousel />
         <Row className={styles.centeredText} id="solution">
-          <h1>Why should you join Quill?</h1>
+          <h1>
+            Empower Your Creativity: Generate Income, Know Your Audience, and
+            Enjoy Flexible Payment Options.
+          </h1>
         </Row>
         <Row className={styles.rowSpace}>
           <Col>
-            <h3>Income Generation for Creators</h3>
+            <h3>Boost Your Earnings</h3>
             <p>
-              Creators need effective ways to monetize their content through
-              page traffic. We offer this by integrating the Lukso blockchain as
-              a micopayment solution.
+              Monetize your content like never before with our innovative page
+              traffic solutions powered by the Lukso blockchain.
             </p>
           </Col>
           <Col>
-            <h3>Creators Meet Consumers</h3>
+            <h3>Understand Your Audience</h3>
             <p>
-              Creators have a platform to know who consumes their content. We
-              provide detailed statistics about your customers so that you can
-              tailor your content to your target group.
+              Gain insights into your content consumers. Tailor your creations
+              to meet the preferences of your target audience.
             </p>
           </Col>
           <Col>
-            <h3>Flexible Payment Options</h3>
+            <h3>Flexible and Cost-Effective Payments</h3>
             <p>
-              Traditional payment methods involve high transaction fees that
-              reduce the overall profit for creators. We avoid this by using the
-              Lukso blockchain as a payment layer. Additionally, we offer a
-              flexible way for users to consume content with a pay-what-you-read
-              mechanism.
+              Say goodbye to high transaction fees. With Lukso blockchain
+              integration, enjoy a pay-what-you-read model and maximize your
+              profits.
             </p>
           </Col>
         </Row>
@@ -148,8 +147,8 @@ const Home: React.FC<HomeProps> = () => {
           <Col className="d-flex justify-content-center">
             <div className={styles.centeredTextUPCreationBox}>
               <p className={styles.centeredTextUPCreationTitle}>
-                Interested in using our DApp? Create your Universal Profile
-                (Digital Identity)
+                Ready to Join Us? Create Your Universal Profile (Digital
+                Identity) Today!
                 <Image
                   src="/UP_logo.png"
                   alt="UP Logo"
@@ -181,12 +180,14 @@ const Home: React.FC<HomeProps> = () => {
       <RootLayout>
         <Row>
           <h3 className={styles.centeredText}>
-            Checkout the Quill Leaderboard
+            Meet the Top 3 Content Supporters on Quill
           </h3>
           <CardsTop3Supporters />
         </Row>
         <Row>
-          <h3 className={styles.centeredTextFeed}>Social Feed of Quill</h3>
+          <h3 className={styles.centeredTextFeed}>
+            Explore the Latest Interactions with Content on Quill
+          </h3>
           <SocialFeed />
         </Row>
       </RootLayout>

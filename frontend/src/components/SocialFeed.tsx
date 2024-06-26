@@ -4,6 +4,7 @@ import { Button, Col, Row, Card, Spinner, Container } from "react-bootstrap";
 import config from "../../config";
 import SupporterInformation from "@/components/SupporterInformation";
 import RootLayout from "@/app/layout";
+import { timeSince } from "@/components/timeUtils"
 
 const SocialFeed: React.FC = () => {
   const [last20InteractionsData, setLast20InteractionsData] = useState<any[]>(
@@ -18,7 +19,6 @@ const SocialFeed: React.FC = () => {
       const response = await fetch(`${config.apiUrl}/last20Transactions`);
       if (response.ok) {
         const data = await response.json();
-        console.log("Fetched data:", data); // Log the fetched data
         setLast20InteractionsData(data);
         setError(null); // Clear any previous error
       } else {
@@ -72,8 +72,8 @@ const SocialFeed: React.FC = () => {
                   </Col>
                   <Col>
                     <div className={styles.stylingEvent}>
-                      {getEventText(interaction.event)} and received{" "}
-                      {interaction.numberOfTokensReceived} Quill Tokens
+                      {getEventText(interaction.event)} {timeSince(interaction.timestamp)} and received{" "}
+                      {interaction.numberOfTokensReceived} Quill Tokens.
                     </div>
                   </Col>
                 </Row>

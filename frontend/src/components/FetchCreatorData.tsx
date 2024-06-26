@@ -20,7 +20,6 @@ const fetchCreatorData = async ({ contentCreator, onDataFetched }: FetchContentD
   try {
     const metaData = await erc725js.fetchData("LSP3Profile");
     onDataFetched(metaData);
-    console.log(metaData);
   } catch (error) {
     console.error("Error fetching data:", error);
   }

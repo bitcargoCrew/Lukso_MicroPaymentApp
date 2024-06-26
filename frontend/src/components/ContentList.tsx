@@ -29,7 +29,6 @@ const ContentList: React.FC = () => {
         const response = await fetch(`${config.apiUrl}/allContent`);
         if (response.ok) {
           const data = await response.json();
-          console.log("Fetched data:", data); // Log the fetched data
           setContentList(data);
         } else {
           setError(`Failed to fetch content data: ${response.statusText}`);

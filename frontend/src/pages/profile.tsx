@@ -53,7 +53,10 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
         <Modal.Header closeButton>
           <Modal.Title>Important</Modal.Title>
         </Modal.Header>
-        <Modal.Body>We are currently in development. Please use the application with your Lukso testnet UP</Modal.Body>
+        <Modal.Body>
+          We are currently in development. Dive into Quill with your Lukso
+          testnet UP and be part of the future of content creation.
+        </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={() => setShowModal(false)}>
             Close
