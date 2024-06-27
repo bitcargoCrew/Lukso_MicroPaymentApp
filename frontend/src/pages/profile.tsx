@@ -111,11 +111,7 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
               </Col>
             </Row>
             <Row className={styles.rowSpace}>
-              <h1>Your purchased content</h1>
-              <div>We will add this section soon</div>
-            </Row>
-            <Row className={styles.rowSpace}>
-              <h1>Explore more content</h1>
+              <h1>Explore the content of Quill</h1>
             </Row>
             <Row className={styles.rowSpace}>
               <ContentList />

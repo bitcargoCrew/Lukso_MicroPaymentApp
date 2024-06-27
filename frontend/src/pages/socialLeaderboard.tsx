@@ -48,8 +48,8 @@ const SocialLeaderboard: React.FC = ({}) => {
       <RootLayout>
         <div>
         <h1 className={styles.rowSpace}>This is the Social Leaderboard of Quill</h1>
-          <Table striped hover style={{ border: 'none' }}>
-            <thead>
+          <Table hover style={{ border: 'none' }}>
+            <thead style={{ border: 'none' }}>
               <tr>
                 <th>Ranking</th>
                 <th>Universal Profile</th>
@@ -61,11 +61,11 @@ const SocialLeaderboard: React.FC = ({}) => {
             <tbody>
               {leaderboardData.map((item, index) => (
                 <tr key={item.contentSupporter}>
-                  <td>{index + 1}</td>
-                  <td><SupporterInformation contentSupporter={item.contentSupporter} /></td>
-                  <td>{item.totalReads}</td>
-                  <td>{item.totalLikes}</td>
-                  <td>{item.totalTokensReceived}</td>
+                  <td style={{ borderBottom: '1px solid #e0e0e0', verticalAlign: 'middle'}}>{index + 1}</td>
+                  <td style={{ borderBottom: '1px solid #e0e0e0', verticalAlign: 'middle'}}><SupporterInformation contentSupporter={item.contentSupporter} /></td>
+                  <td style={{ borderBottom: '1px solid #e0e0e0', verticalAlign: 'middle'}}>{item.totalReads}</td>
+                  <td style={{ borderBottom: '1px solid #e0e0e0', verticalAlign: 'middle'}}>{item.totalLikes}</td>
+                  <td style={{ borderBottom: '1px solid #e0e0e0', verticalAlign: 'middle'}}><strong>{item.totalTokensReceived}</strong></td>
                 </tr>
               ))}
             </tbody>
