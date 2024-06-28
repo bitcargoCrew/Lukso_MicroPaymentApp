@@ -7,6 +7,7 @@ import multer, { Multer } from "multer";
 import transferTokenRead from "./services/transferTokenRead";
 import transferTokenLike from "./services/transferTokenLike";
 import getAllTokenHolder from "./services/getAllTokenHolders";
+import { getLuksoJobs } from "./services/getLuksoJobs" // Import the function
 
 const { initializeApp, cert } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
@@ -317,6 +318,17 @@ app.get("/last20Transactions", async (req: Request, res: Response) => {
     res.status(200).json(transactions);
   } catch (error) {
     console.error("Error fetching transactions:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Endpoint to get job listings from Lukso
+app.get("/getLuksoJobs", async (req: Request, res: Response) => {
+  try {
+    const jobs = await getLuksoJobs();
+    res.status(200).json(jobs);
+  } catch (error) {
+    console.error("Error fetching job listings:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
