@@ -16,6 +16,7 @@ import RootLayout from "../app/layout";
 import ContentCarousel from "@/components/ContentCarousel";
 import CardsTop3Supporters from "@/components/CardsTop3Supporters";
 import SocialFeed from "@/components/SocialFeed";
+import JobBoard from "@/components/JobBoard";
 
 interface HomeProps {}
 
@@ -189,6 +190,12 @@ const Home: React.FC<HomeProps> = () => {
             Explore the Latest Interactions with Content on Quill
           </h3>
           <SocialFeed />
+        </Row>
+        <Row>
+          <div style={{ padding: "20px" }}>
+            <h1>Lukso Job Listings</h1>
+            <JobBoard />
+          </div>
         </Row>
       </RootLayout>
       <Navbar expand="lg" bg="dark" data-bs-theme="dark">
