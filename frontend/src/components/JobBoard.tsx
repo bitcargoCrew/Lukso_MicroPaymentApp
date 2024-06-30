@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
+import { Button, Col, Row, Card, Spinner } from "react-bootstrap";
+import Link from "next/link";
 import config from "../../config";
 
 interface JobListing {
@@ -17,12 +19,15 @@ const JobBoard: React.FC = () => {
       try {
         const response = await fetch(`${config.apiUrl}/getLuksoJobs`);
         if (!response.ok) {
-          throw new Error(`Failed to fetch job listings: ${response.statusText}`);
+          throw new Error(
+            `Failed to fetch job listings: ${response.statusText}`
+          );
         }
         const data: JobListing[] = await response.json();
+        console.log(data);
         setJobListings(data);
       } catch (error) {
-        setError('Failed to fetch job listings');
+        setError("Failed to fetch job listings");
       } finally {
         setLoading(false);
       }
@@ -40,17 +45,27 @@ const JobBoard: React.FC = () => {
   }
 
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+    <Row>
       {jobListings.map((job, index) => (
-        <div key={index} style={{ border: '1px solid #ccc', padding: '20px', borderRadius: '5px', width: '300px' }}>
-          <h3>{job.title}</h3>
-          <p>{job.description}</p>
-          <a href={job.link} target="_blank" rel="noopener noreferrer">
-            Apply Here
-          </a>
-        </div>
+        <Col key={index} xs={12} md={4} className="mb-4">
+          <Card>
+            <Card.Body>
+              <Row>
+                <Card.Title>{job.title}</Card.Title>
+              </Row>
+              <Row>
+                <Card.Text>{job.description}</Card.Text>
+              </Row>
+              <Row>
+                <Link href={`${job.link}`} passHref>
+                  <Button variant="dark" style={{marginTop: "5%"}}>Apply here</Button>
+                </Link>
+              </Row>
+            </Card.Body>
+          </Card>
+        </Col>
       ))}
-    </div>
+    </Row>
   );
 };
 

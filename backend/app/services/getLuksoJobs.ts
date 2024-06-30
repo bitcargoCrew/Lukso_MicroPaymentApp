@@ -48,7 +48,7 @@ export const getLuksoJobs = async (): Promise<JobListing[]> => {
           jobListings.push({
             title,
             description,
-            link: `https://lukso.network${link}`,
+            link: `${link}`,
           });
         }
       });

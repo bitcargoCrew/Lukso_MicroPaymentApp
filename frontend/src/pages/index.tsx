@@ -192,10 +192,8 @@ const Home: React.FC<HomeProps> = () => {
           <SocialFeed />
         </Row>
         <Row>
-          <div style={{ padding: "20px" }}>
-            <h1>Lukso Job Listings</h1>
-            <JobBoard />
-          </div>
+          <h3 className={styles.centeredText}>The Lukso Blockchain offers jobs via the Agency for the Future GmbH</h3>
+          <JobBoard />
         </Row>
       </RootLayout>
       <Navbar expand="lg" bg="dark" data-bs-theme="dark">
