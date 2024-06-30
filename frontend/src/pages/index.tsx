@@ -16,6 +16,7 @@ import RootLayout from "../app/layout";
 import ContentCarousel from "@/components/ContentCarousel";
 import CardsTop3Supporters from "@/components/CardsTop3Supporters";
 import SocialFeed from "@/components/SocialFeed";
+import JobBoard from "@/components/JobBoard";
 
 interface HomeProps {}
 
@@ -189,6 +190,10 @@ const Home: React.FC<HomeProps> = () => {
             Explore the Latest Interactions with Content on Quill
           </h3>
           <SocialFeed />
+        </Row>
+        <Row>
+          <h3 className={styles.centeredText}>The Lukso Blockchain offers jobs via the Agency for the Future GmbH</h3>
+          <JobBoard />
         </Row>
       </RootLayout>
       <Navbar expand="lg" bg="dark" data-bs-theme="dark">
