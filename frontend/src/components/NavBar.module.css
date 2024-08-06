@@ -19,6 +19,16 @@
     text-decoration: none; /* Remove underline */
   }
 
+  .navLinkManager {
+    color: #fff;
+    cursor: pointer;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 0px;
+    padding-right: 40px;
+    text-decoration: none; /* Remove underline */
+  }
+
   .centeredButton {
     margin-top: 4px; /* Adjust margin as needed */
   }

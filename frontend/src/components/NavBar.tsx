@@ -43,6 +43,15 @@ const NavBar: React.FC<NavBarProps> = ({ account }) => {
               >
                 <div className={styles.navLinkSocial}>Social Leaderboard</div>
               </Link>
+              <Link
+                href={{
+                  pathname: "/keyManager",
+                  query: { account: account },
+                }}
+                style={{ textDecoration: 'none' }}
+              >
+                <div className={styles.navLinkManager}>KeyManager</div>
+              </Link>
               <div className={styles.centeredButton}>
                 <Link
                   href={{
