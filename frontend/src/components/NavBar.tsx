@@ -13,14 +13,14 @@ const NavBar: React.FC<NavBarProps> = ({ account }) => {
       <Navbar expand="lg" bg="dark" data-bs-theme="dark" sticky="top">
         <Container>
           <Navbar.Brand>
-          <Link
-                href={{
-                  pathname: "/",
-                }}
-                style={{ textDecoration: 'none' }}
-              >
-                <div className={styles.navLink}>Quill</div>
-              </Link>
+            <Link
+              href={{
+                pathname: "/",
+              }}
+              style={{ textDecoration: "none" }}
+            >
+              <div className={styles.navLink}>Quill</div>
+            </Link>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
@@ -30,7 +30,7 @@ const NavBar: React.FC<NavBarProps> = ({ account }) => {
                   pathname: "/profile",
                   query: { account: account },
                 }}
-                style={{ textDecoration: 'none' }}
+                style={{ textDecoration: "none" }}
               >
                 <div className={styles.navLink}>Content Overview</div>
               </Link>
@@ -39,19 +39,21 @@ const NavBar: React.FC<NavBarProps> = ({ account }) => {
                   pathname: "/socialLeaderboard",
                   query: { account: account },
                 }}
-                style={{ textDecoration: 'none' }}
+                style={{ textDecoration: "none" }}
               >
                 <div className={styles.navLinkSocial}>Social Leaderboard</div>
               </Link>
-              <Link
-                href={{
-                  pathname: "/keyManager",
-                  query: { account: account },
-                }}
-                style={{ textDecoration: 'none' }}
-              >
-                <div className={styles.navLinkManager}>KeyManager</div>
-              </Link>
+              {/* 
+  <Link
+    href={{
+      pathname: "/keyManager",
+      query: { account: account },
+    }}
+    style={{ textDecoration: 'none' }}
+  >
+    Link Text
+  </Link> 
+*/}
               <div className={styles.centeredButton}>
                 <Link
                   href={{

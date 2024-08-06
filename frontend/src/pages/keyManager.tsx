@@ -10,8 +10,8 @@ interface KeyManagerViewProps {}
 
 const KeyManager: React.FC<KeyManagerViewProps> = ({}) => {
   const [account, setAccount] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [controllerAddresses, setControllerAddresses] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [controllerAddresses, setControllerAddresses] = useState<any[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -19,20 +19,24 @@ const KeyManager: React.FC<KeyManagerViewProps> = ({}) => {
     const accountQuery = router.query.account;
     if (accountQuery && accountQuery !== account) {
       setAccount(accountQuery as string);
-      setIsLoading(true); // Reset loading state when account changes
     }
-  }, [router.query, account]);
+  }, [router.query]);
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!account) return;
+
+      setIsLoading(true);
+      setError(null);
+
       try {
         const addresses = await getPermissionedAddresses({ account });
-      } catch (error) {
-        if (error instanceof Error) {
-          setError(`An error occurred: ${error.message}`);
-        } else {
-          setError("An unknown error occurred.");
-        }
+        setControllerAddresses(addresses);
+      } catch (error: any) {
+        setError(`An error occurred: ${error.message}`);
+        setControllerAddresses(null);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -43,7 +47,29 @@ const KeyManager: React.FC<KeyManagerViewProps> = ({}) => {
     <div>
       <NavBar account={account} />
       <RootLayout>
-        <Row>Test</Row>
+        <Row>
+          <Col>
+            {isLoading ? (
+              <Spinner animation="border" role="status">
+              </Spinner>
+            ) : error ? (
+              <div>
+                <p>{error}</p>
+              </div>
+            ) : controllerAddresses && controllerAddresses.length > 0 ? (
+              <ul>
+                {controllerAddresses.map((item, index) => (
+                  <li key={index}>
+                    <div>Address: {item.address}</div>
+                    <div>Permissions: {JSON.stringify(item.permissions, null, 2)}</div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No controller addresses found for this account.</p>
+            )}
+          </Col>
+        </Row>
       </RootLayout>
     </div>
   );
