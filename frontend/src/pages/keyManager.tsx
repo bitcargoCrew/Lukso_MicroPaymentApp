@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import RootLayout from "../app/layout";
 import NavBar from "../components/NavBar";
 import getPermissionedAddresses from "../components/ControllerList";
+import CreateVault from "@/components/CreateVault";
 
 interface KeyManagerViewProps {}
 
@@ -70,6 +71,9 @@ const KeyManager: React.FC<KeyManagerViewProps> = ({}) => {
             )}
           </Col>
         </Row>
+        <Row>
+            <CreateVault account={account}/>
+          </Row>
       </RootLayout>
     </div>
   );

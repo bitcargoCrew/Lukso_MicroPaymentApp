@@ -84,12 +84,14 @@ const Home: React.FC<HomeProps> = () => {
           alt="Creator Background Image"
           className={styles.backgroundImage}
         />
-        <p className={styles.backgroundText}>
-          &quot;Quill revolutionizes content creation by combining the seamless
-          experience of Web2 with the empowering benefits of Web3. Creators,
-          take control of your content distribution and monetization while
-          connecting directly with your audience.&quot;
-        </p>
+        <div className={styles.overlay}>
+          <p className={styles.backgroundText}>
+            &quot;Quill revolutionizes content creation by combining the
+            seamless experience of Web2 with the empowering benefits of Web3.
+            Creators, take control of your content distribution and monetization
+            while connecting directly with your audience.&quot;
+          </p>
+        </div>
       </div>
 
       <RootLayout>
@@ -169,14 +171,16 @@ const Home: React.FC<HomeProps> = () => {
           alt="Creator Quote Image"
           className={styles.backgroundImage}
         />
-        <p className={styles.backgroundText}>
-          &quot;Artists should own their own work for so many reasons, but the
-          most screamingly obvious one is that if you own what you create, you
-          have control over what happens to it.&quot;
-          <br />
-          <br />
-          Taylor Swift, World Renowned Performing Artist
-        </p>
+        <div className={styles.overlay}>
+          <p className={styles.backgroundText}>
+            &quot;Artists should own their own work for so many reasons, but the
+            most screamingly obvious one is that if you own what you create, you
+            have control over what happens to it.&quot;
+            <br />
+            <br />
+            Taylor Swift, World Renowned Performing Artist
+          </p>
+        </div>
       </div>
       <RootLayout>
         <Row>
@@ -192,7 +196,9 @@ const Home: React.FC<HomeProps> = () => {
           <SocialFeed />
         </Row>
         <Row>
-          <h3 className={styles.centeredText}>The Lukso Blockchain offers jobs via the Agency for the Future GmbH</h3>
+          <h3 className={styles.centeredText}>
+            The Lukso Blockchain offers jobs via the Agency for the Future GmbH
+          </h3>
           <JobBoard />
         </Row>
       </RootLayout>
