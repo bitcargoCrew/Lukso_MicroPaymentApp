@@ -1,3 +1,7 @@
+.solutionSection {
+  padding-top: 100px; /* Adjust the value as needed */
+}
+
 .rowSpace {
   padding-bottom: 5%;
 }
@@ -63,10 +67,9 @@
 }
 
 @media screen and (max-width: 4000px) {
-
-	.backgroundImage {
-		min-height: 800px;
-	}
+  .backgroundImage {
+    min-height: 800px;
+  }
 
   .backgroundText {
     top: 55%;
@@ -74,14 +77,12 @@
     transform: translate(-70%, -40%);
     font-size: 40.5px;
   }
-
 }
 
 @media screen and (max-width: 2600px) {
-
-	.backgroundImage {
-		min-height: 800px;
-	}
+  .backgroundImage {
+    min-height: 800px;
+  }
 
   .backgroundText {
     top: 55%;
@@ -89,14 +90,12 @@
     transform: translate(-70%, -40%);
     font-size: 32.5px;
   }
-
 }
 
 @media screen and (max-width: 1200px) {
-
-	.backgroundImage {
-		min-height: 400px;
-	}
+  .backgroundImage {
+    min-height: 400px;
+  }
 
   .backgroundText {
     top: 60%;
@@ -104,14 +103,12 @@
     transform: translate(-60%, -80%);
     font-size: 20.5px;
   }
-
 }
 
 @media screen and (max-width: 600px) {
-
-	.backgroundImage {
-		min-height: 400px;
-	}
+  .backgroundImage {
+    min-height: 400px;
+  }
 
   .backgroundText {
     top: 70%;
@@ -119,5 +116,4 @@
     transform: translate(-60%, -80%);
     font-size: 14.5px;
   }
-
 }

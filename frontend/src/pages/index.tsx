@@ -53,7 +53,7 @@ const Home: React.FC<HomeProps> = () => {
             <Nav className="me-auto">
               <Nav.Link href="#home">Home</Nav.Link>
               <Nav.Link href="#solution">Solution</Nav.Link>
-              <Nav.Link href="#story">Story</Nav.Link>
+              <Nav.Link href="#topSupporters">Top Supporters</Nav.Link>
             </Nav>
             <div className="justify-content-end">
               {!buttonClicked && (
@@ -94,77 +94,79 @@ const Home: React.FC<HomeProps> = () => {
         </div>
       </div>
 
-      <RootLayout>
-        <Modal show={showModal} onHide={() => setShowModal(false)}>
-          <Modal.Header closeButton>
-            <Modal.Title>Important</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            We are currently in development. Dive into Quill with your Lukso
-            testnet UP and be part of the future of content creation.
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="primary" onClick={() => setShowModal(false)}>
-              Close
-            </Button>
-          </Modal.Footer>
-        </Modal>
-        <Row className={styles.centeredText} id="solution">
-          <h1>
-            Welcome to Quill - The Ultimate Content Platform Integrating
-            Micropayments (SocialFi).
-          </h1>
-        </Row>
-        <ContentCarousel />
-        <Row className={styles.centeredText} id="solution">
-          <h1>
-            Empower Your Creativity: Generate Income, Know Your Audience, and
-            Enjoy Flexible Payment Options.
-          </h1>
-        </Row>
-        <Row className={styles.rowSpace}>
-          <Col>
-            <h3>Boost Your Earnings</h3>
-            <p>
-              Monetize your content like never before with our innovative page
-              traffic solutions powered by the Lukso blockchain.
-            </p>
-          </Col>
-          <Col>
-            <h3>Understand Your Audience</h3>
-            <p>
-              Gain insights into your content consumers. Tailor your creations
-              to meet the preferences of your target audience.
-            </p>
-          </Col>
-          <Col>
-            <h3>Flexible and Cost-Effective Payments</h3>
-            <p>
-              Say goodbye to high transaction fees. With Lukso blockchain
-              integration, enjoy a pay-what-you-read model and maximize your
-              profits.
-            </p>
-          </Col>
-        </Row>
-        <Row>
-          <Col className="d-flex justify-content-center">
-            <div className={styles.centeredTextUPCreationBox}>
-              <p className={styles.centeredTextUPCreationTitle}>
-                Ready to Join Us? Create Your Universal Profile (Digital
-                Identity) Today!
-                <Image
-                  src="/UP_logo.png"
-                  alt="UP Logo"
-                  className={styles.centeredTextUPCreationImage}
-                />
+      <div id="solution">
+        <RootLayout>
+          <Modal show={showModal} onHide={() => setShowModal(false)}>
+            <Modal.Header closeButton>
+              <Modal.Title>Important</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              We are currently in development. Dive into Quill with your Lukso
+              testnet UP and be part of the future of content creation.
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="primary" onClick={() => setShowModal(false)}>
+                Close
+              </Button>
+            </Modal.Footer>
+          </Modal>
+          <Row className={styles.centeredText}>
+            <h1>
+              Welcome to Quill - The Ultimate Content Platform Integrating
+              Micropayments (SocialFi).
+            </h1>
+          </Row>
+          <ContentCarousel />
+          <Row className={styles.centeredText}>
+            <h1>
+              Empower Your Creativity: Generate Income, Know Your Audience, and
+              Enjoy Flexible Payment Options.
+            </h1>
+          </Row>
+          <Row className={styles.rowSpace}>
+            <Col>
+              <h3>Boost Your Earnings</h3>
+              <p>
+                Monetize your content like never before with our innovative page
+                traffic solutions powered by the Lukso blockchain.
               </p>
-              <Link href="https://universalprofile.cloud/" passHref>
-                <Button variant="dark">Create your profile</Button>
-              </Link>
-            </div>
-          </Col>
-        </Row>
-      </RootLayout>
+            </Col>
+            <Col>
+              <h3>Understand Your Audience</h3>
+              <p>
+                Gain insights into your content consumers. Tailor your creations
+                to meet the preferences of your target audience.
+              </p>
+            </Col>
+            <Col>
+              <h3>Flexible and Cost-Effective Payments</h3>
+              <p>
+                Say goodbye to high transaction fees. With Lukso blockchain
+                integration, enjoy a pay-what-you-read model and maximize your
+                profits.
+              </p>
+            </Col>
+          </Row>
+          <Row>
+            <Col className="d-flex justify-content-center">
+              <div className={styles.centeredTextUPCreationBox}>
+                <p className={styles.centeredTextUPCreationTitle}>
+                  Ready to Join Us? Create Your Universal Profile (Digital
+                  Identity) Today!
+                  <Image
+                    src="/UP_logo.png"
+                    alt="UP Logo"
+                    className={styles.centeredTextUPCreationImage}
+                  />
+                </p>
+                <Link href="https://universalprofile.cloud/" passHref>
+                  <Button variant="dark">Create your profile</Button>
+                </Link>
+              </div>
+            </Col>
+          </Row>
+        </RootLayout>
+      </div>
       <div className={styles.backgroundContainer}>
         <Image
           src="/quote_image.jpg"
@@ -182,26 +184,29 @@ const Home: React.FC<HomeProps> = () => {
           </p>
         </div>
       </div>
-      <RootLayout>
-        <Row>
-          <h3 className={styles.centeredText}>
-            Meet the Top 3 Content Supporters on Quill
-          </h3>
-          <CardsTop3Supporters />
-        </Row>
-        <Row>
-          <h3 className={styles.centeredTextFeed}>
-            Explore the Latest Interactions with Content on Quill
-          </h3>
-          <SocialFeed />
-        </Row>
-        <Row>
-          <h3 className={styles.centeredText}>
-            The Lukso Blockchain offers jobs via the Agency for the Future GmbH
-          </h3>
-          <JobBoard />
-        </Row>
-      </RootLayout>
+      <div id="topSupporters">
+        <RootLayout>
+          <Row>
+            <h3 className={styles.centeredText}>
+              Meet the Top 3 Content Supporters on Quill
+            </h3>
+            <CardsTop3Supporters />
+          </Row>
+          <Row>
+            <h3 className={styles.centeredTextFeed}>
+              Explore the Latest Interactions with Content on Quill
+            </h3>
+            <SocialFeed />
+          </Row>
+          <Row>
+            <h3 className={styles.centeredText}>
+              The Lukso Blockchain offers jobs via the Agency for the Future
+              GmbH
+            </h3>
+            <JobBoard />
+          </Row>
+        </RootLayout>
+      </div>
       <Navbar expand="lg" bg="dark" data-bs-theme="dark">
         <Container>
           <Nav className="me-auto">
