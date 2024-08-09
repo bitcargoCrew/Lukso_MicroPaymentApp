@@ -19,6 +19,12 @@
   z-index: 1; /* Ensure it appears above the card content */
 }
 
+.spinnerOverlayContent {
+  color: white;
+  font-size: 18px;
+  text-align: center;
+}
+
 
 .contentImage {
   max-width: 100%; /* Ensures the image doesn't exceed the column size */

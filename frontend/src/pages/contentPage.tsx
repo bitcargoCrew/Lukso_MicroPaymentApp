@@ -11,7 +11,7 @@ import Link from "next/link";
 import { Heart } from "react-bootstrap-icons";
 import LikePayment from "../components/LikePayment";
 import { Editor, EditorState, convertFromRaw } from "draft-js";
-import 'draft-js/dist/Draft.css';
+import "draft-js/dist/Draft.css";
 
 const ContentPage: React.FC = () => {
   const [account, setAccount] = useState("");
@@ -19,6 +19,7 @@ const ContentPage: React.FC = () => {
     null
   );
   const [error, setError] = useState<string | null>(null);
+  const [errorLike, setErrorLike] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
   const [isLikeButtonDisabled, setIsLikeButtonDisabled] = useState(false);
   const [transactionInProgress, setTransactionInProgress] = useState(false);
@@ -32,30 +33,29 @@ const ContentPage: React.FC = () => {
     if (accountQuery && accountQuery !== account) {
       setAccount(accountQuery as string);
     }
-
-    const fetchContentData = async () => {
-      if (contentId) {
-        try {
-          const response = await fetch(`${config.apiUrl}/content/${contentId}`);
-          if (response.ok) {
-            const data = await response.json();
-            console.log("Fetched data:", data); // Log the fetched data
-            setContentData(data);
-          } else {
-            setError(`Failed to fetch content data: ${response.statusText}`);
-          }
-        } catch (error) {
-          if (error instanceof Error) {
-            setError(`An error occurred: ${error.message}`);
-          } else {
-            setError("An unknown error occurred.");
-          }
-        }
-      }
-    };
-
     fetchContentData();
   }, [router.query, account, contentId]);
+
+  const fetchContentData = async () => {
+    if (contentId) {
+      try {
+        const response = await fetch(`${config.apiUrl}/content/${contentId}`);
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Fetched data:", data); // Log the fetched data
+          setContentData(data);
+        } else {
+          setError(`Failed to fetch content data: ${response.statusText}`);
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          setError(`An error occurred: ${error.message}`);
+        } else {
+          setError("An unknown error occurred.");
+        }
+      }
+    }
+  };
 
   const handleLike = async () => {
     if (isLikeButtonDisabled || !contentData) return;
@@ -64,7 +64,10 @@ const ContentPage: React.FC = () => {
     setTransactionMessage("Like processing... Waiting for confirmation");
     try {
       const likeCost = 0.01;
-      const { contentSupporter } = await LikePayment.transactionModule(contentData.contentCreator, likeCost);
+      const { contentSupporter } = await LikePayment.transactionModule(
+        contentData.contentCreator,
+        likeCost
+      );
       const updatedNumberOfLikes = (contentData.numberOfLikes || 0) + 1;
       setContentData({ ...contentData, numberOfLikes: updatedNumberOfLikes });
 
@@ -74,7 +77,11 @@ const ContentPage: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ numberOfLikes: updatedNumberOfLikes, contentCreator: contentData.contentCreator, contentSupporter }),
+        body: JSON.stringify({
+          numberOfLikes: updatedNumberOfLikes,
+          contentCreator: contentData.contentCreator,
+          contentSupporter,
+        }),
       });
 
       if (!response.ok) {
@@ -84,8 +91,9 @@ const ContentPage: React.FC = () => {
       setTransactionMessage("Like added successfully!");
     } catch (error) {
       console.error("Error updating like:", error);
-      setError("Failed to update like. Please try again.");
+      setErrorLike("Failed to update like. Please try again.");
       setTransactionMessage("Failed to add like. Please try again.");
+      setIsLiked(false); // Ensure
     } finally {
       setIsLikeButtonDisabled(false);
       setTransactionInProgress(false);
@@ -97,23 +105,50 @@ const ContentPage: React.FC = () => {
     return (
       <RootLayout>
         <div>
-          <h1>You are not authorized to view this page.</h1>
-          <h1>Please make a payment to access this page.</h1>
+          <h3>
+            You are not authorized to view this page. Please make a payment to
+            access this page.
+          </h3>
         </div>
       </RootLayout>
     );
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return (
+      <div>
+        <NavBar account={account}></NavBar>
+        <RootLayout>
+          <div>
+            <h3>The content is not available. Please open another post.</h3>
+          </div>
+        </RootLayout>
+      </div>
+    );
   }
 
   if (!contentData) {
-    return <Spinner animation="border" role="status" />;
+    return (
+      <div>
+        <NavBar account={account}></NavBar>
+        <RootLayout>
+          <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ height: "100vh" }}
+          >
+            <Spinner animation="border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </Spinner>
+          </div>
+        </RootLayout>
+      </div>
+    );
   }
 
   // Convert the raw content state to EditorState
-  const contentState = convertFromRaw(JSON.parse(contentData.contentLongDescription));
+  const contentState = convertFromRaw(
+    JSON.parse(contentData.contentLongDescription)
+  );
   const editorState = EditorState.createWithContent(contentState);
 
   return (
@@ -164,20 +199,19 @@ const ContentPage: React.FC = () => {
             <div>
               <div className={styles.heartButton}>
                 <Button
-                  variant={isLiked ? "dark" : "outline-dark"}
-                  className={`text-dark ${styles.heartButton}`}
+                  variant={"outline-dark"}
                   onClick={handleLike}
                   disabled={isLikeButtonDisabled}
                 >
                   <Heart
                     size={16}
-                    className={`${styles.heartIcon} ${
-                      isLiked ? styles.liked : ""
-                    }`}
+                    className={styles.heartIcon}
                   />
                 </Button>
               </div>
-              <div style={{paddingTop: "5px"}}>{transactionMessage && <p>{transactionMessage}</p>}</div>
+              <div style={{ paddingTop: "5px" }}>
+                {transactionMessage && <p>{transactionMessage}</p>}
+              </div>
             </div>
           </Row>
           <Row style={{ paddingTop: "20px" }}>

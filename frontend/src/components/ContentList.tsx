@@ -138,8 +138,10 @@ const ContentList: React.FC = () => {
                 {selectedContent === content.contentId &&
                   transactionInProgress && (
                     <div className={styles.overlay}>
-                      <Spinner animation="border" variant="light" />
-                      <div>Processing... Waiting for confirmation</div>
+                      <div className={styles.spinnerOverlayContent}>
+                        <Spinner animation="border" variant="light" />
+                        <div>Processing... Waiting for confirmation</div>
+                      </div>
                     </div>
                   )}
                 <Row>
