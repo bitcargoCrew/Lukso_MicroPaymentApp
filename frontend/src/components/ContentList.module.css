@@ -2,6 +2,24 @@
   padding-bottom: 2%;
 }
 
+.customCard {
+  position: relative;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1; /* Ensure it appears above the card content */
+}
+
+
 .contentImage {
   max-width: 100%; /* Ensures the image doesn't exceed the column size */
   max-height: 220px;

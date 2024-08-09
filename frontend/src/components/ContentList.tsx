@@ -1,5 +1,5 @@
 import styles from "./ContentList.module.css";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { Row, Col, Spinner, Card, Image, Button } from "react-bootstrap";
 import { useRouter } from "next/router";
 import ChangePagePayment from "@/components/ChangePagePayment";
@@ -18,18 +18,9 @@ const ContentList: React.FC = () => {
   const [supporterAddress, setSupporterAddress] = useState<string | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const accountQuery = router.query.account;
-    if (accountQuery && accountQuery !== account) {
-      setAccount(accountQuery as string);
-    }
-
-    fetchContentData();
-  }, [router.query, account]);
-
-  const fetchContentData = useCallback(async () => {
-    setLoading(true);
+  const fetchContentData = async () => {
     setError(null); // Reset the error state when retrying
+    setLoading(true); // Ensure loading is true while fetching data
     try {
       const response = await fetch(`${config.apiUrl}/allContent`);
       if (response.ok) {
@@ -47,7 +38,16 @@ const ContentList: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
+
+  useEffect(() => {
+    const accountQuery = router.query.account;
+    if (accountQuery && accountQuery !== account) {
+      setAccount(accountQuery as string);
+    }
+
+    fetchContentData();
+  }, [router.query, account, paid]);
 
   const handlePayment = async (
     contentId: string,
@@ -57,7 +57,8 @@ const ContentList: React.FC = () => {
   ) => {
     try {
       setTransactionInProgress(true);
-      const { txHash, contentSupporter } = await ChangePagePayment.transactionModule(contentCreator, contentCosts);
+      const { txHash, contentSupporter } =
+        await ChangePagePayment.transactionModule(contentCreator, contentCosts);
       setSupporterAddress(contentSupporter);
       setPaid(true);
       const updatedNumberOfRead = (numberOfRead || 0) + 1;
@@ -68,7 +69,12 @@ const ContentList: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ numberOfRead: updatedNumberOfRead, contentCreator, contentCosts, contentSupporter }),
+        body: JSON.stringify({
+          numberOfRead: updatedNumberOfRead,
+          contentCreator,
+          contentCosts,
+          contentSupporter,
+        }),
       });
 
       if (response.ok) {
@@ -128,8 +134,15 @@ const ContentList: React.FC = () => {
       <Row>
         {contentList.map((content) => (
           <Col key={String(content.contentId)} xs={12} className="mb-4">
-            <Card className="customCard">
+            <Card className={styles.custumCard}>
               <Card.Body>
+                {selectedContent === content.contentId &&
+                  transactionInProgress && (
+                    <div className={styles.overlay}>
+                      <Spinner animation="border" variant="light" />
+                      <div>Processing... Waiting for confirmation</div>
+                    </div>
+                  )}
                 <Row>
                   <Col xs={4} className={styles.customCol}>
                     <Image

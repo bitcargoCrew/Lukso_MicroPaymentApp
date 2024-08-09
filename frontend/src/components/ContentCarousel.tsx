@@ -65,11 +65,13 @@ const ContentCarousel: React.FC = () => {
   ) => {
     try {
       setTransactionInProgress(true);
-      const { contentSupporter } =
-        await ChangePagePayment.transactionModule(contentCreator, contentCosts);
+      const { contentSupporter } = await ChangePagePayment.transactionModule(
+        contentCreator,
+        contentCosts
+      );
       setPaid(true);
       const updatedNumberOfRead = (numberOfRead || 0) + 1;
-      console.log(contentSupporter)
+      console.log(contentSupporter);
       const response = await fetch(`${config.apiUrl}/content/${contentId}`, {
         method: "PUT",
         headers: {
@@ -138,6 +140,14 @@ const ContentCarousel: React.FC = () => {
 
   return (
     <div className={styles.carouselContainer}>
+      {transactionInProgress && (
+        <div className={styles.spinnerOverlay}>
+          <div className={styles.spinnerOverlayContent}>
+            <Spinner animation="border" role="status" />
+            <div>Processing... Waiting for confirmation</div>
+          </div>
+        </div>
+      )}
       <Carousel activeIndex={index} onSelect={handleSelect}>
         {contentList.map((content) => (
           <Carousel.Item key={String(content.contentId)}>
@@ -184,13 +194,10 @@ const ContentCarousel: React.FC = () => {
                         <Button
                           variant="dark"
                           onClick={() => handleButtonClick(content.contentId)}
-                          disabled={transactionInProgress}
+                          disabled={transactionInProgress} // Disable if any transaction is in progress
                           aria-label={`Read more about ${content.contentTitle}`}
                         >
-                          {selectedContent === content.contentId &&
-                          transactionInProgress
-                            ? "Processing... Waiting for confirmation"
-                            : "Read More"}
+                          Read More
                         </Button>
                       </Col>
                     </Row>
