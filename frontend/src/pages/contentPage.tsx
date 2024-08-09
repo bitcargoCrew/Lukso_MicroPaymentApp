@@ -23,7 +23,6 @@ const ContentPage: React.FC = () => {
   const [isLikeButtonDisabled, setIsLikeButtonDisabled] = useState(false);
   const [transactionInProgress, setTransactionInProgress] = useState(false);
   const [transactionMessage, setTransactionMessage] = useState("");
-  const [supporterAddress, setSupporterAddress] = useState<string | null>(null);
   const router = useRouter();
   const { query } = router;
   const { paid, contentId } = query;
@@ -66,7 +65,6 @@ const ContentPage: React.FC = () => {
     try {
       const likeCost = 0.01;
       const { contentSupporter } = await LikePayment.transactionModule(contentData.contentCreator, likeCost);
-      setSupporterAddress(contentSupporter);
       const updatedNumberOfLikes = (contentData.numberOfLikes || 0) + 1;
       setContentData({ ...contentData, numberOfLikes: updatedNumberOfLikes });
 

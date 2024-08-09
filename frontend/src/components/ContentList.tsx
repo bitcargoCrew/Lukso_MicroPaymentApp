@@ -1,5 +1,5 @@
 import styles from "./ContentList.module.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Row, Col, Spinner, Card, Image, Button } from "react-bootstrap";
 import { useRouter } from "next/router";
 import ChangePagePayment from "@/components/ChangePagePayment";
@@ -24,28 +24,30 @@ const ContentList: React.FC = () => {
       setAccount(accountQuery as string);
     }
 
-    const fetchContentData = async () => {
-      try {
-        const response = await fetch(`${config.apiUrl}/allContent`);
-        if (response.ok) {
-          const data = await response.json();
-          setContentList(data);
-        } else {
-          setError(`Failed to fetch content data: ${response.statusText}`);
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          setError(`An error occurred: ${error.message}`);
-        } else {
-          setError("An unknown error occurred.");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchContentData();
-  }, [router.query, account, paid]);
+  }, [router.query, account]);
+
+  const fetchContentData = useCallback(async () => {
+    setLoading(true);
+    setError(null); // Reset the error state when retrying
+    try {
+      const response = await fetch(`${config.apiUrl}/allContent`);
+      if (response.ok) {
+        const data = await response.json();
+        setContentList(data);
+      } else {
+        setError(`Failed to fetch content data: ${response.statusText}`);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(`An error occurred: ${error.message}`);
+      } else {
+        setError("An unknown error occurred.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const handlePayment = async (
     contentId: string,
@@ -111,7 +113,14 @@ const ContentList: React.FC = () => {
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return (
+      <div>
+        <div>{error}</div>
+        <Button variant="danger" onClick={fetchContentData}>
+          Retry
+        </Button>
+      </div>
+    );
   }
 
   return (

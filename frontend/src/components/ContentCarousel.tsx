@@ -24,11 +24,20 @@ const ContentCarousel: React.FC = () => {
   const [paid, setPaid] = useState(false);
   const [account, setAccount] = useState("");
   const [selectedContent, setSelectedContent] = useState<string | null>(null);
-  const [supporterAddress, setSupporterAddress] = useState<string | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const accountQuery = router.query.account;
+    if (accountQuery && accountQuery !== account) {
+      setAccount(accountQuery as string);
+    }
+
+    fetchContentData();
+  }, [router.query, account]);
 
   const fetchContentData = useCallback(async () => {
     setLoading(true);
+    setError(null); // Reset the error state when retrying
     try {
       const response = await fetch(`${config.apiUrl}/allContent`);
       if (response.ok) {
@@ -48,15 +57,6 @@ const ContentCarousel: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const accountQuery = router.query.account;
-    if (accountQuery && accountQuery !== account) {
-      setAccount(accountQuery as string);
-    }
-
-    fetchContentData();
-  }, [router.query, account, paid, fetchContentData]);
-
   const handlePayment = async (
     contentId: string,
     contentCreator: string,
@@ -67,10 +67,9 @@ const ContentCarousel: React.FC = () => {
       setTransactionInProgress(true);
       const { contentSupporter } =
         await ChangePagePayment.transactionModule(contentCreator, contentCosts);
-      setSupporterAddress(contentSupporter);
       setPaid(true);
       const updatedNumberOfRead = (numberOfRead || 0) + 1;
-
+      console.log(contentSupporter)
       const response = await fetch(`${config.apiUrl}/content/${contentId}`, {
         method: "PUT",
         headers: {
