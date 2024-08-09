@@ -120,10 +120,9 @@ const ContentList: React.FC = () => {
 
   if (error) {
     return (
-      <div>
-        <div>{error}</div>
+      <div className={styles.rowSpace}>
         <Button variant="danger" onClick={fetchContentData}>
-          Retry
+          {error}
         </Button>
       </div>
     );
