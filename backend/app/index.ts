@@ -6,8 +6,7 @@ import path from "path";
 import multer, { Multer } from "multer";
 import transferTokenRead from "./services/transferTokenRead";
 import transferTokenLike from "./services/transferTokenLike";
-import getAllTokenHolder from "./services/getAllTokenHolders";
-import { getLuksoJobs } from "./services/getLuksoJobs" // Import the function
+import { getLuksoJobs } from "./services/getLuksoJobs"; // Import the function
 
 const { initializeApp, cert } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
@@ -165,7 +164,8 @@ app.get("/content/:id", async (req: Request, res: Response) => {
 // Endpoint to update numberOfRead or numberOfLikes for specific content by ID
 app.put("/content/:id", async (req: Request, res: Response) => {
   const contentId = req.params.id;
-  const { numberOfLikes, numberOfRead, contentCosts, contentSupporter } = req.body;
+  const { numberOfLikes, numberOfRead, contentCosts, contentSupporter } =
+    req.body;
   console.log("Request body:", req.body);
 
   try {
@@ -203,6 +203,42 @@ app.put("/content/:id", async (req: Request, res: Response) => {
   }
 });
 
+app.get(
+  "/getContentPerSupporter/:contentSupporter",
+  async (req: Request, res: Response) => {
+    const contentSupporter = req.params.contentSupporter;
+
+    try {
+      // Reference to the "socialLeaderboard" collection
+      const contentRef = db.collection("socialLeaderboard");
+
+      // Query the collection where the contentSupporter matches
+      const snapshot = await contentRef
+        .where("contentSupporter", "==", contentSupporter)
+        .get();
+
+      if (snapshot.empty) {
+        return res
+          .status(404)
+          .json({ error: "No content found for this supporter" });
+      }
+
+      // Extract and accumulate the content IDs from the matching documents
+      const contentIds: string[] = snapshot.docs.map(
+        (doc: any) => doc.data().contentId
+      );
+
+      // Remove duplicates by converting the array to a Set and back to an array
+      const uniqueContentIds = Array.from(new Set(contentIds));
+
+      res.status(200).json({ uniqueContentIds });
+    } catch (error: any) {
+      console.error("Error fetching content IDs:", error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+);
+
 // Endpoint to get aggregated data for all contentSupporters
 app.get("/aggregateSocialLeaderboard", async (req: Request, res: Response) => {
   try {
@@ -214,7 +250,13 @@ app.get("/aggregateSocialLeaderboard", async (req: Request, res: Response) => {
     }
 
     // Object to hold aggregated data
-    const aggregation: { [key: string]: { totalLikes: number; totalReads: number; totalTokensReceived: number } } = {};
+    const aggregation: {
+      [key: string]: {
+        totalLikes: number;
+        totalReads: number;
+        totalTokensReceived: number;
+      };
+    } = {};
 
     snapshot.docs.forEach((doc: any) => {
       const data = doc.data();
@@ -230,17 +272,20 @@ app.get("/aggregateSocialLeaderboard", async (req: Request, res: Response) => {
 
       aggregation[supporter].totalLikes += data.likes || 0;
       aggregation[supporter].totalReads += data.reads || 0;
-      aggregation[supporter].totalTokensReceived += parseInt(data.numberOfTokensReceived) || 0;
+      aggregation[supporter].totalTokensReceived +=
+        parseInt(data.numberOfTokensReceived) || 0;
     });
 
     // Convert aggregation object to an array
-    const aggregatedList = Object.keys(aggregation).map(supporter => ({
+    const aggregatedList = Object.keys(aggregation).map((supporter) => ({
       contentSupporter: supporter,
       ...aggregation[supporter],
     }));
 
     // Sort the aggregated list by totalTokensReceived in descending order
-    aggregatedList.sort((a, b) => b.totalTokensReceived - a.totalTokensReceived);
+    aggregatedList.sort(
+      (a, b) => b.totalTokensReceived - a.totalTokensReceived
+    );
 
     res.status(200).json(aggregatedList);
   } catch (error) {
@@ -260,7 +305,13 @@ app.get("/top3Supporters", async (req: Request, res: Response) => {
     }
 
     // Object to hold aggregated data
-    const aggregation: { [key: string]: { totalLikes: number; totalReads: number; totalTokensReceived: number } } = {};
+    const aggregation: {
+      [key: string]: {
+        totalLikes: number;
+        totalReads: number;
+        totalTokensReceived: number;
+      };
+    } = {};
 
     snapshot.docs.forEach((doc: any) => {
       const data = doc.data();
@@ -276,17 +327,20 @@ app.get("/top3Supporters", async (req: Request, res: Response) => {
 
       aggregation[supporter].totalLikes += data.likes || 0;
       aggregation[supporter].totalReads += data.reads || 0;
-      aggregation[supporter].totalTokensReceived += parseInt(data.numberOfTokensReceived) || 0;
+      aggregation[supporter].totalTokensReceived +=
+        parseInt(data.numberOfTokensReceived) || 0;
     });
 
     // Convert aggregation object to an array
-    const aggregatedList = Object.keys(aggregation).map(supporter => ({
+    const aggregatedList = Object.keys(aggregation).map((supporter) => ({
       contentSupporter: supporter,
       ...aggregation[supporter],
     }));
 
     // Sort the aggregated list by totalTokensReceived in descending order
-    aggregatedList.sort((a, b) => b.totalTokensReceived - a.totalTokensReceived);
+    aggregatedList.sort(
+      (a, b) => b.totalTokensReceived - a.totalTokensReceived
+    );
 
     // Get the top 3 entries
     const top3 = aggregatedList.slice(0, 3);
@@ -301,9 +355,12 @@ app.get("/top3Supporters", async (req: Request, res: Response) => {
 // Endpoint to get the last 20 transactions/entries
 app.get("/last20Transactions", async (req: Request, res: Response) => {
   try {
-    const contentRef = db.collection("socialLeaderboard").orderBy("timestamp", "desc").limit(20);
+    const contentRef = db
+      .collection("socialLeaderboard")
+      .orderBy("timestamp", "desc")
+      .limit(20);
     const snapshot = await contentRef.get();
-    console.log(snapshot)
+    console.log(snapshot);
 
     if (snapshot.empty) {
       return res.status(404).json({ error: "No transactions found" });
@@ -330,16 +387,6 @@ app.get("/getLuksoJobs", async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error fetching job listings:", error);
     res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-// get all token holders from Quill - Does not work so far..
-app.get("/getAllTokenHolders", async (req: Request, res: Response) => {
-  try {
-      const data = await getAllTokenHolder();
-      res.json(data); // Send JSON response with fetched data
-  } catch (error: any) {
-      res.status(500).json({ error: error.message }); // Handle error response
   }
 });
 

@@ -8,6 +8,7 @@ import FetchProfileData from "../components/FetchProfileData";
 import RootLayout from "../app/layout";
 import NavBar from "../components/NavBar";
 import ContentList from "@/components/ContentList";
+import PurchasedContent from "@/components/PurchasedContent";
 
 interface ProfileViewProps {}
 
@@ -109,6 +110,12 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
                 <div>Account: {account}</div>
                 <Balance account={account} />
               </Col>
+            </Row>
+            <Row className={styles.rowSpace}>
+              <h1>Your purchased content</h1>
+            </Row>
+            <Row className={styles.rowSpace}>
+              <PurchasedContent />
             </Row>
             <Row className={styles.rowSpace}>
               <h1>Explore the content of Quill</h1>
