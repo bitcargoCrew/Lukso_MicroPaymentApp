@@ -18,7 +18,7 @@ const Balance: React.FC<BalanceProps> = ({ account }) => {
         const walletBalanceConverted = ethers.formatEther(walletBalance);
 
         const outputWalletBalance =
-          "Balance: " + parseFloat(walletBalanceConverted).toFixed(2) + " LYX";
+          parseFloat(walletBalanceConverted).toFixed(2) + " LYX";
 
         setBalance(outputWalletBalance);
       } catch (error) {
@@ -31,16 +31,9 @@ const Balance: React.FC<BalanceProps> = ({ account }) => {
     }
   }, [account]);
 
-  // Render JSX
   return (
     <div>
-      {balance ? (
-        <div>
-          <p>{balance}</p>
-        </div>
-      ) : (
-        <div>Wallet is loading...</div>
-      )}
+      {balance ? <div style={{ display: "flex", whiteSpace: "nowrap" }}> {balance}</div> : <div>Wallet is loading...</div>}
     </div>
   );
 };

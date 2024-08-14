@@ -124,7 +124,7 @@ const ContentCarousel: React.FC = () => {
   };
 
   if (loading) {
-    return <Spinner animation="border" role="status" />;
+    return <Spinner animation="border" role="status"className={styles.spinnerOverlayContent}/>;
   }
 
   if (error) {

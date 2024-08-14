@@ -2,57 +2,40 @@
 .navLink {
     color: #fff;
     cursor: pointer;
-    padding-top: 10px;
-    padding-bottom: 10px;
     padding-left: 30px;
-    padding-right: 40px;
+    padding-right: 30px;
     text-decoration: none; /* Remove underline */
+    display: inline-block;
   }
 
   .navLinkSocial {
     color: #fff;
     cursor: pointer;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 0px;
-    padding-right: 40px;
+    padding-right: 30px;
     text-decoration: none; /* Remove underline */
+    display: inline-block;
   }
 
-  .navLinkManager {
+  .navBalance {
     color: #fff;
     cursor: pointer;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 0px;
-    padding-right: 40px;
-    text-decoration: none; /* Remove underline */
+    padding-left: 30px;
+    padding-right: 30px;
+    display: inline-block;
   }
 
-  .centeredButton {
-    margin-top: 4px; /* Adjust margin as needed */
-  }
-  
   @media (max-width: 1000px) {
     .navLink {
       color: #fff;
       cursor: pointer;
-      padding-top: 5px;
-      padding-bottom: 5px;
       padding-left: 0px;
       padding-right: 40px;
     }
     .navLinkSocial {
       color: #fff;
       cursor: pointer;
-      padding-top: 5px;
-      padding-bottom: 5px;
       padding-left: 0px;
       padding-right: 40px;
       text-decoration: none; /* Remove underline */
-    }
-    .centeredButton {
-      margin-top: 0px; /* Adjust margin as needed */
-      margin-bottom: 8px; /* Adjust margin as needed */
     }
   }

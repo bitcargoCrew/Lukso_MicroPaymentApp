@@ -2,7 +2,6 @@ import styles from "./profile.module.css";
 import { Button, Col, Row, Spinner, Image, Modal } from "react-bootstrap";
 import React, { useEffect, useState, useCallback } from "react";
 import { PersonBoundingBox } from "react-bootstrap-icons";
-import Balance from "../components/Balance";
 import { useRouter } from "next/router";
 import FetchProfileData from "../components/FetchProfileData";
 import RootLayout from "../app/layout";
@@ -20,20 +19,22 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
   const [showModal, setShowModal] = useState(false); // State to control the modal visibility
   const router = useRouter();
 
-  useEffect(() => {
-    setShowModal(true);
-    const accountQuery = router.query.account;
-    if (accountQuery && accountQuery !== account) {
-      setAccount(accountQuery as string);
-      setIsLoading(true); // Reset loading state when account changes
-    }
-  }, [router.query, account]);
-
   // Callback function to handle fetched data
   const handleProfileData = useCallback((data: any) => {
     setProfileMetaData(data);
     setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    setShowModal(true);
+    const accountQuery = router.query.account;
+    if (accountQuery && accountQuery !== account) {
+      const accountValue = accountQuery as string;
+      setAccount(accountValue);
+      setIsLoading(true); // Reset loading state when account changes
+      FetchProfileData({ account: accountValue, onDataFetched: handleProfileData });
+    }
+  }, [router.query, account, handleProfileData]);
 
   const getProfileImageUrl = useCallback((profileMetaData: any) => {
     const ipfsHash =
@@ -72,45 +73,12 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
         />
       </div>
       <RootLayout>
-        <FetchProfileData account={account} onDataFetched={handleProfileData} />
         {isLoading ? (
           <div className={styles.spinnerContainer}>
             <Spinner animation="border" role="status" />
           </div>
         ) : (
           <div>
-            <Row className={styles.rowSpace}>
-              <h1 className={styles.rowSpace}>User Profile</h1>
-              <Col xs={4}>
-                {imageError || !profileMetaData ? (
-                  <PersonBoundingBox
-                    size={200}
-                    className={styles.profileIcon}
-                  />
-                ) : (
-                  <Image
-                    src={getProfileImageUrl(profileMetaData)}
-                    fluid
-                    rounded
-                    alt="Profile"
-                    onError={() => setImageError(true)}
-                  />
-                )}
-              </Col>
-              <Col xs={8}>
-                {profileMetaData && (
-                  <div>
-                    <div>Name: {profileMetaData?.value?.LSP3Profile?.name}</div>
-                    <div>
-                      Description:{" "}
-                      {profileMetaData?.value?.LSP3Profile?.description}
-                    </div>
-                  </div>
-                )}
-                <div>Account: {account}</div>
-                <Balance account={account} />
-              </Col>
-            </Row>
             <Row className={styles.rowSpace}>
               <h1>Your purchased content</h1>
             </Row>
