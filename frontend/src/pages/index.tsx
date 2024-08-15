@@ -17,6 +17,8 @@ import ContentCarousel from "@/components/ContentCarousel";
 import CardsTop3Supporters from "@/components/CardsTop3Supporters";
 import SocialFeed from "@/components/SocialFeed";
 import JobBoard from "@/components/JobBoard";
+import ProfileHeader from "@/components/ProfileHeader";
+import Balance from "@/components/Balance";
 
 interface HomeProps {}
 
@@ -55,26 +57,45 @@ const Home: React.FC<HomeProps> = () => {
               <Nav.Link href="#solution">Solution</Nav.Link>
               <Nav.Link href="#topSupporters">Top Supporters</Nav.Link>
             </Nav>
-            <div className="justify-content-end">
-              {!buttonClicked && (
-                <Button variant="success" onClick={handleButtonClick}>
-                  Connect UP
-                </Button>
-              )}
-              {buttonClicked && !account && (
+
+            {!buttonClicked && (
+              <Nav className="d-flex align-items-center">
+                <Nav.Item>
+                  <Button variant="success" onClick={handleButtonClick}>
+                    Connect UP
+                  </Button>
+                </Nav.Item>
+              </Nav>
+            )}
+
+            {buttonClicked && !account && (
+              <Nav className="d-flex align-items-center ms-auto">
                 <SignIn onSignInSuccess={handleSignInSuccess} />
-              )}
-              {account && (
-                <Link
-                  href={{
-                    pathname: "/profile",
-                    query: { account: account },
-                  }}
-                >
-                  <Button variant="success">Go to your profile</Button>
-                </Link>
-              )}
-            </div>
+              </Nav>
+            )}
+
+            {account && (
+              <Nav className="d-flex align-items-center ms-auto">
+                <Nav.Item>
+                  <ProfileHeader account={account} />
+                </Nav.Item>
+                <Nav.Item>
+                  <div className={styles.navBalance}>
+                    <Balance account={account} />
+                  </div>
+                </Nav.Item>
+                <Nav.Item>
+                  <Link
+                    href={{
+                      pathname: "/profile",
+                      query: { account: account },
+                    }}
+                  >
+                    <Button variant="success">Go to your profile</Button>
+                  </Link>
+                </Nav.Item>
+              </Nav>
+            )}
           </Navbar.Collapse>
         </Container>
       </Navbar>

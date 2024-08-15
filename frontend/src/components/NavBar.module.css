@@ -28,14 +28,10 @@
     .navLink {
       color: #fff;
       cursor: pointer;
-      padding-left: 0px;
-      padding-right: 40px;
     }
     .navLinkSocial {
       color: #fff;
       cursor: pointer;
-      padding-left: 0px;
-      padding-right: 40px;
       text-decoration: none; /* Remove underline */
     }
   }

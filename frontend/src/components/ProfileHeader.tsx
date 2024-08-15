@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Image, Spinner, Row, Col } from "react-bootstrap";
+import { Image, Row, Col } from "react-bootstrap";
 import { PersonBoundingBox } from "react-bootstrap-icons";
 import fetchProfileData from "./FetchProfileData";
 
@@ -31,26 +31,22 @@ const ProfileHeader: React.FC<{ account: string }> = ({ account }) => {
   }, []);
 
   return (
-    <div>
-      <Row>
-        <Col>
-          {imageError || !profileMetaData ? (
-            <PersonBoundingBox size={38} />
-          ) : (
-            <Image
-              src={getProfileImageUrl(profileMetaData)}
-              fluid
-              rounded
-              alt="Profile"
-              onError={() => setImageError(true)}
-              style={{ height: "38px", width: "38px" }}
-            />
-          )}
-        </Col>
-        <Col style={{ paddingLeft: "1%", paddingTop: "4.5%", color: "white" }}>
-          {profileMetaData?.value?.LSP3Profile?.name}
-        </Col>
-      </Row>
+    <div className="d-flex align-items-center">
+        {imageError || !profileMetaData ? (
+          <PersonBoundingBox width="38px" height="38px" fill="white" />
+        ) : (
+          <Image
+            src={getProfileImageUrl(profileMetaData)}
+            fluid
+            rounded
+            alt="Profile"
+            onError={() => setImageError(true)}
+            style={{ height: "38px", width: "38px" }}
+          />
+        )}
+      <span style={{ paddingLeft: "10%", color: "white" }}>
+        {profileMetaData?.value?.LSP3Profile?.name}
+      </span>
     </div>
   );
 };
