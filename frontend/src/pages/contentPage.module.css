@@ -56,13 +56,11 @@
 
 /* Ensure heart icon inherits text color and is centered */
 .heartIcon {
-  fill: none; /* Ensures the heart icon is not filled initially */
   stroke: grey; /* Sets the stroke to current color (dark by default) */
 }
 
 .heartIcon.liked {
-  fill: none; /* Changes the heart icon fill to red when liked */
-  stroke: black
+  stroke: darkred;
 }
 
 .draftEditorWrapper {

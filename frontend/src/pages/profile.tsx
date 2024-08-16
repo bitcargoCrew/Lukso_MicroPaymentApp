@@ -12,7 +12,6 @@ interface ProfileViewProps {}
 
 const Profile: React.FC<ProfileViewProps> = ({}) => {
   const [account, setAccount] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false); // State to control the modal visibility
   const router = useRouter();
 
@@ -22,7 +21,6 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
     if (accountQuery && accountQuery !== account) {
       const accountValue = accountQuery as string;
       setAccount(accountValue);
-      setIsLoading(true); // Reset loading state when account changes
     }
   }, [router.query, account]);
 

@@ -34,6 +34,7 @@ const ContentPage: React.FC = () => {
       setAccount(accountQuery as string);
     }
     fetchContentData();
+    setIsLikeButtonDisabled(false);
   }, [router.query, account, contentId]);
 
   const fetchContentData = async () => {
@@ -95,9 +96,8 @@ const ContentPage: React.FC = () => {
       setTransactionMessage("Failed to add like. Please try again.");
       setIsLiked(false); // Ensure
     } finally {
-      setIsLikeButtonDisabled(false);
       setTransactionInProgress(false);
-      setTimeout(() => setTransactionMessage(""), 5000); // Clear the message after 5 seconds
+      setTimeout(() => setTransactionMessage(""), 10000); // Clear the message after 10 seconds
     }
   };
 
@@ -205,7 +205,7 @@ const ContentPage: React.FC = () => {
                 >
                   <Heart
                     size={16}
-                    className={styles.heartIcon}
+                    className={`${styles.heartIcon} ${isLiked ? styles.liked : ""}`}
                   />
                 </Button>
               </div>
