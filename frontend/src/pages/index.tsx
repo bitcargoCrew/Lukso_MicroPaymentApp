@@ -104,6 +104,7 @@ const Home: React.FC<HomeProps> = () => {
                       size="sm"
                       role="status"
                       aria-hidden="true"
+                      className="align-items-center"
                     />
                     Connecting...
                   </Button>

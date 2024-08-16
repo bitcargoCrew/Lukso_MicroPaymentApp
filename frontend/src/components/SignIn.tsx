@@ -88,11 +88,6 @@ const SignIn: React.FC<SignInProps> = ({ onSignInSuccess, onSignInError }) => {
   // Render JSX
   return (
     <div>
-      {account ? (
-        <div>Successful Universal Profile login</div>
-      ) : (
-        <div>Universal Profile is loading...</div>
-      )}
     </div>
   );
 };
