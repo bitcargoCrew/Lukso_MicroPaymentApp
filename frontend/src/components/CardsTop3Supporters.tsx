@@ -2,7 +2,6 @@ import styles from "./CardsTop3Supporters.module.css";
 import React, { useEffect, useState, useCallback } from "react";
 import { Button, Col, Row, Card, Spinner } from "react-bootstrap";
 import config from "../../config";
-import Link from "next/link";
 import SupporterInformation from "@/components/SupporterInformation";
 import { Icon1Circle, Icon2Circle, Icon3Circle } from "react-bootstrap-icons";
 
@@ -77,14 +76,18 @@ const CardsTop3Supporters: React.FC = () => {
                     </Card.Text>
                   </Row>
                   <Row>
-                    <Link
-                      href={`https://universalprofile.cloud/${top3Supporter.contentSupporter}`}
-                      passHref
+                    <Button
+                      variant="dark"
+                      className={styles.buttonStyling}
+                      onClick={() =>
+                        window.open(
+                          `https://universalprofile.cloud/${top3Supporter.contentSupporter}`,
+                          "_blank"
+                        )
+                      }
                     >
-                      <Button variant="dark" className={styles.buttonStyling}>
-                        Check out UP
-                      </Button>
-                    </Link>
+                      Check out UP
+                    </Button>
                   </Row>
                 </Col>
               </Row>

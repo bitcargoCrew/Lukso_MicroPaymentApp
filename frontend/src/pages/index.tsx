@@ -8,6 +8,8 @@ import {
   Navbar,
   Image,
   Modal,
+  Spinner,
+  Alert,
 } from "react-bootstrap";
 import SignIn from "../components/SignIn";
 import React, { useState, useEffect } from "react";
@@ -19,6 +21,7 @@ import SocialFeed from "@/components/SocialFeed";
 import JobBoard from "@/components/JobBoard";
 import ProfileHeader from "@/components/ProfileHeader";
 import Balance from "@/components/Balance";
+import { useRouter } from "next/router";
 
 interface HomeProps {}
 
@@ -26,17 +29,29 @@ const Home: React.FC<HomeProps> = () => {
   const [buttonClicked, setButtonClicked] = useState(false);
   const [account, setAccount] = useState(""); // State to store account
   const [showModal, setShowModal] = useState(false); // State to control the modal visibility
+  const [signInError, setSignInError] = useState<string | null>(null); // State to store sign-in errors
+  const router = useRouter();
 
   useEffect(() => {
     setShowModal(true);
-  }, []);
+    const accountQuery = router.query.account;
+    if (accountQuery && accountQuery !== account) {
+      setAccount(accountQuery as string);
+    }
+  }, [router.query]);
 
   const handleButtonClick = () => {
     setButtonClicked(true);
+    setSignInError(null); // Clear any previous error when attempting a new sign-in
   };
 
   const handleSignInSuccess = (account: string) => {
     setAccount(account); // Update account state
+  };
+
+  const handleSignInError = (error: string) => {
+    setSignInError(error); // Set error message
+    setButtonClicked(false); // Reset button state to allow retry
   };
 
   return (
@@ -49,6 +64,13 @@ const Home: React.FC<HomeProps> = () => {
         sticky="top"
       >
         <Container>
+          <Navbar.Brand href="#home">
+            <Image
+              src="/Quill_logo_white.png"
+              alt="UP Logo"
+              className={styles.logoHeader}
+            />
+          </Navbar.Brand>
           <Navbar.Brand href="#home">Quill</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
@@ -58,7 +80,7 @@ const Home: React.FC<HomeProps> = () => {
               <Nav.Link href="#topSupporters">Top Supporters</Nav.Link>
             </Nav>
 
-            {!buttonClicked && (
+            {!buttonClicked && !account && (
               <Nav className="d-flex align-items-center">
                 <Nav.Item>
                   <Button variant="success" onClick={handleButtonClick}>
@@ -70,7 +92,22 @@ const Home: React.FC<HomeProps> = () => {
 
             {buttonClicked && !account && (
               <Nav className="d-flex align-items-center ms-auto">
-                <SignIn onSignInSuccess={handleSignInSuccess} />
+                <Nav.Item>
+                  <SignIn
+                    onSignInSuccess={handleSignInSuccess}
+                    onSignInError={handleSignInError}
+                  />
+                  <Button variant="success" disabled>
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                    Connecting...
+                  </Button>
+                </Nav.Item>
               </Nav>
             )}
 
@@ -99,6 +136,20 @@ const Home: React.FC<HomeProps> = () => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
+
+      {signInError && ( // Display error message if sign-in error occurs
+        <div className={styles.errorOverlay}>
+          <Alert
+            variant="danger"
+            onClose={() => setSignInError(null)}
+            dismissible
+          >
+            <Alert.Heading>Sign-In Error</Alert.Heading>
+            <p>{signInError}</p>
+          </Alert>
+        </div>
+      )}
+
       <div className={styles.backgroundContainer} id="home">
         <Image
           src="/background_image_creator.jpg"
@@ -180,9 +231,14 @@ const Home: React.FC<HomeProps> = () => {
                     className={styles.centeredTextUPCreationImage}
                   />
                 </p>
-                <Link href="https://universalprofile.cloud/" passHref>
-                  <Button variant="dark">Create your profile</Button>
-                </Link>
+                <Button
+                  variant="dark"
+                  onClick={() =>
+                    window.open("https://universalprofile.cloud/", "_blank")
+                  }
+                >
+                  Create your profile
+                </Button>
               </div>
             </Col>
           </Row>

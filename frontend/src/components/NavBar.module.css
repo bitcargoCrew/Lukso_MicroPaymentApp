@@ -1,4 +1,19 @@
 /* NavBar.module.css */
+.logoHeader {
+  height: 38px;
+  width: 38px;
+  align-items: center;
+}
+
+.navLinkQuill {
+  color: #fff;
+  cursor: pointer;
+  padding-left: 10px;
+  padding-right: 30px;
+  text-decoration: none; /* Remove underline */
+  display: inline-block;
+}
+
 .navLink {
     color: #fff;
     cursor: pointer;

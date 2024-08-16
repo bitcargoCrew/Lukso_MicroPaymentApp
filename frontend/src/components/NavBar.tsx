@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Container, Nav, Navbar, Col } from "react-bootstrap";
+import { Button, Container, Nav, Navbar, Image } from "react-bootstrap";
 import Link from "next/link";
 import styles from "./NavBar.module.css";
 import ProfileHeader from "./ProfileHeader";
@@ -14,16 +14,23 @@ const NavBar: React.FC<NavBarProps> = ({ account }) => {
     <div>
       <Navbar expand="lg" bg="dark" data-bs-theme="dark" sticky="top">
         <Container>
-          <Navbar.Brand>
-            <Link
-              href={{
-                pathname: "/",
-              }}
-              style={{ textDecoration: "none" }}
-            >
-              <div className={styles.navLink}>Quill</div>
-            </Link>
-          </Navbar.Brand>
+          <Nav className="d-flex align-items-center me-auto">
+            <Nav.Item>
+              <Link
+                href={{
+                  pathname: "/",
+                  query: { account },
+                }}
+                style={{ textDecoration: "none" }}
+              >
+                <Image
+                  src="/Quill_logo_white.png"
+                  alt="UP Logo"
+                  className={styles.logoHeader}
+                />
+              </Link>
+            </Nav.Item>
+          </Nav>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="d-flex align-items-center me-auto">

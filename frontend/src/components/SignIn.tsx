@@ -5,10 +5,11 @@ import { SiweMessage } from "siwe";
 
 interface SignInProps {
   onSignInSuccess: (account: string) => void;
+  onSignInError: (error: string) => void; // Callback for error handling
 }
 
 // Wrap your code in a React component
-const SignIn: React.FC<SignInProps> = ({ onSignInSuccess }) => {
+const SignIn: React.FC<SignInProps> = ({ onSignInSuccess, onSignInError }) => {
   const [account, setAccount] = useState<string | undefined>();
 
   useEffect(() => {
@@ -16,14 +17,17 @@ const SignIn: React.FC<SignInProps> = ({ onSignInSuccess }) => {
       try {
         // Ensure 'lukso' is available
         if (!(window as any).lukso) {
-          console.error("Lukso provider is not available.");
-          return;
+          throw new Error("Lukso provider is not available.");
         }
         // Initialize ethers provider with the injected Ethereum provider
         const provider = new ethers.BrowserProvider((window as any).lukso);
 
         // Request user accounts
         const accounts = await provider.send("eth_requestAccounts", []);
+        if (!accounts || accounts.length === 0) {
+          throw new Error("No accounts found.");
+        }
+
         const { chainId } = await provider.getNetwork();
         const chainIdNumber: number = Number(chainId);
 
@@ -65,20 +69,21 @@ const SignIn: React.FC<SignInProps> = ({ onSignInSuccess }) => {
           console.log("Log In successful!");
         } else {
           // The signing EOA has no SIGN permission on this UP.
-          console.log("Log In failed");
+          throw new Error("Log In failed");
         }
 
         console.log("Connected with", accounts[0]);
 
         onSignInSuccess(accounts[0]);
         setAccount(accounts[0]);
-      } catch (error) {
-        console.error("Error getting user accounts:", error);
+      } catch (error: any) {
+        console.error("Error connecting to Lukso:", error);
+        onSignInError("Error connecting to Lukso, try again");
       }
     }
 
     connectToLukso();
-  }, [onSignInSuccess]);
+  }, [onSignInSuccess, onSignInError]);
 
   // Render JSX
   return (
