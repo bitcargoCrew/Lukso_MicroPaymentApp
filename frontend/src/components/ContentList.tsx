@@ -4,8 +4,8 @@ import { Row, Col, Spinner, Card, Image, Button } from "react-bootstrap";
 import { useRouter } from "next/router";
 import ChangePagePayment from "@/components/ChangePagePayment";
 import CreatedBy from "./CreatedBy";
-import ContentDataInterface from "./ContentDataInterface";
-import config from "../../config";
+import { ContentDataInterface } from "/Users/sruettimann/lukso_up/frontend/src/components/ContentDataInterface"
+import { config } from "/Users/sruettimann/lukso_up/frontend/config"
 
 const ContentList: React.FC = () => {
   const [contentList, setContentList] = useState<ContentDataInterface[]>([]);

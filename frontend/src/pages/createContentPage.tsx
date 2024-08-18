@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 import RootLayout from "../app/layout";
 import { useRouter } from "next/router";
 import NavBar from "../components/NavBar";
-import ContentDataInterface from "@/components/ContentDataInterface";
-import config from "../../config";
+import { ContentDataInterface } from "/Users/sruettimann/lukso_up/frontend/src/components/ContentDataInterface";
+import { ImageDataInterface } from "/Users/sruettimann/lukso_up/frontend/src/components/ContentDataInterface";
 import { Editor, EditorState, convertToRaw } from "draft-js";
 import "draft-js/dist/Draft.css";
 
@@ -14,22 +14,10 @@ const CreateContentPage: React.FC = () => {
   const [account, setAccount] = useState<string>("");
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState("creator"); // Track active tab
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    const accountQuery = router.query.account as string;
-    if (accountQuery && accountQuery !== account) {
-      setAccount(accountQuery);
-    }
-  }, [router.query.account, account]);
-
   const [formData, setFormData] = useState<ContentDataInterface>({
     contentId: "",
     contentTitle: "",
-    contentMedia: null,
+    contentMedia: "",
     contentCreator: account,
     contentCosts: 0,
     creatorMessage: "",
@@ -41,9 +29,22 @@ const CreateContentPage: React.FC = () => {
     numberOfComments: 0,
     contentComments: [""],
   });
+  const [imageData, setImageData] = useState<ImageDataInterface>({
+    ipfsImage: null,
+  });
 
-  // Draft.js editor state
-  const [editorState, setEditorState] = useState(EditorState.createEmpty());
+  const [editorState, setEditorState] = useState(EditorState.createEmpty()); // Draft.js editor state
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    const accountQuery = router.query.account as string;
+    if (accountQuery && accountQuery !== account) {
+      setAccount(accountQuery);
+    }
+  }, [router.query.account, account]);
 
   // Convert content state to raw JSON format
   const handleEditorChange = (state: any) => {
@@ -78,18 +79,60 @@ const CreateContentPage: React.FC = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
+    console.log(files);
     if (files && files.length > 0) {
-      setFormData((prevState) => ({
+      console.log("ok");
+      setImageData((prevState) => ({
         ...prevState,
-        contentMedia: files[0],
+        ipfsImage: files[0],
       }));
+      console.log(imageData);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const formDataToSend = new FormData();
+    const imageFormDataToSend = new FormData();
+    const urlPinata = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
+
+    // Check if there's an image to upload
+    console.log(imageData.ipfsImage)
+    if (imageData.ipfsImage) {
+      try {
+        console.log(imageFormDataToSend)
+        console.log(imageData.ipfsImage)
+        imageFormDataToSend.append("ipfsImage", imageData.ipfsImage);
+        console.log(imageFormDataToSend)
+
+        // Upload image
+        const imageUploadResponse = await fetch(urlPinata, {
+          method: "POST",
+          headers: {
+            pinata_api_key: process.env.NEXT_PUBLIC_API_KEY_PINATA as string,
+            pinata_secret_api_key: process.env
+              .NEXT_PUBLIC_API_SECRET_PINATA as string,
+          },
+          body: imageFormDataToSend,
+        });
+
+        if (!imageUploadResponse.ok) {
+          throw new Error(
+            `Image upload failed: ${imageUploadResponse.statusText}`
+          );
+        }
+
+        const imageDataResponse = await imageUploadResponse.json();
+        const imageCid = imageDataResponse.IpfsHash;
+
+        // Update form data with image CID
+        formDataToSend.append("contentMedia", imageCid);
+      } catch (error) {
+        console.error("An error occurred during image upload:", error);
+        return; // Exit if image upload fails
+      }
+    }
+
     formDataToSend.append("contentId", formData.contentId);
     formDataToSend.append("contentTitle", formData.contentTitle);
     formDataToSend.append("contentCreator", formData.contentCreator);
@@ -115,21 +158,16 @@ const CreateContentPage: React.FC = () => {
       formData.contentComments.join(",")
     );
 
-    if (formData.contentMedia) {
-      formDataToSend.append("contentMedia", formData.contentMedia);
-    }
-
     try {
-      
-      // Pinata API URL and headers
-      const urlPinata = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
-      const headers = {
-        pinata_api_key: process.env.AAPI_KEY_PINATA as string,
-        pinata_secret_api_key: process.env.API_SECRET_PINATA as string,
-      };
-      const response = await fetch(`${config.apiUrl}/postContent`, {
+      const response = await fetch(urlPinata, {
         method: "POST",
-        body: formDataToSend,
+        headers: {
+          "Content-Type": "application/json",
+          pinata_api_key: process.env.NEXT_PUBLIC_API_KEY_PINATA as string,
+          pinata_secret_api_key: process.env
+            .NEXT_PUBLIC_API_SECRET_PINATA as string,
+        },
+        body: JSON.stringify(formData),
       });
 
       if (response.ok) {

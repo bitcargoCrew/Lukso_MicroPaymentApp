@@ -1,9 +1,9 @@
 import styles from "./ContentList.module.css";
 import React, { useEffect, useState } from "react";
 import { Row, Col, Spinner, Card, Image, Button } from "react-bootstrap";
-import ContentDataInterface from "./ContentDataInterface";
+import { ContentDataInterface } from "/Users/sruettimann/lukso_up/frontend/src/components/ContentDataInterface"
 import { useRouter } from "next/router";
-import config from "../../config";
+import { config } from "/Users/sruettimann/lukso_up/frontend/config"
 import CreatedBy from "./CreatedBy";
 
 interface PurchasedContentInterface {

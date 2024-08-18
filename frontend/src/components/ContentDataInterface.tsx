@@ -1,7 +1,7 @@
-interface ContentDataInterface {
+export interface ContentDataInterface {
   contentId: string;
   contentTitle: string;
-  contentMedia: File | string | null;
+  contentMedia: string;
   contentCreator: string;
   contentCosts: number;
   creatorMessage: string;
@@ -14,4 +14,6 @@ interface ContentDataInterface {
   contentComments: string[];
 }
 
-export default ContentDataInterface;
+export interface ImageDataInterface {
+  ipfsImage: File | string | null;
+}
