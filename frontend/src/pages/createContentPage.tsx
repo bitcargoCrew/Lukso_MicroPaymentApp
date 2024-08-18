@@ -120,6 +120,13 @@ const CreateContentPage: React.FC = () => {
     }
 
     try {
+      
+      // Pinata API URL and headers
+      const urlPinata = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
+      const headers = {
+        pinata_api_key: process.env.AAPI_KEY_PINATA as string,
+        pinata_secret_api_key: process.env.API_SECRET_PINATA as string,
+      };
       const response = await fetch(`${config.apiUrl}/postContent`, {
         method: "POST",
         body: formDataToSend,
@@ -159,7 +166,12 @@ const CreateContentPage: React.FC = () => {
                 activeKey={activeTab}
                 onSelect={(k) => handleTabChange(k as string)}
               >
-                <Tab eventKey="creator" title={<span style={{ color: 'black' }}>Creator Information</span>}>
+                <Tab
+                  eventKey="creator"
+                  title={
+                    <span style={{ color: "black" }}>Creator Information</span>
+                  }
+                >
                   <InputGroup className="mb-3">
                     <InputGroup.Text
                       id="basic-addon1"
@@ -226,7 +238,10 @@ const CreateContentPage: React.FC = () => {
                     </Button>
                   </div>
                 </Tab>
-                <Tab eventKey="overview" title={<span style={{ color: 'black' }}>Post Overview</span>}>
+                <Tab
+                  eventKey="overview"
+                  title={<span style={{ color: "black" }}>Post Overview</span>}
+                >
                   <InputGroup className="mb-3">
                     <InputGroup.Text
                       id="basic-addon1"
@@ -316,7 +331,10 @@ const CreateContentPage: React.FC = () => {
                     </Button>
                   </div>
                 </Tab>
-                <Tab eventKey="post" title={<span style={{ color: 'black' }}>Post Content</span>}>
+                <Tab
+                  eventKey="post"
+                  title={<span style={{ color: "black" }}>Post Content</span>}
+                >
                   <InputGroup className="mb-3">
                     <div className={styles.draftEditorWrapper}>
                       <Editor

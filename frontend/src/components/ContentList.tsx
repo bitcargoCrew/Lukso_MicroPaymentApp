@@ -97,6 +97,7 @@ const ContentList: React.FC = () => {
   };
 
   const handleButtonClick = (contentId: string) => {
+    const VALID_ACCESS_KEY = "my_secure_key";
     setSelectedContent(contentId);
     const selectedContent = contentList.find(
       (content) => content.contentId === contentId
