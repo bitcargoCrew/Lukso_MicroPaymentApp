@@ -5,8 +5,8 @@ import RootLayout from "../app/layout";
 import { useRouter } from "next/router";
 import NavBar from "../components/NavBar";
 import CreatedBy from "@/components/CreatedBy";
-import { ContentDataInterface } from "/Users/sruettimann/lukso_up/frontend/src/components/ContentDataInterface"
-import { config } from "/Users/sruettimann/lukso_up/frontend/config"
+import { ContentDataInterface } from "../components/ContentDataInterface";
+import { config } from "../../config"
 import Link from "next/link";
 import { Heart } from "react-bootstrap-icons";
 import LikePayment from "../components/LikePayment";

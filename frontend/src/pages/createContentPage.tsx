@@ -4,10 +4,15 @@ import React, { useEffect, useState } from "react";
 import RootLayout from "../app/layout";
 import { useRouter } from "next/router";
 import NavBar from "../components/NavBar";
-import { ContentDataInterface } from "/Users/sruettimann/lukso_up/frontend/src/components/ContentDataInterface";
-import { ImageDataInterface } from "/Users/sruettimann/lukso_up/frontend/src/components/ContentDataInterface";
+import {
+  ContentDataInterface,
+  ImageDataInterface,
+} from "../components/ContentDataInterface";
 import { Editor, EditorState, convertToRaw } from "draft-js";
 import "draft-js/dist/Draft.css";
+import { pinata } from "../../config";
+import { v4 as uuidv4 } from "uuid";
+import { config } from "../../config";
 
 const CreateContentPage: React.FC = () => {
   const router = useRouter();
@@ -15,7 +20,7 @@ const CreateContentPage: React.FC = () => {
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState("creator"); // Track active tab
   const [formData, setFormData] = useState<ContentDataInterface>({
-    contentId: "",
+    contentId: uuidv4(),
     contentTitle: "",
     contentMedia: "",
     contentCreator: account,
@@ -34,6 +39,8 @@ const CreateContentPage: React.FC = () => {
   });
 
   const [editorState, setEditorState] = useState(EditorState.createEmpty()); // Draft.js editor state
+  const [imageCID, setImageCID] = useState<string>("");
+  const [postCID, setPostCID] = useState<string>("");
 
   useEffect(() => {
     setIsClient(true);
@@ -79,106 +86,94 @@ const CreateContentPage: React.FC = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    console.log(files);
     if (files && files.length > 0) {
-      console.log("ok");
       setImageData((prevState) => ({
         ...prevState,
         ipfsImage: files[0],
       }));
-      console.log(imageData);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formDataToSend = new FormData();
-    const imageFormDataToSend = new FormData();
-    const urlPinata = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
 
-    // Check if there's an image to upload
-    console.log(imageData.ipfsImage)
-    if (imageData.ipfsImage) {
+    if (imageData.ipfsImage instanceof File && !imageCID) {
       try {
-        console.log(imageFormDataToSend)
-        console.log(imageData.ipfsImage)
-        imageFormDataToSend.append("ipfsImage", imageData.ipfsImage);
-        console.log(imageFormDataToSend)
+        const imageFile = new File(
+          [imageData.ipfsImage],
+          imageData.ipfsImage.name,
+          {
+            type: "text/plain",
+          }
+        );
+        const imageupload = await pinata.upload.file(imageFile);
 
-        // Upload image
-        const imageUploadResponse = await fetch(urlPinata, {
-          method: "POST",
-          headers: {
-            pinata_api_key: process.env.NEXT_PUBLIC_API_KEY_PINATA as string,
-            pinata_secret_api_key: process.env
-              .NEXT_PUBLIC_API_SECRET_PINATA as string,
-          },
-          body: imageFormDataToSend,
-        });
+        const imageCid = `https://gateway.pinata.cloud/ipfs/${imageupload.IpfsHash}`;
+        setImageCID(imageCid);
 
-        if (!imageUploadResponse.ok) {
-          throw new Error(
-            `Image upload failed: ${imageUploadResponse.statusText}`
-          );
-        }
-
-        const imageDataResponse = await imageUploadResponse.json();
-        const imageCid = imageDataResponse.IpfsHash;
-
-        // Update form data with image CID
-        formDataToSend.append("contentMedia", imageCid);
+        return imageCid;
       } catch (error) {
         console.error("An error occurred during image upload:", error);
         return; // Exit if image upload fails
       }
     }
 
-    formDataToSend.append("contentId", formData.contentId);
-    formDataToSend.append("contentTitle", formData.contentTitle);
-    formDataToSend.append("contentCreator", formData.contentCreator);
-    formDataToSend.append("contentCosts", String(formData.contentCosts));
-    formDataToSend.append("creatorMessage", formData.creatorMessage);
-    formDataToSend.append(
-      "contentShortDescription",
-      formData.contentShortDescription
-    );
-    formDataToSend.append(
-      "contentLongDescription",
-      formData.contentLongDescription
-    );
-    formDataToSend.append("contentTags", formData.contentTags.join(","));
-    formDataToSend.append("numberOfRead", String(formData.numberOfRead));
-    formDataToSend.append("numberOfLikes", String(formData.numberOfLikes));
-    formDataToSend.append(
-      "numberOfComments",
-      String(formData.numberOfComments)
-    );
-    formDataToSend.append(
-      "contentComments",
-      formData.contentComments.join(",")
-    );
+    if (!imageCID) {
+      console.error("Image CID not set, upload might have failed");
+      return;
+    }
 
     try {
-      const response = await fetch(urlPinata, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          pinata_api_key: process.env.NEXT_PUBLIC_API_KEY_PINATA as string,
-          pinata_secret_api_key: process.env
-            .NEXT_PUBLIC_API_SECRET_PINATA as string,
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Form submitted successfully!", result);
-        router.push({
-          pathname: "/profile",
-          query: { account: account },
+      console.log("test upload");
+      const responseIPFS = await pinata.upload
+        .json({
+          contentId: formData.contentId,
+          contentTitle: formData.contentTitle,
+          contentCreator: formData.contentCreator,
+          contentCosts: formData.contentCosts,
+          creatorMessage: formData.creatorMessage,
+          contentShortDescription: formData.contentShortDescription,
+          contentLongDescription: formData.contentLongDescription,
+          contentTags: formData.contentTags.join(","),
+          numberOfRead: formData.numberOfRead,
+          numberOfLikes: formData.numberOfLikes,
+          numberOfComments: formData.numberOfComments,
+          contentComments: formData.contentComments.join(","),
+          contentMedia: imageCID,
+        })
+        .addMetadata({
+          name: formData.contentId,
+          keyValues: {
+            whimsey: 100,
+            description: formData.contentShortDescription,
+            author: formData.contentCreator,
+          },
         });
+
+      if (responseIPFS) {
+        const postCIDValue = responseIPFS.IpfsHash;
+        console.log("Post submitted successfully!", responseIPFS);
+        console.log(postCIDValue)
+        const response = await fetch(`${config.apiUrl}/postContentCID`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ postCID: postCIDValue }),
+        });
+        if (response.ok) {
+          const result = await response.json();
+          console.log("POST CID submitted successfully!", result);
+          router.push({
+            pathname: "/profile",
+            query: { account: account },
+          });
+        } else {
+          console.error("POST CID submission failed:", response.statusText);
+        }
+
       } else {
-        console.error("Form submission failed:", response.statusText);
+        console.error("Form submission failed:", responseIPFS);
       }
     } catch (error) {
       console.error("An error occurred:", error);

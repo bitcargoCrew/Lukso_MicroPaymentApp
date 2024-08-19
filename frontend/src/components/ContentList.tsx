@@ -4,11 +4,15 @@ import { Row, Col, Spinner, Card, Image, Button } from "react-bootstrap";
 import { useRouter } from "next/router";
 import ChangePagePayment from "@/components/ChangePagePayment";
 import CreatedBy from "./CreatedBy";
-import { ContentDataInterface } from "/Users/sruettimann/lukso_up/frontend/src/components/ContentDataInterface"
-import { config } from "/Users/sruettimann/lukso_up/frontend/config"
+import {
+  ContentDataInterface,
+  PostCidInterface,
+} from "../components/ContentDataInterface";
+import { config, pinata } from "../../config";
 
 const ContentList: React.FC = () => {
   const [contentList, setContentList] = useState<ContentDataInterface[]>([]);
+  const [cidList, setCidList] = useState<PostCidInterface[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [transactionInProgress, setTransactionInProgress] = useState(false);
@@ -17,6 +21,77 @@ const ContentList: React.FC = () => {
   const [selectedContent, setSelectedContent] = useState<string | null>(null);
   const [supporterAddress, setSupporterAddress] = useState<string | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const accountQuery = router.query.account;
+    if (accountQuery && accountQuery !== account) {
+      setAccount(accountQuery as string);
+    }
+    fetchAllContentCID();
+    // fetchContentData();
+  }, [router.query, account, paid]);
+
+  useEffect(() => {
+    if (cidList.length > 0) {
+      // Fetch content from IPFS only when cidList is updated
+      fetchAllContentFromIPFS(cidList);
+    }
+  }, [cidList]); // Dependency on cidList
+
+  const fetchAllContentCID = async () => {
+    setError(null); // Reset the error state when retrying
+    setLoading(true); // Ensure loading is true while fetching data
+    try {
+      const cidResponse = await fetch(`${config.apiUrl}/allContentCID`);
+      if (cidResponse.ok) {
+        const cidData: PostCidInterface[] = await cidResponse.json();
+        console.log(cidData);
+        setCidList(cidData); // This will trigger the useEffect when updated
+      } else {
+        setError(`Failed to fetch content data: ${cidResponse.statusText}`);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(`An error occurred: ${error.message}`);
+      } else {
+        setError("An unknown error occurred.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAllContentFromIPFS = async (cidList: PostCidInterface[]) => {
+    try {
+      // Check if cidList is empty or not an array
+      if (!Array.isArray(cidList) || cidList.length === 0) {
+        console.warn("No CID list provided or CID list is empty.");
+        return []; // Return an empty array or handle as needed
+      }
+
+      // Use Promise.all to fetch data from IPFS for each CID
+      const contentDataIPFS = await Promise.all(
+        cidList.map(async (item: PostCidInterface) => {
+          try {
+            console.log(item.postCID)
+            const data = await pinata.gateways.get(item.postCID); // Pass only the postCID
+            return data;
+          } catch (error) {
+            console.error(
+              `Error fetching content for CID ${item.postCID}:`,
+              error
+            );
+            return null; // Return null or handle as needed
+          }
+        })
+      );
+
+      console.log(contentDataIPFS);
+      return contentDataIPFS; // Optionally return the data
+    } catch (error) {
+      console.error("Error fetching content from IPFS:", error);
+    }
+  };
 
   const fetchContentData = async () => {
     setError(null); // Reset the error state when retrying
@@ -39,15 +114,6 @@ const ContentList: React.FC = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    const accountQuery = router.query.account;
-    if (accountQuery && accountQuery !== account) {
-      setAccount(accountQuery as string);
-    }
-
-    fetchContentData();
-  }, [router.query, account, paid]);
 
   const handlePayment = async (
     contentId: string,
@@ -97,7 +163,6 @@ const ContentList: React.FC = () => {
   };
 
   const handleButtonClick = (contentId: string) => {
-    const VALID_ACCESS_KEY = "my_secure_key";
     setSelectedContent(contentId);
     const selectedContent = contentList.find(
       (content) => content.contentId === contentId

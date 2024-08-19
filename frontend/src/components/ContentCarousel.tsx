@@ -11,8 +11,8 @@ import {
 import { useRouter } from "next/router";
 import ChangePagePayment from "@/components/ChangePagePayment";
 import CreatedBy from "./CreatedBy";
-import { ContentDataInterface } from "/Users/sruettimann/lukso_up/frontend/src/components/ContentDataInterface"
-import { config } from "/Users/sruettimann/lukso_up/frontend/config"
+import { ContentDataInterface } from "../components/ContentDataInterface";
+import { config } from "../../config"
 import styles from "./ContentCarousel.module.css"; // Assuming you're using the same styles
 
 const ContentCarousel: React.FC = () => {

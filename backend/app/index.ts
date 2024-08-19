@@ -56,52 +56,50 @@ const upload: Multer = multer({
   limits: { fileSize: 20 * 1024 * 1024 }, // Limit file size to 20MB
 });
 
-// Endpoint to post new content with an image
-app.post(
-  "/postContent",
-  upload.single("contentMedia"),
-  async (req: Request, res: Response) => {
-    try {
-      const contentData = req.body;
-      const uniqueContentId = uuidv4();
-      contentData.contentId = uniqueContentId; // Assign uniqueContentId to contentId in contentData
+app.post("/postContentCID", async (req: Request, res: Response) => {
+  try {
+    const { postCID } = req.body;
 
-      // Convert numeric fields from strings to numbers
-      contentData.contentCosts = Number(contentData.contentCosts);
-      contentData.numberOfRead = Number(contentData.numberOfRead);
-      contentData.numberOfLikes = Number(contentData.numberOfLikes);
-      contentData.numberOfComments = Number(contentData.numberOfComments);
-
-      if (req.file) {
-        const blob = bucket.file(`images/${uniqueContentId}`);
-        const blobStream = blob.createWriteStream({
-          metadata: {
-            contentType: req.file.mimetype,
-          },
-          gzip: true, // Enable compression if needed
-        });
-
-        blobStream.on("error", (error: Error) => {
-          console.error("Blob stream error:", error);
-          res.status(500).json({ error: "Failed to upload image" });
-        });
-
-        blobStream.on("finish", async () => {
-          await db.collection("content").doc(uniqueContentId).set(contentData);
-          res.status(201).json({ id: uniqueContentId });
-        });
-
-        blobStream.end(req.file.buffer);
-      } else {
-        await db.collection("content").doc(uniqueContentId).set(contentData);
-        res.status(201).json({ id: uniqueContentId });
-      }
-    } catch (error) {
-      console.error("Error adding document:", error);
-      res.status(500).json({ error: "Internal server error" });
+    if (!postCID) {
+      return res.status(400).json({ error: "postCID is required" });
     }
+
+    // Save the postCID with a generated document ID, or use postCID as the ID if it is unique.
+    const contentRef = await db.collection("postCID").doc(postCID).set({ postCID });
+
+    console.log("Content CID stored successfully:", contentRef);
+
+    res.status(200).json({ message: "Content CID stored successfully" });
+  } catch (error) {
+    console.error("Error storing postCID:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
-);
+});
+
+app.get("/allContentCID", async (req: Request, res: Response) => {
+  try {
+    const contentRef = db.collection("postCID");
+    const snapshot = await contentRef.get();
+
+    if (snapshot.empty) {
+      return res.status(404).json({ error: "No CID found" });
+    }
+
+    // Map through the snapshot, adding doc.id to each document's data
+    const cidList = snapshot.docs.map((doc: any) => ({
+      id: doc.id,           // Add the document ID as a unique identifier
+      ...doc.data(),        // Spread the rest of the document data
+    }));
+
+    res.status(200).json(cidList);
+  } catch (error) {
+    console.error("Error fetching content:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+
 
 // Endpoint to get all content with picture URL
 app.get("/allContent", async (req: Request, res: Response) => {

@@ -17,3 +17,8 @@ export interface ContentDataInterface {
 export interface ImageDataInterface {
   ipfsImage: File | string | null;
 }
+
+export interface PostCidInterface {
+  id: string;
+  postCID: string
+}

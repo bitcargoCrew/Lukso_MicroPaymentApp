@@ -1,7 +1,7 @@
 import styles from "./SocialFeed.module.css";
 import React, { useEffect, useState, useCallback } from "react";
 import { Button, Col, Row, Card, Spinner, Container } from "react-bootstrap";
-import config from "../../config";
+import { config } from "../../config";
 import SupporterInformation from "@/components/SupporterInformation";
 import RootLayout from "@/app/layout";
 import { timeSince } from "@/components/timeUtils"

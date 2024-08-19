@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Col, Row, Card, Spinner } from "react-bootstrap";
 import Link from "next/link";
-import config from "../../config";
+import { config } from "../../config";
 
 interface JobListing {
   title: string;
