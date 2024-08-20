@@ -58,16 +58,37 @@ const upload: Multer = multer({
 
 app.post("/postContentCID", async (req: Request, res: Response) => {
   try {
-    const { postCID } = req.body;
+    const {
+      postCID,
+      contentId,
+      contentCreator,
+      contentCosts,
+      numberOfRead,
+      numberOfLikes,
+      numberOfComments,
+      contentComments,
+    } = req.body;
 
     if (!postCID) {
       return res.status(400).json({ error: "postCID is required" });
     }
 
     // Save the postCID with a generated document ID, or use postCID as the ID if it is unique.
-    const contentRef = await db.collection("postCID").doc(postCID).set({ postCID });
+    const contentRef = await db
+      .collection("postCID")
+      .doc(postCID)
+      .set({
+        postCID,
+        contentId,
+        contentCreator,
+        contentCosts,
+        numberOfRead,
+        numberOfLikes,
+        numberOfComments,
+        contentComments,
+      });
 
-    console.log("Content CID stored successfully:", contentRef);
+    console.log("Content CID stored successfully", contentRef);
 
     res.status(200).json({ message: "Content CID stored successfully" });
   } catch (error) {
@@ -87,8 +108,8 @@ app.get("/allContentCID", async (req: Request, res: Response) => {
 
     // Map through the snapshot, adding doc.id to each document's data
     const cidList = snapshot.docs.map((doc: any) => ({
-      id: doc.id,           // Add the document ID as a unique identifier
-      ...doc.data(),        // Spread the rest of the document data
+      id: doc.id, // Add the document ID as a unique identifier
+      ...doc.data(), // Spread the rest of the document data
     }));
 
     res.status(200).json(cidList);
@@ -97,9 +118,6 @@ app.get("/allContentCID", async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-
-
 
 // Endpoint to get all content with picture URL
 app.get("/allContent", async (req: Request, res: Response) => {

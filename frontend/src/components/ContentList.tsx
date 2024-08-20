@@ -45,7 +45,6 @@ const ContentList: React.FC = () => {
       const cidResponse = await fetch(`${config.apiUrl}/allContentCID`);
       if (cidResponse.ok) {
         const cidData: PostCidInterface[] = await cidResponse.json();
-        console.log(cidData);
         setCidList(cidData); // This will trigger the useEffect when updated
       } else {
         setError(`Failed to fetch content data: ${cidResponse.statusText}`);
@@ -73,7 +72,6 @@ const ContentList: React.FC = () => {
       const contentDataIPFS = await Promise.all(
         cidList.map(async (item: PostCidInterface) => {
           try {
-            console.log(item.postCID)
             const data = await pinata.gateways.get(item.postCID); // Pass only the postCID
             return data;
           } catch (error) {

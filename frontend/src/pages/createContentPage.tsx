@@ -1,5 +1,5 @@
 import styles from "./createContentPage.module.css";
-import { Button, Form, InputGroup, Tab, Tabs } from "react-bootstrap";
+import { Button, Form, InputGroup, Tab, Tabs, Spinner } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
 import RootLayout from "../app/layout";
 import { useRouter } from "next/router";
@@ -13,6 +13,7 @@ import "draft-js/dist/Draft.css";
 import { pinata } from "../../config";
 import { v4 as uuidv4 } from "uuid";
 import { config } from "../../config";
+import { deployAndSetCollectionMetadata } from "../components/DeployContentPost";
 
 const CreateContentPage: React.FC = () => {
   const router = useRouter();
@@ -40,7 +41,7 @@ const CreateContentPage: React.FC = () => {
 
   const [editorState, setEditorState] = useState(EditorState.createEmpty()); // Draft.js editor state
   const [imageCID, setImageCID] = useState<string>("");
-  const [postCID, setPostCID] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     setIsClient(true);
@@ -96,6 +97,7 @@ const CreateContentPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
 
     if (imageData.ipfsImage instanceof File && !imageCID) {
       try {
@@ -153,30 +155,48 @@ const CreateContentPage: React.FC = () => {
       if (responseIPFS) {
         const postCIDValue = responseIPFS.IpfsHash;
         console.log("Post submitted successfully!", responseIPFS);
-        console.log(postCIDValue)
         const response = await fetch(`${config.apiUrl}/postContentCID`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ postCID: postCIDValue }),
+          body: JSON.stringify({
+            postCID: postCIDValue,
+            contentId: formData.contentId,
+            contentCreator: formData.contentCreator,
+            contentCosts: formData.contentCosts,
+            numberOfRead: formData.numberOfRead,
+            numberOfLikes: formData.numberOfLikes,
+            numberOfComments: formData.numberOfComments,
+            contentComments: formData.contentComments.join(","),
+          }),
         });
         if (response.ok) {
           const result = await response.json();
           console.log("POST CID submitted successfully!", result);
+
+          const contentCreator = formData.contentCreator;
+          const postCID = postCIDValue;
+
+          deployAndSetCollectionMetadata(postCID, contentCreator);
+
+          setLoading(false);
+
           router.push({
             pathname: "/profile",
             query: { account: account },
           });
         } else {
           console.error("POST CID submission failed:", response.statusText);
+          setLoading(false);
         }
-
       } else {
         console.error("Form submission failed:", responseIPFS);
+        setLoading(false);
       }
     } catch (error) {
       console.error("An error occurred:", error);
+      setLoading(false);
     }
   };
 
@@ -190,6 +210,14 @@ const CreateContentPage: React.FC = () => {
       <RootLayout>
         <div>
           <h1 className={styles.rowSpace}>Create your post</h1>
+          {loading && (
+            <div className={styles.spinnerOverlay}>
+              <div className={styles.spinnerOverlayContent}>
+                <Spinner animation="border" role="status" />
+                <div>Processing... Waiting for confirmation</div>
+              </div>
+            </div>
+          )}
           <Form onSubmit={handleSubmit}>
             {isClient && (
               <Tabs

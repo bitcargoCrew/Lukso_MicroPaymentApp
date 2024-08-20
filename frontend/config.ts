@@ -9,5 +9,5 @@ export const config = {
 export const pinata = new PinataSDK({
   pinataJwt: `${process.env.NEXT_PUBLIC_API_JWT_PINATA}`,
   pinataGateway: `${process.env.NEXT_PUBLIC_GATEWAY_URL}`,
-  pinataGatewayKey: `${process.env.NEXT_PUBLIC_GATEWAY_KEY_PINAT}`
+  pinataGatewayKey: `${process.env.NEXT_PUBLIC_GATEWAY_KEY_PINATA}`
 })
