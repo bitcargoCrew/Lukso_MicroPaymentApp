@@ -1,3 +1,5 @@
+{
+  /*
 import { ethers } from 'hardhat';
 import { ERC725YDataKeys } from '@lukso/lsp-smart-contracts';
 
@@ -50,4 +52,5 @@ export const deployAndSetCollectionMetadata = async (postCID: string, contentCre
 }
 
 }
-
+          */
+}

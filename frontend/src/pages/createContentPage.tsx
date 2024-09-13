@@ -1,6 +1,6 @@
 import styles from "./createContentPage.module.css";
 import { Button, Form, InputGroup, Tab, Tabs, Spinner } from "react-bootstrap";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import RootLayout from "../app/layout";
 import { useRouter } from "next/router";
 import NavBar from "../components/NavBar";
@@ -13,7 +13,7 @@ import "draft-js/dist/Draft.css";
 import { pinata } from "../../config";
 import { v4 as uuidv4 } from "uuid";
 import { config } from "../../config";
-import { deployAndSetCollectionMetadata } from "../components/DeployContentPost";
+// import { deployAndSetCollectionMetadata } from "../components/DeployContentPost";
 
 const CreateContentPage: React.FC = () => {
   const router = useRouter();
@@ -34,17 +34,20 @@ const CreateContentPage: React.FC = () => {
     numberOfLikes: 0,
     numberOfComments: 0,
     contentComments: [""],
+    contentSupporters: [""],
   });
   const [imageData, setImageData] = useState<ImageDataInterface>({
     ipfsImage: null,
   });
 
   const [editorState, setEditorState] = useState(EditorState.createEmpty()); // Draft.js editor state
+  const imageCIDRef = useRef<string>(""); // Initialize a ref for imageCID
   const [imageCID, setImageCID] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     setIsClient(true);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -109,19 +112,22 @@ const CreateContentPage: React.FC = () => {
           }
         );
         const imageupload = await pinata.upload.file(imageFile);
+        console.log(imageupload)
 
         const imageCid = `https://gateway.pinata.cloud/ipfs/${imageupload.IpfsHash}`;
-        setImageCID(imageCid);
+        imageCIDRef.current = imageCid;
+        console.log("test2:", imageCid)
 
-        return imageCid;
       } catch (error) {
         console.error("An error occurred during image upload:", error);
+        setLoading(false);
         return; // Exit if image upload fails
       }
     }
 
-    if (!imageCID) {
+    if (!imageCIDRef.current) {
       console.error("Image CID not set, upload might have failed");
+      setLoading(false);
       return;
     }
 
@@ -141,7 +147,8 @@ const CreateContentPage: React.FC = () => {
           numberOfLikes: formData.numberOfLikes,
           numberOfComments: formData.numberOfComments,
           contentComments: formData.contentComments.join(","),
-          contentMedia: imageCID,
+          contentMedia: imageCIDRef.current,
+          contentSupporters: formData.contentSupporters,
         })
         .addMetadata({
           name: formData.contentId,
@@ -155,7 +162,7 @@ const CreateContentPage: React.FC = () => {
       if (responseIPFS) {
         const postCIDValue = responseIPFS.IpfsHash;
         console.log("Post submitted successfully!", responseIPFS);
-        const response = await fetch(`${config.apiUrl}/postContentCID`, {
+        const response = await fetch(`${config.apiUrl}/postContentDatabase`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -169,16 +176,16 @@ const CreateContentPage: React.FC = () => {
             numberOfLikes: formData.numberOfLikes,
             numberOfComments: formData.numberOfComments,
             contentComments: formData.contentComments.join(","),
+            contentSupporters: formData.contentSupporters,
           }),
         });
         if (response.ok) {
           const result = await response.json();
           console.log("POST CID submitted successfully!", result);
 
-          const contentCreator = formData.contentCreator;
-          const postCID = postCIDValue;
-
-          deployAndSetCollectionMetadata(postCID, contentCreator);
+          // const contentCreator = formData.contentCreator;
+          // const postCID = postCIDValue;
+          // deployAndSetCollectionMetadata(postCID, contentCreator);
 
           setLoading(false);
 

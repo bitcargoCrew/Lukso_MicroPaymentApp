@@ -12,13 +12,14 @@ export interface ContentDataInterface {
   numberOfLikes: number;
   numberOfComments: number;
   contentComments: string[];
+  contentSupporters: string[];
 }
 
 export interface ImageDataInterface {
   ipfsImage: File | string | null;
 }
 
-export interface PostCidInterface {
+export interface IPFSCidInterface {
   id: string;
-  postCID: string
+  postCID: string;
 }

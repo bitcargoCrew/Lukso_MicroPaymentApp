@@ -6,7 +6,6 @@ import path from "path";
 import multer, { Multer } from "multer";
 import transferTokenRead from "./services/transferTokenRead";
 import transferTokenLike from "./services/transferTokenLike";
-import { getLuksoJobs } from "./services/getLuksoJobs"; // Import the function
 
 const { initializeApp, cert } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
@@ -56,7 +55,7 @@ const upload: Multer = multer({
   limits: { fileSize: 20 * 1024 * 1024 }, // Limit file size to 20MB
 });
 
-app.post("/postContentCID", async (req: Request, res: Response) => {
+app.post("/postContentDatabase", async (req: Request, res: Response) => {
   try {
     const {
       postCID,
@@ -67,6 +66,7 @@ app.post("/postContentCID", async (req: Request, res: Response) => {
       numberOfLikes,
       numberOfComments,
       contentComments,
+      contentSupporters,
     } = req.body;
 
     if (!postCID) {
@@ -75,8 +75,8 @@ app.post("/postContentCID", async (req: Request, res: Response) => {
 
     // Save the postCID with a generated document ID, or use postCID as the ID if it is unique.
     const contentRef = await db
-      .collection("postCID")
-      .doc(postCID)
+      .collection("contentPostData")
+      .doc(contentId)
       .set({
         postCID,
         contentId,
@@ -86,24 +86,25 @@ app.post("/postContentCID", async (req: Request, res: Response) => {
         numberOfLikes,
         numberOfComments,
         contentComments,
+        contentSupporters
       });
 
-    console.log("Content CID stored successfully", contentRef);
+    console.log("Content stored successfully", contentRef);
 
-    res.status(200).json({ message: "Content CID stored successfully" });
+    res.status(200).json({ message: "Content stored successfully" });
   } catch (error) {
-    console.error("Error storing postCID:", error);
+    console.error("Error storing contentPostData:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
 app.get("/allContentCID", async (req: Request, res: Response) => {
   try {
-    const contentRef = db.collection("postCID");
+    const contentRef = db.collection("contentPostData");
     const snapshot = await contentRef.get();
 
     if (snapshot.empty) {
-      return res.status(404).json({ error: "No CID found" });
+      return res.status(404).json({ error: "No contentPostData found" });
     }
 
     // Map through the snapshot, adding doc.id to each document's data
@@ -119,44 +120,12 @@ app.get("/allContentCID", async (req: Request, res: Response) => {
   }
 });
 
-// Endpoint to get all content with picture URL
-app.get("/allContent", async (req: Request, res: Response) => {
-  try {
-    const contentRef = db.collection("content");
-    const snapshot = await contentRef.get();
-
-    if (snapshot.empty) {
-      return res.status(404).json({ error: "No content found" });
-    }
-
-    const contentList: { id: string; [key: string]: any }[] = [];
-    await Promise.all(
-      snapshot.docs.map(async (doc: any) => {
-        const contentData = doc.data();
-        // Construct the storage path and get signed URL
-        const file = bucket.file(`images/${contentData.contentId}`);
-        const [url] = await file.getSignedUrl({
-          action: "read",
-          expires: "01-01-2500",
-        });
-        contentData.contentMedia = url;
-        contentList.push({ id: contentData.contentId, ...contentData });
-      })
-    );
-
-    res.status(200).json(contentList);
-  } catch (error) {
-    console.error("Error fetching content:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
 // Endpoint to get specific content by ID
-app.get("/content/:id", async (req: Request, res: Response) => {
+app.get("/getContent/:id", async (req: Request, res: Response) => {
   const contentId = req.params.id;
 
   try {
-    const contentRef = db.collection("content").doc(contentId);
+    const contentRef = db.collection("contentPostData").doc(contentId);
     const doc = await contentRef.get();
 
     if (!doc.exists) {
@@ -164,12 +133,6 @@ app.get("/content/:id", async (req: Request, res: Response) => {
     }
 
     const contentData = doc.data();
-    const file = bucket.file(`images/${contentData.contentId}`);
-    const [url] = await file.getSignedUrl({
-      action: "read",
-      expires: "01-01-2500",
-    });
-    contentData.contentMedia = url;
     res.status(200).json(contentData);
   } catch (error) {
     console.error("Error fetching document:", error);
@@ -177,15 +140,15 @@ app.get("/content/:id", async (req: Request, res: Response) => {
   }
 });
 
-// Endpoint to update numberOfRead or numberOfLikes for specific content by ID
-app.put("/content/:id", async (req: Request, res: Response) => {
+// Endpoint to update numberOfRead numberOfLikes for specific content by ID
+app.put("/updateContent/:id", async (req: Request, res: Response) => {
   const contentId = req.params.id;
   const { numberOfLikes, numberOfRead, contentCosts, contentSupporter } =
     req.body;
   console.log("Request body:", req.body);
 
   try {
-    const contentRef = db.collection("content").doc(contentId);
+    const contentRef = db.collection("contentPostData").doc(contentId);
     const doc = await contentRef.get();
 
     if (!doc.exists) {
@@ -391,17 +354,6 @@ app.get("/last20Transactions", async (req: Request, res: Response) => {
     res.status(200).json(transactions);
   } catch (error) {
     console.error("Error fetching transactions:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-// Endpoint to get job listings from Lukso
-app.get("/getLuksoJobs", async (req: Request, res: Response) => {
-  try {
-    const jobs = await getLuksoJobs();
-    res.status(200).json(jobs);
-  } catch (error) {
-    console.error("Error fetching job listings:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });

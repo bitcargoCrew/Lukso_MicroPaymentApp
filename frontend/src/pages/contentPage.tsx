@@ -6,23 +6,25 @@ import { useRouter } from "next/router";
 import NavBar from "../components/NavBar";
 import CreatedBy from "@/components/CreatedBy";
 import { ContentDataInterface } from "../components/ContentDataInterface";
-import { config } from "../../config"
 import Link from "next/link";
 import { Heart } from "react-bootstrap-icons";
 import LikePayment from "../components/LikePayment";
 import { Editor, EditorState, convertFromRaw } from "draft-js";
 import "draft-js/dist/Draft.css";
+import { config, pinata } from "../../config";
 
 const ContentPage: React.FC = () => {
   const [account, setAccount] = useState("");
   const [contentData, setContentData] = useState<ContentDataInterface | null>(
     null
   );
+  const [contentCid, setContentCid] = useState("");
+  const [ipfsResponse, setIpfsResponse] = useState<ContentDataInterface | null>(
+    null
+  );
   const [error, setError] = useState<string | null>(null);
-  const [errorLike, setErrorLike] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
   const [isLikeButtonDisabled, setIsLikeButtonDisabled] = useState(false);
-  const [transactionInProgress, setTransactionInProgress] = useState(false);
   const [transactionMessage, setTransactionMessage] = useState("");
   const router = useRouter();
   const { query } = router;
@@ -33,18 +35,30 @@ const ContentPage: React.FC = () => {
     if (accountQuery && accountQuery !== account) {
       setAccount(accountQuery as string);
     }
-    fetchContentData();
-    setIsLikeButtonDisabled(false);
-  }, [router.query, account, contentId]);
+  }, [router.query, account]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchContentData();
+      if (contentCid) {
+        await fetchContentFromIPFS(contentCid); // Wait for IPFS data after CID is set
+      }
+      setIsLikeButtonDisabled(false);
+    };
+    fetchData();
+  }, [contentId, contentCid]); // Added contentCid as a dependency
 
   const fetchContentData = async () => {
     if (contentId) {
       try {
-        const response = await fetch(`${config.apiUrl}/content/${contentId}`);
+        const response = await fetch(
+          `${config.apiUrl}/getContent/${contentId}`
+        );
         if (response.ok) {
           const data = await response.json();
           console.log("Fetched data:", data); // Log the fetched data
           setContentData(data);
+          setContentCid(data.postCID);
         } else {
           setError(`Failed to fetch content data: ${response.statusText}`);
         }
@@ -58,10 +72,54 @@ const ContentPage: React.FC = () => {
     }
   };
 
+  const fetchContentFromIPFS = async (contentCid: string) => {
+    try {
+      const response = await pinata.gateways.get(contentCid);
+      let ipfsData: any = response?.data;
+
+      if (ipfsData instanceof Blob) {
+        ipfsData = await ipfsData.text();
+      }
+
+      if (typeof ipfsData === "string") {
+        ipfsData = JSON.parse(ipfsData);
+      }
+
+      if (typeof ipfsData !== "object" || ipfsData === null) {
+        console.error(`Invalid data format for CID ${contentCid}`);
+        return;
+      }
+
+      const ipfsResponse: ContentDataInterface = {
+        contentId: ipfsData.contentId || "",
+        contentTitle: ipfsData.contentTitle || "",
+        contentMedia: ipfsData.contentMedia || "",
+        contentCreator: ipfsData.contentCreator || "",
+        contentCosts: ipfsData.contentCosts || 0,
+        creatorMessage: ipfsData.creatorMessage || "",
+        contentShortDescription: ipfsData.contentShortDescription || "",
+        contentLongDescription: ipfsData.contentLongDescription || "",
+        contentTags: ipfsData.contentTags || [],
+        numberOfRead: ipfsData.numberOfRead || 0,
+        numberOfLikes: ipfsData.numberOfLikes || 0,
+        numberOfComments: ipfsData.numberOfComments || 0,
+        contentComments: ipfsData.contentComments || [],
+        contentSupporters: ipfsData.contentSupporters || [],
+      };
+
+      setIpfsResponse(ipfsResponse);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(`An error occurred: ${error.message}`);
+      } else {
+        setError("An unknown error occurred.");
+      }
+    }
+  };
+
   const handleLike = async () => {
     if (isLikeButtonDisabled || !contentData) return;
     setIsLikeButtonDisabled(true); // Disable the button
-    setTransactionInProgress(true);
     setTransactionMessage("Like processing... Waiting for confirmation");
     try {
       const likeCost = 0.01;
@@ -73,17 +131,20 @@ const ContentPage: React.FC = () => {
       setContentData({ ...contentData, numberOfLikes: updatedNumberOfLikes });
 
       // Send the updated numberOfLikes to backend
-      const response = await fetch(`${config.apiUrl}/content/${contentId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          numberOfLikes: updatedNumberOfLikes,
-          contentCreator: contentData.contentCreator,
-          contentSupporter,
-        }),
-      });
+      const response = await fetch(
+        `${config.apiUrl}/updateContent/${contentId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            numberOfLikes: updatedNumberOfLikes,
+            contentCreator: contentData.contentCreator,
+            contentSupporter,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -92,11 +153,9 @@ const ContentPage: React.FC = () => {
       setTransactionMessage("Like added successfully!");
     } catch (error) {
       console.error("Error updating like:", error);
-      setErrorLike("Failed to update like. Please try again.");
       setTransactionMessage("Failed to add like. Please try again.");
       setIsLiked(false); // Ensure
     } finally {
-      setTransactionInProgress(false);
       setTimeout(() => setTransactionMessage(""), 10000); // Clear the message after 10 seconds
     }
   };
@@ -127,7 +186,7 @@ const ContentPage: React.FC = () => {
     );
   }
 
-  if (!contentData) {
+  if (!contentData || !ipfsResponse) {
     return (
       <div>
         <NavBar account={account}></NavBar>
@@ -147,7 +206,7 @@ const ContentPage: React.FC = () => {
 
   // Convert the raw content state to EditorState
   const contentState = convertFromRaw(
-    JSON.parse(contentData.contentLongDescription)
+    JSON.parse(ipfsResponse.contentLongDescription)
   );
   const editorState = EditorState.createWithContent(contentState);
 
@@ -157,18 +216,12 @@ const ContentPage: React.FC = () => {
       <RootLayout>
         <div>
           <Row className={styles.rowSpace}>
-            <h1>{contentData.creatorMessage}</h1>
+            <h1>{ipfsResponse.creatorMessage}</h1>
           </Row>
           <Row className={styles.rowSpace}>
             <div className={styles.imageContainer}>
               <Image
-                src={
-                  typeof contentData.contentMedia === "string"
-                    ? contentData.contentMedia
-                    : contentData.contentMedia instanceof File
-                    ? URL.createObjectURL(contentData.contentMedia)
-                    : undefined
-                }
+                src={ipfsResponse.contentMedia}
                 alt="Creator Quote Image"
                 fluid
                 className={styles.contentImage}
@@ -176,10 +229,10 @@ const ContentPage: React.FC = () => {
             </div>
           </Row>
           <Row className={styles.rowSpace}>
-            <h1>{contentData.contentTitle}</h1>
+            <h1>{ipfsResponse.contentTitle}</h1>
           </Row>
           <Row>
-            <CreatedBy contentCreator={contentData.contentCreator} />
+            <CreatedBy contentCreator={ipfsResponse.contentCreator} />
           </Row>
           <Row className={styles.rowSpace}>
             <div>
@@ -205,7 +258,9 @@ const ContentPage: React.FC = () => {
                 >
                   <Heart
                     size={16}
-                    className={`${styles.heartIcon} ${isLiked ? styles.liked : ""}`}
+                    className={`${styles.heartIcon} ${
+                      isLiked ? styles.liked : ""
+                    }`}
                   />
                 </Button>
               </div>
