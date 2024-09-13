@@ -1,9 +1,9 @@
 import styles from "./ContentList.module.css";
 import React, { useEffect, useState } from "react";
 import { Row, Col, Spinner, Card, Image, Button } from "react-bootstrap";
-import ContentDataInterface from "./ContentDataInterface";
+import { ContentDataInterface } from "../components/ContentDataInterface";
+import { config } from "../../config"
 import { useRouter } from "next/router";
-import config from "../../config";
 import CreatedBy from "./CreatedBy";
 
 interface PurchasedContentInterface {
@@ -120,18 +120,12 @@ const PurchasedContent: React.FC = () => {
               <Card.Body>
                 <Row>
                   <Col xs={4} className={styles.customCol}>
-                    <Image
-                      src={
-                        typeof content.contentMedia === "string"
-                          ? content.contentMedia
-                          : content.contentMedia instanceof File
-                          ? URL.createObjectURL(content.contentMedia)
-                          : undefined
-                      }
-                      alt="Creator Quote Image"
-                      fluid
-                      className={styles.contentImage}
-                    />
+                  <Image
+                        src={content.contentMedia}
+                        alt="Creator Quote Image"
+                        fluid
+                        className={styles.contentImage}
+                      />
                   </Col>
                   <Col xs={8}>
                     <Card.Title className="cardTitleSpace">

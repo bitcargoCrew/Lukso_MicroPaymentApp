@@ -6,7 +6,6 @@ import path from "path";
 import multer, { Multer } from "multer";
 import transferTokenRead from "./services/transferTokenRead";
 import transferTokenLike from "./services/transferTokenLike";
-import { getLuksoJobs } from "./services/getLuksoJobs"; // Import the function
 
 const { initializeApp, cert } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
@@ -56,79 +55,65 @@ const upload: Multer = multer({
   limits: { fileSize: 20 * 1024 * 1024 }, // Limit file size to 20MB
 });
 
-// Endpoint to post new content with an image
-app.post(
-  "/postContent",
-  upload.single("contentMedia"),
-  async (req: Request, res: Response) => {
-    try {
-      const contentData = req.body;
-      const uniqueContentId = uuidv4();
-      contentData.contentId = uniqueContentId; // Assign uniqueContentId to contentId in contentData
-
-      // Convert numeric fields from strings to numbers
-      contentData.contentCosts = Number(contentData.contentCosts);
-      contentData.numberOfRead = Number(contentData.numberOfRead);
-      contentData.numberOfLikes = Number(contentData.numberOfLikes);
-      contentData.numberOfComments = Number(contentData.numberOfComments);
-
-      if (req.file) {
-        const blob = bucket.file(`images/${uniqueContentId}`);
-        const blobStream = blob.createWriteStream({
-          metadata: {
-            contentType: req.file.mimetype,
-          },
-          gzip: true, // Enable compression if needed
-        });
-
-        blobStream.on("error", (error: Error) => {
-          console.error("Blob stream error:", error);
-          res.status(500).json({ error: "Failed to upload image" });
-        });
-
-        blobStream.on("finish", async () => {
-          await db.collection("content").doc(uniqueContentId).set(contentData);
-          res.status(201).json({ id: uniqueContentId });
-        });
-
-        blobStream.end(req.file.buffer);
-      } else {
-        await db.collection("content").doc(uniqueContentId).set(contentData);
-        res.status(201).json({ id: uniqueContentId });
-      }
-    } catch (error) {
-      console.error("Error adding document:", error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  }
-);
-
-// Endpoint to get all content with picture URL
-app.get("/allContent", async (req: Request, res: Response) => {
+app.post("/postContentDatabase", async (req: Request, res: Response) => {
   try {
-    const contentRef = db.collection("content");
+    const {
+      postCID,
+      contentId,
+      contentCreator,
+      contentCosts,
+      numberOfRead,
+      numberOfLikes,
+      numberOfComments,
+      contentComments,
+      contentSupporters,
+    } = req.body;
+
+    if (!postCID) {
+      return res.status(400).json({ error: "postCID is required" });
+    }
+
+    // Save the postCID with a generated document ID, or use postCID as the ID if it is unique.
+    const contentRef = await db
+      .collection("contentPostData")
+      .doc(contentId)
+      .set({
+        postCID,
+        contentId,
+        contentCreator,
+        contentCosts,
+        numberOfRead,
+        numberOfLikes,
+        numberOfComments,
+        contentComments,
+        contentSupporters
+      });
+
+    console.log("Content stored successfully", contentRef);
+
+    res.status(200).json({ message: "Content stored successfully" });
+  } catch (error) {
+    console.error("Error storing contentPostData:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.get("/allContentCID", async (req: Request, res: Response) => {
+  try {
+    const contentRef = db.collection("contentPostData");
     const snapshot = await contentRef.get();
 
     if (snapshot.empty) {
-      return res.status(404).json({ error: "No content found" });
+      return res.status(404).json({ error: "No contentPostData found" });
     }
 
-    const contentList: { id: string; [key: string]: any }[] = [];
-    await Promise.all(
-      snapshot.docs.map(async (doc: any) => {
-        const contentData = doc.data();
-        // Construct the storage path and get signed URL
-        const file = bucket.file(`images/${contentData.contentId}`);
-        const [url] = await file.getSignedUrl({
-          action: "read",
-          expires: "01-01-2500",
-        });
-        contentData.contentMedia = url;
-        contentList.push({ id: contentData.contentId, ...contentData });
-      })
-    );
+    // Map through the snapshot, adding doc.id to each document's data
+    const cidList = snapshot.docs.map((doc: any) => ({
+      id: doc.id, // Add the document ID as a unique identifier
+      ...doc.data(), // Spread the rest of the document data
+    }));
 
-    res.status(200).json(contentList);
+    res.status(200).json(cidList);
   } catch (error) {
     console.error("Error fetching content:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -136,11 +121,11 @@ app.get("/allContent", async (req: Request, res: Response) => {
 });
 
 // Endpoint to get specific content by ID
-app.get("/content/:id", async (req: Request, res: Response) => {
+app.get("/getContent/:id", async (req: Request, res: Response) => {
   const contentId = req.params.id;
 
   try {
-    const contentRef = db.collection("content").doc(contentId);
+    const contentRef = db.collection("contentPostData").doc(contentId);
     const doc = await contentRef.get();
 
     if (!doc.exists) {
@@ -148,12 +133,6 @@ app.get("/content/:id", async (req: Request, res: Response) => {
     }
 
     const contentData = doc.data();
-    const file = bucket.file(`images/${contentData.contentId}`);
-    const [url] = await file.getSignedUrl({
-      action: "read",
-      expires: "01-01-2500",
-    });
-    contentData.contentMedia = url;
     res.status(200).json(contentData);
   } catch (error) {
     console.error("Error fetching document:", error);
@@ -161,15 +140,15 @@ app.get("/content/:id", async (req: Request, res: Response) => {
   }
 });
 
-// Endpoint to update numberOfRead or numberOfLikes for specific content by ID
-app.put("/content/:id", async (req: Request, res: Response) => {
+// Endpoint to update numberOfRead numberOfLikes for specific content by ID
+app.put("/updateContent/:id", async (req: Request, res: Response) => {
   const contentId = req.params.id;
   const { numberOfLikes, numberOfRead, contentCosts, contentSupporter } =
     req.body;
   console.log("Request body:", req.body);
 
   try {
-    const contentRef = db.collection("content").doc(contentId);
+    const contentRef = db.collection("contentPostData").doc(contentId);
     const doc = await contentRef.get();
 
     if (!doc.exists) {
@@ -375,17 +354,6 @@ app.get("/last20Transactions", async (req: Request, res: Response) => {
     res.status(200).json(transactions);
   } catch (error) {
     console.error("Error fetching transactions:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-// Endpoint to get job listings from Lukso
-app.get("/getLuksoJobs", async (req: Request, res: Response) => {
-  try {
-    const jobs = await getLuksoJobs();
-    res.status(200).json(jobs);
-  } catch (error) {
-    console.error("Error fetching job listings:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });

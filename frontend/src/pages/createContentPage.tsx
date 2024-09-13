@@ -1,35 +1,29 @@
 import styles from "./createContentPage.module.css";
-import { Button, Form, InputGroup, Tab, Tabs } from "react-bootstrap";
-import React, { useEffect, useState } from "react";
+import { Button, Form, InputGroup, Tab, Tabs, Spinner } from "react-bootstrap";
+import React, { useEffect, useState, useRef } from "react";
 import RootLayout from "../app/layout";
 import { useRouter } from "next/router";
 import NavBar from "../components/NavBar";
-import ContentDataInterface from "@/components/ContentDataInterface";
-import config from "../../config";
+import {
+  ContentDataInterface,
+  ImageDataInterface,
+} from "../components/ContentDataInterface";
 import { Editor, EditorState, convertToRaw } from "draft-js";
 import "draft-js/dist/Draft.css";
+import { pinata } from "../../config";
+import { v4 as uuidv4 } from "uuid";
+import { config } from "../../config";
+// import { deployAndSetCollectionMetadata } from "../components/DeployContentPost";
 
 const CreateContentPage: React.FC = () => {
   const router = useRouter();
   const [account, setAccount] = useState<string>("");
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState("creator"); // Track active tab
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    const accountQuery = router.query.account as string;
-    if (accountQuery && accountQuery !== account) {
-      setAccount(accountQuery);
-    }
-  }, [router.query.account, account]);
-
   const [formData, setFormData] = useState<ContentDataInterface>({
-    contentId: "",
+    contentId: uuidv4(),
     contentTitle: "",
-    contentMedia: null,
+    contentMedia: "",
     contentCreator: account,
     contentCosts: 0,
     creatorMessage: "",
@@ -40,10 +34,28 @@ const CreateContentPage: React.FC = () => {
     numberOfLikes: 0,
     numberOfComments: 0,
     contentComments: [""],
+    contentSupporters: [""],
+  });
+  const [imageData, setImageData] = useState<ImageDataInterface>({
+    ipfsImage: null,
   });
 
-  // Draft.js editor state
-  const [editorState, setEditorState] = useState(EditorState.createEmpty());
+  const [editorState, setEditorState] = useState(EditorState.createEmpty()); // Draft.js editor state
+  const imageCIDRef = useRef<string>(""); // Initialize a ref for imageCID
+  const [imageCID, setImageCID] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    setIsClient(true);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    const accountQuery = router.query.account as string;
+    if (accountQuery && accountQuery !== account) {
+      setAccount(accountQuery);
+    }
+  }, [router.query.account, account]);
 
   // Convert content state to raw JSON format
   const handleEditorChange = (state: any) => {
@@ -79,64 +91,119 @@ const CreateContentPage: React.FC = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      setFormData((prevState) => ({
+      setImageData((prevState) => ({
         ...prevState,
-        contentMedia: files[0],
+        ipfsImage: files[0],
       }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
 
-    const formDataToSend = new FormData();
-    formDataToSend.append("contentId", formData.contentId);
-    formDataToSend.append("contentTitle", formData.contentTitle);
-    formDataToSend.append("contentCreator", formData.contentCreator);
-    formDataToSend.append("contentCosts", String(formData.contentCosts));
-    formDataToSend.append("creatorMessage", formData.creatorMessage);
-    formDataToSend.append(
-      "contentShortDescription",
-      formData.contentShortDescription
-    );
-    formDataToSend.append(
-      "contentLongDescription",
-      formData.contentLongDescription
-    );
-    formDataToSend.append("contentTags", formData.contentTags.join(","));
-    formDataToSend.append("numberOfRead", String(formData.numberOfRead));
-    formDataToSend.append("numberOfLikes", String(formData.numberOfLikes));
-    formDataToSend.append(
-      "numberOfComments",
-      String(formData.numberOfComments)
-    );
-    formDataToSend.append(
-      "contentComments",
-      formData.contentComments.join(",")
-    );
+    if (imageData.ipfsImage instanceof File && !imageCID) {
+      try {
+        const imageFile = new File(
+          [imageData.ipfsImage],
+          imageData.ipfsImage.name,
+          {
+            type: "text/plain",
+          }
+        );
+        const imageupload = await pinata.upload.file(imageFile);
+        console.log(imageupload)
 
-    if (formData.contentMedia) {
-      formDataToSend.append("contentMedia", formData.contentMedia);
+        const imageCid = `https://gateway.pinata.cloud/ipfs/${imageupload.IpfsHash}`;
+        imageCIDRef.current = imageCid;
+        console.log("test2:", imageCid)
+
+      } catch (error) {
+        console.error("An error occurred during image upload:", error);
+        setLoading(false);
+        return; // Exit if image upload fails
+      }
+    }
+
+    if (!imageCIDRef.current) {
+      console.error("Image CID not set, upload might have failed");
+      setLoading(false);
+      return;
     }
 
     try {
-      const response = await fetch(`${config.apiUrl}/postContent`, {
-        method: "POST",
-        body: formDataToSend,
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Form submitted successfully!", result);
-        router.push({
-          pathname: "/profile",
-          query: { account: account },
+      console.log("test upload");
+      const responseIPFS = await pinata.upload
+        .json({
+          contentId: formData.contentId,
+          contentTitle: formData.contentTitle,
+          contentCreator: formData.contentCreator,
+          contentCosts: formData.contentCosts,
+          creatorMessage: formData.creatorMessage,
+          contentShortDescription: formData.contentShortDescription,
+          contentLongDescription: formData.contentLongDescription,
+          contentTags: formData.contentTags.join(","),
+          numberOfRead: formData.numberOfRead,
+          numberOfLikes: formData.numberOfLikes,
+          numberOfComments: formData.numberOfComments,
+          contentComments: formData.contentComments.join(","),
+          contentMedia: imageCIDRef.current,
+          contentSupporters: formData.contentSupporters,
+        })
+        .addMetadata({
+          name: formData.contentId,
+          keyValues: {
+            whimsey: 100,
+            description: formData.contentShortDescription,
+            author: formData.contentCreator,
+          },
         });
+
+      if (responseIPFS) {
+        const postCIDValue = responseIPFS.IpfsHash;
+        console.log("Post submitted successfully!", responseIPFS);
+        const response = await fetch(`${config.apiUrl}/postContentDatabase`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            postCID: postCIDValue,
+            contentId: formData.contentId,
+            contentCreator: formData.contentCreator,
+            contentCosts: formData.contentCosts,
+            numberOfRead: formData.numberOfRead,
+            numberOfLikes: formData.numberOfLikes,
+            numberOfComments: formData.numberOfComments,
+            contentComments: formData.contentComments.join(","),
+            contentSupporters: formData.contentSupporters,
+          }),
+        });
+        if (response.ok) {
+          const result = await response.json();
+          console.log("POST CID submitted successfully!", result);
+
+          // const contentCreator = formData.contentCreator;
+          // const postCID = postCIDValue;
+          // deployAndSetCollectionMetadata(postCID, contentCreator);
+
+          setLoading(false);
+
+          router.push({
+            pathname: "/profile",
+            query: { account: account },
+          });
+        } else {
+          console.error("POST CID submission failed:", response.statusText);
+          setLoading(false);
+        }
       } else {
-        console.error("Form submission failed:", response.statusText);
+        console.error("Form submission failed:", responseIPFS);
+        setLoading(false);
       }
     } catch (error) {
       console.error("An error occurred:", error);
+      setLoading(false);
     }
   };
 
@@ -150,6 +217,14 @@ const CreateContentPage: React.FC = () => {
       <RootLayout>
         <div>
           <h1 className={styles.rowSpace}>Create your post</h1>
+          {loading && (
+            <div className={styles.spinnerOverlay}>
+              <div className={styles.spinnerOverlayContent}>
+                <Spinner animation="border" role="status" />
+                <div>Processing... Waiting for confirmation</div>
+              </div>
+            </div>
+          )}
           <Form onSubmit={handleSubmit}>
             {isClient && (
               <Tabs
@@ -159,7 +234,12 @@ const CreateContentPage: React.FC = () => {
                 activeKey={activeTab}
                 onSelect={(k) => handleTabChange(k as string)}
               >
-                <Tab eventKey="creator" title={<span style={{ color: 'black' }}>Creator Information</span>}>
+                <Tab
+                  eventKey="creator"
+                  title={
+                    <span style={{ color: "black" }}>Creator Information</span>
+                  }
+                >
                   <InputGroup className="mb-3">
                     <InputGroup.Text
                       id="basic-addon1"
@@ -226,7 +306,10 @@ const CreateContentPage: React.FC = () => {
                     </Button>
                   </div>
                 </Tab>
-                <Tab eventKey="overview" title={<span style={{ color: 'black' }}>Post Overview</span>}>
+                <Tab
+                  eventKey="overview"
+                  title={<span style={{ color: "black" }}>Post Overview</span>}
+                >
                   <InputGroup className="mb-3">
                     <InputGroup.Text
                       id="basic-addon1"
@@ -316,7 +399,10 @@ const CreateContentPage: React.FC = () => {
                     </Button>
                   </div>
                 </Tab>
-                <Tab eventKey="post" title={<span style={{ color: 'black' }}>Post Content</span>}>
+                <Tab
+                  eventKey="post"
+                  title={<span style={{ color: "black" }}>Post Content</span>}
+                >
                   <InputGroup className="mb-3">
                     <div className={styles.draftEditorWrapper}>
                       <Editor

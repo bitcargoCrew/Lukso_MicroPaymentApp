@@ -2,7 +2,6 @@ import styles from "./profile.module.css";
 import { Button, Col, Row, Spinner, Image, Modal } from "react-bootstrap";
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
-import FetchProfileData from "../components/FetchProfileData";
 import RootLayout from "../app/layout";
 import NavBar from "../components/NavBar";
 import ContentList from "@/components/ContentList";
@@ -50,12 +49,14 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
       </div>
       <RootLayout>
         <div>
-          <Row className={styles.rowSpace}>
+        {/*
+        <Row className={styles.rowSpace}>
             <h1>Your purchased content</h1>
           </Row>
           <Row className={styles.rowSpace}>
             <PurchasedContent />
           </Row>
+          */}
           <Row className={styles.rowSpace}>
             <h1>Explore the content of Quill</h1>
           </Row>

@@ -1,7 +1,7 @@
 import styles from "./CardsTop3Supporters.module.css";
 import React, { useEffect, useState, useCallback } from "react";
 import { Button, Col, Row, Card, Spinner } from "react-bootstrap";
-import config from "../../config";
+import { config } from "/Users/sruettimann/lukso_up/frontend/config"
 import SupporterInformation from "@/components/SupporterInformation";
 import { Icon1Circle, Icon2Circle, Icon3Circle } from "react-bootstrap-icons";
 

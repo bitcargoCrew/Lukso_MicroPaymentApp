@@ -10,6 +10,6 @@
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true
     },
-    "include": ["app/**/*.ts"],
+    "include": ["app/**/*.ts", "../frontend/src/components/DeployContentPost.ts"],
     "exclude": ["node_modules", "build"]
 }  
