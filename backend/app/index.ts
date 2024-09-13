@@ -1,28 +1,13 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import path from "path";
-import multer, { Multer } from "multer";
 import transferTokenRead from "./services/transferTokenRead";
 import transferTokenLike from "./services/transferTokenLike";
 
 const { initializeApp, cert } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
 const { getStorage } = require("firebase-admin/storage");
-
-// Extend the Request interface to include file properties for multer
-declare global {
-  namespace Express {
-    interface Request {
-      file?: Express.Multer.File; // Ensure this matches the type from multer
-      files?:
-        | { [fieldname: string]: Express.Multer.File[] }
-        | Express.Multer.File[]
-        | undefined;
-    }
-  }
-}
 
 // Determine the path to the service account key file
 const isRender = process.env.RENDER || false;
@@ -48,12 +33,6 @@ const bucket = storage.bucket();
 
 // Export db for use in other modules
 export { db };
-
-// Configure multer for file uploads
-const upload: Multer = multer({
-  storage: multer.memoryStorage(), // Store files in memory temporarily
-  limits: { fileSize: 20 * 1024 * 1024 }, // Limit file size to 20MB
-});
 
 app.post("/postContentDatabase", async (req: Request, res: Response) => {
   try {
