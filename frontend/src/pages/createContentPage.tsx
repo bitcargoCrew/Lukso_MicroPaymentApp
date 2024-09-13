@@ -29,12 +29,12 @@ const CreateContentPage: React.FC = () => {
     creatorMessage: "",
     contentShortDescription: "",
     contentLongDescription: "",
-    contentTags: [""],
+    contentTags: [],
     numberOfRead: 0,
     numberOfLikes: 0,
     numberOfComments: 0,
-    contentComments: [""],
-    contentSupporters: [""],
+    contentComments: [],
+    contentSupporters: [],
   });
   const [imageData, setImageData] = useState<ImageDataInterface>({
     ipfsImage: null,
@@ -42,7 +42,6 @@ const CreateContentPage: React.FC = () => {
 
   const [editorState, setEditorState] = useState(EditorState.createEmpty()); // Draft.js editor state
   const imageCIDRef = useRef<string>(""); // Initialize a ref for imageCID
-  const [imageCID, setImageCID] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -102,7 +101,7 @@ const CreateContentPage: React.FC = () => {
     e.preventDefault();
     setLoading(true);
 
-    if (imageData.ipfsImage instanceof File && !imageCID) {
+    if (imageData.ipfsImage instanceof File) {
       try {
         const imageFile = new File(
           [imageData.ipfsImage],
@@ -116,7 +115,6 @@ const CreateContentPage: React.FC = () => {
 
         const imageCid = `https://gateway.pinata.cloud/ipfs/${imageupload.IpfsHash}`;
         imageCIDRef.current = imageCid;
-        console.log("test2:", imageCid)
 
       } catch (error) {
         console.error("An error occurred during image upload:", error);
@@ -132,7 +130,6 @@ const CreateContentPage: React.FC = () => {
     }
 
     try {
-      console.log("test upload");
       const responseIPFS = await pinata.upload
         .json({
           contentId: formData.contentId,

@@ -86,8 +86,9 @@ const ContentCarousel: React.FC = () => {
         contentCosts
       );
       const updatedNumberOfRead = (numberOfRead || 0) + 1;
-      console.log(contentSupporter);
-      const response = await fetch(
+
+      // Send the read update to the server
+      const readUpdateResponse = await fetch(
         `${config.apiUrl}/updateContent/${contentId}`,
         {
           method: "PUT",
@@ -103,14 +104,44 @@ const ContentCarousel: React.FC = () => {
         }
       );
 
-      if (response.ok) {
-        router.push({
-          pathname: "/contentPage",
-          query: { account, paid: "true", contentId },
-        });
-      } else {
-        setError(`Failed to update content data: ${response.statusText}`);
+      if (!readUpdateResponse.ok) {
+        setError(
+          `Failed to update the number of reads: ${readUpdateResponse.statusText}`
+        );
+        return;
       }
+
+      // Add current user (account) as a supporter
+      const supporterUpdateResponse = await fetch(
+        `${config.apiUrl}/updateSupporters/${contentId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            supporter: account, // current user account as a supporter
+          }),
+        }
+      );
+
+      if (!supporterUpdateResponse.ok) {
+        setError(
+          `Failed to update supporters: ${supporterUpdateResponse.statusText}`
+        );
+        return;
+      }
+
+      console.log(
+        "Updated content data:",
+        await supporterUpdateResponse.json()
+      );
+
+      router.push({
+        pathname: "/contentPage",
+        query: { account, paid: "true", contentId },
+      });
+
     } catch (error) {
       console.error("Payment failed:", error);
       setError("Payment failed. Please try again.");
