@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import RootLayout from "../app/layout";
 import NavBar from "../components/NavBar";
-import { config } from "/Users/sruettimann/lukso_up/frontend/config"
+import { config } from "../../config";
 import SupporterInformation from "@/components/SupporterInformation";
 
 const SocialLeaderboard: React.FC = ({}) => {
