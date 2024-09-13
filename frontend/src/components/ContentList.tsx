@@ -4,12 +4,20 @@ import { Row, Col, Spinner, Card, Image, Button } from "react-bootstrap";
 import { useRouter } from "next/router";
 import ChangePagePayment from "@/components/ChangePagePayment";
 import CreatedBy from "./CreatedBy";
-import {ContentDataInterface,IPFSCidInterface} from "../components/ContentDataInterface";
+import {
+  ContentDataInterface,
+  IPFSCidInterface,
+} from "../components/ContentDataInterface";
 import { config } from "../../config";
-import { fetchAllContentCID, fetchAllContentFromIPFS } from "@/components/FetchIPFSData"; // Import the functions
+import {
+  fetchAllContentCID,
+  fetchAllContentFromIPFS,
+} from "@/components/FetchIPFSData"; // Import the functions
 
 const ContentList: React.FC = () => {
-  const [contentList, setContentList] = useState<(ContentDataInterface | null)[]>([]);
+  const [contentList, setContentList] = useState<
+    (ContentDataInterface | null)[]
+  >([]);
   const [cidList, setCidList] = useState<IPFSCidInterface[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +65,6 @@ const ContentList: React.FC = () => {
     }
   };
 
-  
   const handlePayment = async (
     contentId: string,
     contentCreator: string,
@@ -70,33 +77,62 @@ const ContentList: React.FC = () => {
         await ChangePagePayment.transactionModule(contentCreator, contentCosts);
       setPaid(true);
       const updatedNumberOfRead = (numberOfRead || 0) + 1;
-      console.log(updatedNumberOfRead)
 
-      // Send the update to the server
-      const response = await fetch(`${config.apiUrl}/updateContent/${contentId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          numberOfRead: updatedNumberOfRead,
-          contentCreator,
-          contentCosts,
-          contentSupporter,
-        }),
-      });
+      // Send the read update to the server
+      const readUpdateResponse = await fetch(
+        `${config.apiUrl}/updateContent/${contentId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            numberOfRead: updatedNumberOfRead,
+            contentCreator,
+            contentCosts,
+            contentSupporter,
+          }),
+        }
+      );
 
-      if (response.ok) {
-        console.log("Updated content data:", await response.json());
-
-        // Redirect to the content page
-        router.push({
-          pathname: "/contentPage",
-          query: { account, paid: "true", contentId },
-        });
-      } else {
-        setError(`Failed to update content data: ${response.statusText}`);
+      if (!readUpdateResponse.ok) {
+        setError(
+          `Failed to update the number of reads: ${readUpdateResponse.statusText}`
+        );
+        return;
       }
+
+      // Add current user (account) as a supporter
+      const supporterUpdateResponse = await fetch(
+        `${config.apiUrl}/updateSupporters/${contentId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            supporter: account, // current user account as a supporter
+          }),
+        }
+      );
+
+      if (!supporterUpdateResponse.ok) {
+        setError(
+          `Failed to update supporters: ${supporterUpdateResponse.statusText}`
+        );
+        return;
+      }
+
+      console.log(
+        "Updated content data:",
+        await supporterUpdateResponse.json()
+      );
+
+      // Redirect to the content page
+      router.push({
+        pathname: "/contentPage",
+        query: { account, paid: "true", contentId },
+      });
     } catch (error) {
       console.error("Payment failed:", error);
       setError("Payment failed. Please try again.");
@@ -128,14 +164,14 @@ const ContentList: React.FC = () => {
   }
 
   if (error) {
-    console.log(error)
+    console.log(error);
     return (
       <div className={styles.rowSpace}>
-      <p>{error}</p>
-      <Button variant="danger" onClick={fetchContentCID}>
-        Retry Fetching Content
-      </Button>
-    </div>
+        <p>{error}</p>
+        <Button variant="danger" onClick={fetchContentCID}>
+          Retry Fetching Content
+        </Button>
+      </div>
     );
   }
 

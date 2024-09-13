@@ -161,6 +161,45 @@ app.put("/updateContent/:id", async (req: Request, res: Response) => {
   }
 });
 
+app.put("/updateSupporters/:id", async (req: Request, res: Response) => {
+  const contentId = req.params.id;
+  const { supporter } = req.body; // Assuming 'supporter' is the single supporter being added
+  console.log("Request body:", req.body);
+
+  if (!supporter) {
+    return res.status(400).json({ error: "Supporter ID is required" });
+  }
+
+  try {
+    const contentRef = db.collection("contentPostData").doc(contentId);
+    const doc = await contentRef.get();
+
+    if (!doc.exists) {
+      return res.status(404).json({ error: "Content not found" });
+    }
+
+    // Get the current list of supporters
+    const currentData = doc.data();
+    const currentSupporters: string[] = currentData?.contentSupporters || [];
+
+    // Check if supporter is already in the list
+    if (currentSupporters.includes(supporter)) {
+      return res.status(200).json({ message: "Supporter already exists, no update required." });
+    }
+
+    // Add new supporter
+    const updatedSupporters = [...currentSupporters, supporter];
+
+    // Update the document
+    await contentRef.update({ contentSupporters: updatedSupporters });
+
+    return res.status(200).json({ message: "Supporter added successfully" });
+  } catch (error) {
+    console.error("Error updating document:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.get(
   "/getContentPerSupporter/:contentSupporter",
   async (req: Request, res: Response) => {
