@@ -32,16 +32,11 @@ const ContentCarousel: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [transactionInProgress, setTransactionInProgress] = useState(false);
-  const [account, setAccount] = useState("");
   const router = useRouter();
 
   useEffect(() => {
-    const accountQuery = router.query.account;
-    if (accountQuery && accountQuery !== account) {
-      setAccount(accountQuery as string);
-    }
     fetchContentCID(); // Use a function to fetch data
-  }, [router.query, account]);
+  }, []);
 
   useEffect(() => {
     if (cidList.length > 0) {
@@ -88,6 +83,7 @@ const ContentCarousel: React.FC = () => {
 
       // Send contentSupporter to getAccessPerson
       await setContentSupporter(contentSupporter);
+      const account = contentSupporter
 
       const updatedNumberOfRead = (numberOfRead || 0) + 1;
 
