@@ -13,6 +13,7 @@ import {
   fetchAllContentCID,
   fetchAllContentFromIPFS,
 } from "@/components/FetchIPFSData"; // Import the functions
+import { setContentSupporter } from "./PageAccess"
 
 const ContentList: React.FC = () => {
   const [contentList, setContentList] = useState<
@@ -22,7 +23,6 @@ const ContentList: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [transactionInProgress, setTransactionInProgress] = useState(false);
-  const [paid, setPaid] = useState(false);
   const [account, setAccount] = useState("");
   const [selectedContent, setSelectedContent] = useState<string | null>(null);
   const router = useRouter();
@@ -33,7 +33,7 @@ const ContentList: React.FC = () => {
       setAccount(accountQuery as string);
     }
     fetchContentCID(); // Use a function to fetch data
-  }, [router.query, account, paid]);
+  }, [router.query, account]);
 
   useEffect(() => {
     if (cidList.length > 0) {
@@ -73,9 +73,12 @@ const ContentList: React.FC = () => {
   ) => {
     try {
       setTransactionInProgress(true);
-      const { txHash, contentSupporter } =
+      const { contentSupporter } =
         await ChangePagePayment.transactionModule(contentCreator, contentCosts);
-      setPaid(true);
+
+      // Send contentSupporter to getAccessPerson
+      await setContentSupporter(contentSupporter);
+
       const updatedNumberOfRead = (numberOfRead || 0) + 1;
 
       // Send the read update to the server
@@ -111,7 +114,7 @@ const ContentList: React.FC = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            supporter: account, // current user account as a supporter
+            supporter: contentSupporter, // current user account as a supporter
           }),
         }
       );
@@ -131,7 +134,7 @@ const ContentList: React.FC = () => {
       // Redirect to the content page
       router.push({
         pathname: "/contentPage",
-        query: { account, paid: "true", contentId },
+        query: { account, contentId },
       });
     } catch (error) {
       console.error("Payment failed:", error);

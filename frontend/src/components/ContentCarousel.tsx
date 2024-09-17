@@ -21,6 +21,7 @@ import {
   fetchAllContentFromIPFS,
 } from "@/components/FetchIPFSData"; // Import the functions
 import styles from "./ContentCarousel.module.css"; // Assuming you're using the same styles
+import { setContentSupporter } from "./PageAccess";
 
 const ContentCarousel: React.FC = () => {
   const [index, setIndex] = useState(0);
@@ -33,7 +34,6 @@ const ContentCarousel: React.FC = () => {
   const [transactionInProgress, setTransactionInProgress] = useState(false);
   const [account, setAccount] = useState("");
   const router = useRouter();
-  const [selectedContent, setSelectedContent] = useState<string | null>(null);
 
   useEffect(() => {
     const accountQuery = router.query.account;
@@ -85,6 +85,10 @@ const ContentCarousel: React.FC = () => {
         contentCreator,
         contentCosts
       );
+
+      // Send contentSupporter to getAccessPerson
+      await setContentSupporter(contentSupporter);
+
       const updatedNumberOfRead = (numberOfRead || 0) + 1;
 
       // Send the read update to the server
@@ -120,7 +124,7 @@ const ContentCarousel: React.FC = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            supporter: account, // current user account as a supporter
+            supporter: contentSupporter, // current user account as a supporter
           }),
         }
       );
@@ -139,9 +143,8 @@ const ContentCarousel: React.FC = () => {
 
       router.push({
         pathname: "/contentPage",
-        query: { account, paid: "true", contentId },
+        query: { account, contentId },
       });
-
     } catch (error) {
       console.error("Payment failed:", error);
       setError("Payment failed. Please try again.");
@@ -151,7 +154,6 @@ const ContentCarousel: React.FC = () => {
   };
 
   const handleButtonClick = (contentId: string) => {
-    setSelectedContent(contentId);
     const selectedContent = contentList.find(
       (content) => content && content.contentId === contentId
     );
