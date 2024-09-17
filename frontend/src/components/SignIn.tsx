@@ -10,7 +10,6 @@ interface SignInProps {
 
 // Wrap your code in a React component
 const SignIn: React.FC<SignInProps> = ({ onSignInSuccess, onSignInError }) => {
-  const [account, setAccount] = useState<string | undefined>();
 
   useEffect(() => {
     async function connectToLukso() {
@@ -75,7 +74,6 @@ const SignIn: React.FC<SignInProps> = ({ onSignInSuccess, onSignInError }) => {
         console.log("Connected with", accounts[0]);
 
         onSignInSuccess(accounts[0]);
-        setAccount(accounts[0]);
       } catch (error: any) {
         console.error("Error connecting to Lukso:", error);
         onSignInError("Error connecting to Lukso, try again");

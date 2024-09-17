@@ -1,5 +1,5 @@
 import styles from "./contentPage.module.css";
-import { Button, Col, Container, Row, Image, Spinner } from "react-bootstrap";
+import { Button, Row, Image, Spinner } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
 import RootLayout from "../app/layout";
 import { useRouter } from "next/router";
@@ -12,6 +12,7 @@ import LikePayment from "../components/LikePayment";
 import { Editor, EditorState, convertFromRaw } from "draft-js";
 import "draft-js/dist/Draft.css";
 import { config, pinata } from "../../config";
+import { setSupporterArray } from "../components/PageAccess";
 
 const ContentPage: React.FC = () => {
   const [account, setAccount] = useState("");
@@ -26,9 +27,10 @@ const ContentPage: React.FC = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [isLikeButtonDisabled, setIsLikeButtonDisabled] = useState(false);
   const [transactionMessage, setTransactionMessage] = useState("");
+  const [accessGranted, setAccessGranted] = useState<boolean>(false); // Track access
   const router = useRouter();
   const { query } = router;
-  const { paid, contentId } = query;
+  const { contentId } = query;
 
   useEffect(() => {
     const accountQuery = router.query.account;
@@ -56,9 +58,14 @@ const ContentPage: React.FC = () => {
         );
         if (response.ok) {
           const data = await response.json();
-          console.log("Fetched data:", data); // Log the fetched data
           setContentData(data);
           setContentCid(data.postCID);
+
+          // Send contentSupporter to getAccessPerson
+          const supporterArray = data.contentSupporters;
+          await setSupporterArray(supporterArray, (access) => {
+            setAccessGranted(access); // Set access based on result
+          });
         } else {
           setError(`Failed to fetch content data: ${response.statusText}`);
         }
@@ -160,16 +167,27 @@ const ContentPage: React.FC = () => {
     }
   };
 
-  if (!paid || paid !== "true") {
+  // Access denied handling
+  if (accessGranted === false) {
     return (
-      <RootLayout>
-        <div>
-          <h3>
-            You are not authorized to view this page. Please make a payment to
-            access this page.
-          </h3>
-        </div>
-      </RootLayout>
+      <div>
+        <NavBar account={account}></NavBar>
+        <RootLayout>
+          <div>
+            <h3>You do not have access to view this content.</h3>
+          </div>
+          <Row style={{ paddingTop: "20px" }}>
+            <Link
+              href={{
+                pathname: "/profile",
+                query: { account: account },
+              }}
+            >
+              <Button variant="dark">Back</Button>
+            </Link>
+          </Row>
+        </RootLayout>
+      </div>
     );
   }
 
@@ -181,6 +199,16 @@ const ContentPage: React.FC = () => {
           <div>
             <h3>The content is not available. Please open another post.</h3>
           </div>
+          <Row style={{ paddingTop: "20px" }}>
+            <Link
+              href={{
+                pathname: "/profile",
+                query: { account: account },
+              }}
+            >
+              <Button variant="dark">Back</Button>
+            </Link>
+          </Row>
         </RootLayout>
       </div>
     );
