@@ -1,4 +1,4 @@
-import { PinataSDK } from "pinata"
+import { PinataSDK } from "pinata-web3";
 
 const dev = process.env.NODE_ENV !== 'production';
 
