@@ -7,7 +7,6 @@ import {
   Nav,
   Navbar,
   Image,
-  Modal,
   Spinner,
   Alert,
 } from "react-bootstrap";
@@ -168,20 +167,6 @@ const Home: React.FC<HomeProps> = () => {
 
       <div id="solution">
         <RootLayout>
-          <Modal show={showModal} onHide={() => setShowModal(false)}>
-            <Modal.Header closeButton>
-              <Modal.Title>Important</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              We are currently in development. Dive into Quill with your Lukso
-              testnet UP and be part of the future of content creation.
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="primary" onClick={() => setShowModal(false)}>
-                Close
-              </Button>
-            </Modal.Footer>
-          </Modal>
           <Row className={styles.centeredText}>
             <h1>
               Welcome to Quill - The Ultimate Content Platform Integrating

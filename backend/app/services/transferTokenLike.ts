@@ -22,7 +22,7 @@ const transferTokenLike = async (contentSupporter: string, contentId: string) =>
     const provider = new JsonRpcProvider("https://rpc.lukso.sigmacore.io"); //mainnet
     const privateKey: string = process.env.PRIVATE_KEY || "";
     const signer = new Wallet(privateKey, provider);
-    const tokenContractAddress = "0xA5A639E4C5f629Ed2A2c087788084D83F2509B5a"; //mainnet contract
+    const tokenContractAddress = "0xcE757ca20501b6036bFda92317B3e7227884eeef"; //mainnet contract
     const universalProfileAddress: string = process.env.UP_ADDR || "";
     const token = new Contract(
       tokenContractAddress,
@@ -37,7 +37,7 @@ const transferTokenLike = async (contentSupporter: string, contentId: string) =>
     );
 
     const transferDetails = {
-      recipient: contentSupporter, //testnet UP sandro
+      recipient: contentSupporter,
       amount: parseEther("10"),
       force: true,
       data: toUtf8Bytes("Thank you for the support!"),
@@ -75,7 +75,7 @@ const transferTokenLike = async (contentSupporter: string, contentId: string) =>
       timestamp,
       event,
       contentSupporter,
-      contentId: contentId,
+      contentId,
       reads,
       likes,
       numberOfTokensReceived,

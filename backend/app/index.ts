@@ -200,9 +200,7 @@ app.put("/updateSupporters/:id", async (req: Request, res: Response) => {
   }
 });
 
-app.get(
-  "/getContentPerSupporter/:contentSupporter",
-  async (req: Request, res: Response) => {
+app.get("/getContentPerSupporter/:contentSupporter",async (req: Request, res: Response) => {
     const contentSupporter = req.params.contentSupporter;
 
     try {

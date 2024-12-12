@@ -1,5 +1,5 @@
 import styles from "./profile.module.css";
-import { Button, Col, Row, Spinner, Image, Modal } from "react-bootstrap";
+import { Button, Col, Row, Spinner, Image } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import RootLayout from "../app/layout";
@@ -26,20 +26,6 @@ const Profile: React.FC<ProfileViewProps> = ({}) => {
   return (
     <div>
       <NavBar account={account} />
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Important</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          We are currently in development. Dive into Quill with your Lukso
-          testnet UP and be part of the future of content creation.
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="primary" onClick={() => setShowModal(false)}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
       <div className={styles.backgroundContainer}>
         <Image
           src="/profile_background.jpeg"
