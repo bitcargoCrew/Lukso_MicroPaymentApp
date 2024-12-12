@@ -19,10 +19,10 @@ if (!process.env.PRIVATE_KEY || !process.env.UP_ADDR) {
 
 const transferTokenRead = async (contentSupporter: string, contentCosts: number, contentId: string) => {
   try {
-    const provider = new JsonRpcProvider("https://rpc.testnet.lukso.network"); //testnet
+    const provider = new JsonRpcProvider("https://rpc.lukso.sigmacore.io"); //mainnet
     const privateKey: string = process.env.PRIVATE_KEY || "";
     const signer = new Wallet(privateKey, provider);
-    const tokenContractAddress = "0x04e88e1b017baf2f2a15468b2a567a20f81c64b8"; //testnet contract
+    const tokenContractAddress = "0x04e88e1b017baf2f2a15468b2a567a20f81c64b8"; //mainnet contract
     const universalProfileAddress: string = process.env.UP_ADDR || "";
     const token = new Contract(
       tokenContractAddress,

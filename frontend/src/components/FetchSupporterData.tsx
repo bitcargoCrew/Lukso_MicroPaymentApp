@@ -13,7 +13,7 @@ const fetchSupporterData = async ({ contentSupporter, onDataFetched }: FetchCont
   const erc725js = new ERC725(
     lsp3ProfileSchema as ERC725JSONSchema[],
     contentSupporter,
-    RPC_ENDPOINT_Testnet,
+    RPC_ENDPOINT,
     { ipfsGateway: "https://api.universalprofile.cloud/ipfs" }
   );
 

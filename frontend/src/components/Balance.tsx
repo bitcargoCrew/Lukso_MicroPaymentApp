@@ -13,7 +13,7 @@ const Balance: React.FC<BalanceProps> = ({ account }) => {
       try {
         const RPC_ENDPOINT = "https://rpc.lukso.sigmacore.io"; //Mainnet
         const RPC_ENDPOINT_Testnet = "https://rpc.testnet.lukso.network"; //Testnet
-        const provider = new ethers.JsonRpcProvider(RPC_ENDPOINT_Testnet);
+        const provider = new ethers.JsonRpcProvider(RPC_ENDPOINT);
         const walletBalance = await provider.getBalance(account);
         const walletBalanceConverted = ethers.formatEther(walletBalance);
 

@@ -14,7 +14,7 @@ const getPermissionedAddresses = async ({ account }: ControllerListProps) => {
   const erc725 = new ERC725(
     LSP6Schema,
     UNIVERSAL_PROFILE,
-    RPC_ENDPOINT_Testnet
+    RPC_ENDPOINT
   );
 
   try {
