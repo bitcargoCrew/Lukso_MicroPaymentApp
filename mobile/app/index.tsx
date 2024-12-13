@@ -1,37 +1,20 @@
-import { View, Text, Image, ScrollView, Button, Modal, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, Image, ScrollView, StyleSheet } from "react-native";
 const backgroundImage = require("@/assets/images/profile_background.jpeg");
 import { useState, useEffect } from "react";
 import Greet from "@/components/Greet";
+import Login from "@/components/Login";
+import 'react-native-get-random-values';
 
 const App = () => {
-  const [isModalVisibile, setIsModalVisible] = useState(true);
-  const [isSpinnerVisibile, setIsSpinnerVisible] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsSpinnerVisible(false);
-    }, 5000); // Stop spinner after 5 seconds
-
-    // Cleanup the timer in case the component unmounts before the timer finishes
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <View style={{ flex: 1 }}>
       <ScrollView style={{ backgroundColor: "#ffebee" }}>
-        <Modal
-          visible={isModalVisibile}
-          onRequestClose={() => setIsModalVisible(false)}
-        >
-          <View style={{ padding: 60 }}>
-            <Text>Please switch to testnet</Text>
-            <Button title="Close" onPress={() => setIsModalVisible(false)} />
-          </View>
-        </Modal>
         <Image
           source={backgroundImage}
           style={{ width: "auto", height: 200 }}
         ></Image>
+        <Login/>
         <Text style={{ padding: 60 }}>
           What is Lorem Ipsum? Lorem Ipsum is simply dummy text of the printing
           and typesetting industry. Lorem Ipsum has been the industry's standard
@@ -55,20 +38,7 @@ const App = () => {
           first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from
           a line in section 1.10.32.
         </Text>
-        <Greet/>
-        <Button
-          title="Press"
-          color="midnightblue"
-          onPress={() => console.log("Button pressed")}
-        />
       </ScrollView>
-
-      {/* ActivityIndicator as an overlay */}
-      {isSpinnerVisibile && (
-        <View style={styles.overlay}>
-          <ActivityIndicator size="large" color="black" />
-        </View>
-      )}
     </View>
   );
 };

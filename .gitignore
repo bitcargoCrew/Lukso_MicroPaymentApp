@@ -4,3 +4,4 @@ backend/.env
 backend/app/serviceAccountKey.json
 backend/build
 smart-contracts/.env
+mobile/.env
