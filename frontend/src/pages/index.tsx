@@ -26,12 +26,10 @@ interface HomeProps {}
 const Home: React.FC<HomeProps> = () => {
   const [buttonClicked, setButtonClicked] = useState(false);
   const [account, setAccount] = useState(""); // State to store account
-  const [showModal, setShowModal] = useState(false); // State to control the modal visibility
   const [signInError, setSignInError] = useState<string | null>(null); // State to store sign-in errors
   const router = useRouter();
 
   useEffect(() => {
-    setShowModal(true);
     const accountQuery = router.query.account;
     if (accountQuery && accountQuery !== account) {
       setAccount(accountQuery as string);

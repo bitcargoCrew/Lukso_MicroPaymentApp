@@ -13,13 +13,10 @@ export interface ContentDataInterface {
   numberOfComments: number;
   contentComments: string[];
   contentSupporters: string[];
+  postCID: string;
 }
 
 export interface ImageDataInterface {
   ipfsImage: File | string | null;
 }
 
-export interface IPFSCidInterface {
-  id: string;
-  postCID: string;
-}

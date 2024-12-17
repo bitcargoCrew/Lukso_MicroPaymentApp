@@ -5,13 +5,11 @@ import { useRouter } from "next/router";
 import ChangePagePayment from "@/components/ChangePagePayment";
 import CreatedBy from "./CreatedBy";
 import {
-  ContentDataInterface,
-  IPFSCidInterface,
+  ContentDataInterface
 } from "../components/ContentDataInterface";
 import { config } from "../../config";
 import {
-  fetchAllContentCID,
-  fetchAllContentFromIPFS,
+  fetchAllIpfsData
 } from "@/components/FetchIPFSData"; // Import the functions
 import { setContentSupporter } from "./PageAccess"
 
@@ -19,7 +17,6 @@ const ContentList: React.FC = () => {
   const [contentList, setContentList] = useState<
     (ContentDataInterface | null)[]
   >([]);
-  const [cidList, setCidList] = useState<IPFSCidInterface[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [transactionInProgress, setTransactionInProgress] = useState(false);
@@ -32,36 +29,22 @@ const ContentList: React.FC = () => {
     if (accountQuery && accountQuery !== account) {
       setAccount(accountQuery as string);
     }
-    fetchContentCID(); // Use a function to fetch data
+    fetchData(); // Use a function to fetch data
   }, [router.query, account]);
 
-  useEffect(() => {
-    if (cidList.length > 0) {
-      fetchContentFromIPFS(); // Fetch content from IPFS when cidList changes
-    }
-  }, [cidList]);
-
-  const fetchContentCID = async () => {
+  const fetchData = async () => {
     try {
       setError(null); // Reset error before retrying
       setLoading(true);
-      const cidData = await fetchAllContentCID(); // Fetch CIDs
-      setCidList(cidData);
+      const contentDataIPFS = await fetchAllIpfsData(); // Fetch IPFS data
+      setContentList(contentDataIPFS);
     } catch (error) {
+      console.error("Failed to fetch content", error);
       if (error instanceof Error) {
         setError(error.message);
       }
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchContentFromIPFS = async () => {
-    try {
-      const contentDataIPFS = await fetchAllContentFromIPFS(cidList); // Fetch content from IPFS
-      setContentList(contentDataIPFS);
-    } catch (error) {
-      console.error("Failed to fetch content from IPFS", error);
     }
   };
 
@@ -171,7 +154,7 @@ const ContentList: React.FC = () => {
     return (
       <div className={styles.rowSpace}>
         <p>{error}</p>
-        <Button variant="danger" onClick={fetchContentCID}>
+        <Button variant="danger" onClick={fetchData}>
           Retry Fetching Content
         </Button>
       </div>

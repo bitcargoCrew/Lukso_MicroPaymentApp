@@ -5,11 +5,15 @@ import {
   defaultConfig,
   AppKitButton,
   AppKit,
-  useWalletInfo,
   useAppKitAccount,
 } from "@reown/appkit-ethers-react-native";
+import React, { useEffect } from "react";
 
-const Login = () => {
+interface LoginProps {
+  onAddressChange?: (address: string | undefined) => void;
+}
+
+const Login: React.FC<LoginProps> = ({ onAddressChange }) => {
   const projectId = process.env.EXPO_PUBLIC_PROJECT_ID as string;
   const metadata = {
     name: "AppKit RN Lukso App",
@@ -31,14 +35,6 @@ const Login = () => {
     rpcUrl: "https://rpc.lukso.sigmacore.io",
   };
 
-  const ethereum = {
-    chainId: 1,
-    name: "Ethereum",
-    currency: "ETH",
-    explorerUrl: "https://etherscan.io",
-    rpcUrl: "https://cloudflare-eth.com",
-  };
-
   const chains = [lukso];
 
   try {
@@ -52,7 +48,14 @@ const Login = () => {
     console.error("AppKit initialization error:", error);
   }
 
-  const { isConnected } = useAppKitAccount();
+  const { address, isConnected } = useAppKitAccount();
+
+    // Use useEffect to call the onAddressChange prop when address changes
+    useEffect(() => {
+      if (onAddressChange) {
+        onAddressChange(address);
+      }
+    }, [address, onAddressChange]);
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>

@@ -13,58 +13,37 @@ import ChangePagePayment from "@/components/ChangePagePayment";
 import CreatedBy from "./CreatedBy";
 import {
   ContentDataInterface,
-  IPFSCidInterface,
 } from "../components/ContentDataInterface";
 import { config } from "../../config";
-import {
-  fetchAllContentCID,
-  fetchAllContentFromIPFS,
-} from "@/components/FetchIPFSData"; // Import the functions
+import { fetchAllIpfsData } from "@/components/FetchIPFSData";
 import styles from "./ContentCarousel.module.css"; // Assuming you're using the same styles
 import { setContentSupporter } from "./PageAccess";
 
 const ContentCarousel: React.FC = () => {
   const [index, setIndex] = useState(0);
-  const [contentList, setContentList] = useState<
-    (ContentDataInterface | null)[]
-  >([]);
-  const [cidList, setCidList] = useState<IPFSCidInterface[]>([]);
+  const [contentList, setContentList] = useState<(ContentDataInterface | null)[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [transactionInProgress, setTransactionInProgress] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    fetchContentCID(); // Use a function to fetch data
+    fetchData(); // Use a function to fetch data
   }, []);
 
-  useEffect(() => {
-    if (cidList.length > 0) {
-      fetchContentFromIPFS(); // Fetch content from IPFS when cidList changes
-    }
-  }, [cidList]);
-
-  const fetchContentCID = async () => {
+  const fetchData = async () => {
     try {
       setError(null); // Reset error before retrying
       setLoading(true);
-      const cidData = await fetchAllContentCID(); // Fetch CIDs
-      setCidList(cidData);
+      const contentDataIPFS = await fetchAllIpfsData(); // Fetch IPFS data
+      setContentList(contentDataIPFS);
     } catch (error) {
+      console.error("Failed to fetch content", error);
       if (error instanceof Error) {
         setError(error.message);
       }
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchContentFromIPFS = async () => {
-    try {
-      const contentDataIPFS = await fetchAllContentFromIPFS(cidList); // Fetch content from IPFS
-      setContentList(contentDataIPFS);
-    } catch (error) {
-      console.error("Failed to fetch content from IPFS", error);
     }
   };
 
@@ -184,7 +163,7 @@ const ContentCarousel: React.FC = () => {
     return (
       <div className={styles.rowSpace}>
         <p>{error}</p>
-        <Button variant="danger" onClick={fetchContentCID}>
+        <Button variant="danger" onClick={fetchData}>
           Retry Fetching Content
         </Button>
       </div>
