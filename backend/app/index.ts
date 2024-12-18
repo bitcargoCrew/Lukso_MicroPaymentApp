@@ -31,13 +31,19 @@ const app = express();
 app.use(cors({
   origin: [
     'https://lukso-micropaymentapp.onrender.com', 
-    'http://localhost:3000' // include local development server if needed
+    'http://localhost:3000'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true // Add this if you're using cookies or authentication
 }));
 
 app.use(express.json());
+
+app.use((req, res, next) => {
+  console.log('Incoming request from origin:', req.get('origin'));
+  next();
+});
 
 // Initialize Firebase
 initializeApp({
