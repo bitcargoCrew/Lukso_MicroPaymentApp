@@ -27,13 +27,17 @@ const serviceAccountPath = isRender
 const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
 
 const app = express();
-app.use(express.json());
 
 app.use(cors({
-  origin: 'https://lukso-micropaymentapp.onrender.com',
+  origin: [
+    'https://lukso-micropaymentapp.onrender.com', 
+    'http://localhost:3000' // include local development server if needed
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+app.use(express.json());
 
 // Initialize Firebase
 initializeApp({
