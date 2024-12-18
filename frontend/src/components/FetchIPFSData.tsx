@@ -1,17 +1,13 @@
 // fetchContentUtils.ts
 import { config } from "../../config";
-import { ContentDataInterface } from "../components/ContentDataInterface";
+import {
+  ContentDataInterface,
+} from "../components/ContentDataInterface";
 
 export const fetchAllIpfsData = async (): Promise<ContentDataInterface[]> => {
   try {
     const ipfsResponse = await fetch(
-      `${config.apiUrl}/getAllContentPostsFromIPFS`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+      `${config.apiUrl}/getAllContentPostsFromIPFS`
     );
     if (ipfsResponse.ok) {
       const ipfsData: ContentDataInterface[] = await ipfsResponse.json();

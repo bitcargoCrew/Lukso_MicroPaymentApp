@@ -27,19 +27,8 @@ const serviceAccountPath = isRender
 const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
 
 const app = express();
-
-app.use(cors({
-  origin: '*', // Be careful - only use for testing
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
 app.use(express.json());
-
-app.use((req, res, next) => {
-  console.log('Incoming request from origin:', req.get('origin'));
-  next();
-});
+app.use(cors());
 
 // Initialize Firebase
 initializeApp({
