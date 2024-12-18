@@ -28,15 +28,7 @@ const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
 
 const app = express();
 
-app.use(cors({
-  origin: [
-    'https://lukso-micropaymentapp.onrender.com', 
-    'http://localhost:3000'
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true // Add this if you're using cookies or authentication
-}));
+app.use(cors());
 
 app.use(express.json());
 
