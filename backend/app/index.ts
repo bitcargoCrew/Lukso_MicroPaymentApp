@@ -151,6 +151,8 @@ app.get("/getAllContentPostsFromIPFS", async (req: Request, res: Response) => {
       ...doc.data(),
     }));
 
+    console.log(cidList)
+
     // Fetch IPFS content for all CIDs
     const contentDataIPFS = await Promise.all(
       cidList.map(async (item: any) => {
@@ -161,6 +163,8 @@ app.get("/getAllContentPostsFromIPFS", async (req: Request, res: Response) => {
           }
 
           const response = await pinata.gateways.get(item.postCID);
+
+          console.log(response)
 
           let ipfsData: any = response?.data;
 
@@ -367,9 +371,7 @@ app.put("/updateSupporters/:id", async (req: Request, res: Response) => {
   }
 });
 
-app.get(
-  "/getContentPerSupporter/:contentSupporter",
-  async (req: Request, res: Response) => {
+app.get("/getContentPerSupporter/:contentSupporter", async (req: Request, res: Response) => {
     const contentSupporter = req.params.contentSupporter;
 
     try {
@@ -400,8 +402,7 @@ app.get(
       console.error("Error fetching content IDs:", error);
       res.status(500).json({ error: error.message });
     }
-  }
-);
+});
 
 // Endpoint to get aggregated data for all contentSupporters
 app.get("/aggregateSocialLeaderboard", async (req: Request, res: Response) => {
