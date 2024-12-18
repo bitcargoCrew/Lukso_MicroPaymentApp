@@ -28,7 +28,11 @@ const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: '*', // Be careful - only use for testing
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(express.json());
 
