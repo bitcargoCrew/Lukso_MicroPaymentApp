@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 const backgroundImage = require("@/assets/images/profile_background.jpeg");
 import ContentList from "@/components/ContentList";
 import Login from "@/components/Login";
-import 'react-native-get-random-values';
 
 const App = () => {
   const [userAddress, setUserAddress] = useState<string | undefined>(undefined);

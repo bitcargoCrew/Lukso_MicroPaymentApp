@@ -1,3 +1,5 @@
+import { RawDraftContentState } from "draft-js";
+
 export interface ContentDataInterface {
   contentId: string;
   contentTitle: string;
@@ -6,7 +8,7 @@ export interface ContentDataInterface {
   contentCosts: number;
   creatorMessage: string;
   contentShortDescription: string;
-  contentLongDescription: string;
+  contentLongDescription: RawDraftContentState;
   contentTags: string[];
   numberOfRead: number;
   numberOfLikes: number;

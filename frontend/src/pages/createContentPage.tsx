@@ -28,7 +28,7 @@ const CreateContentPage: React.FC = () => {
     contentCosts: 0,
     creatorMessage: "",
     contentShortDescription: "",
-    contentLongDescription: "",
+    contentLongDescription: { blocks: [], entityMap: {} },
     contentTags: [],
     numberOfRead: 0,
     numberOfLikes: 0,
@@ -64,7 +64,7 @@ const CreateContentPage: React.FC = () => {
     const rawContent = convertToRaw(contentState);
     setFormData((prevState) => ({
       ...prevState,
-      contentLongDescription: JSON.stringify(rawContent),
+      contentLongDescription: rawContent,
     }));
   };
 

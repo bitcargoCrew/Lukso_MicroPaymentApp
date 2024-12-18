@@ -11,7 +11,7 @@ import { Heart } from "react-bootstrap-icons";
 import LikePayment from "../components/LikePayment";
 import { Editor, EditorState, convertFromRaw } from "draft-js";
 import "draft-js/dist/Draft.css";
-import { config, pinata } from "../../config";
+import { config } from "../../config";
 import { setSupporterArray } from "../components/PageAccess";
 import { fetchAllIpfsData } from "@/components/FetchIPFSData"; // Import the functions
 
@@ -183,10 +183,8 @@ const ContentPage: React.FC = () => {
     );
   }
 
-  // Convert the raw content state to EditorState
-  const contentState = convertFromRaw(
-    JSON.parse(contentData.contentLongDescription)
-  );
+  const contentState = convertFromRaw(contentData.contentLongDescription); // no need for parse
+
   const editorState = EditorState.createWithContent(contentState);
 
   return (

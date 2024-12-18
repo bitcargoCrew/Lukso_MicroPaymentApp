@@ -151,7 +151,7 @@ app.get("/getAllContentPostsFromIPFS", async (req: Request, res: Response) => {
       ...doc.data(),
     }));
 
-    console.log(cidList)
+    console.log(cidList);
 
     // Fetch IPFS content for all CIDs
     const contentDataIPFS = await Promise.all(
@@ -163,8 +163,6 @@ app.get("/getAllContentPostsFromIPFS", async (req: Request, res: Response) => {
           }
 
           const response = await pinata.gateways.get(item.postCID);
-
-          console.log(response)
 
           let ipfsData: any = response?.data;
 
@@ -184,6 +182,14 @@ app.get("/getAllContentPostsFromIPFS", async (req: Request, res: Response) => {
             return null;
           }
 
+          // Parse nested contentLongDescription
+          let parsedLongDescription = ipfsData.contentLongDescription;
+
+          // If the contentLongDescription is a stringified JSON, parse it
+          if (typeof parsedLongDescription === 'string') {
+            parsedLongDescription = JSON.parse(parsedLongDescription);
+          }
+
           // Map to consistent content interface
           return {
             ...item, // Spread original Firestore document data
@@ -193,7 +199,7 @@ app.get("/getAllContentPostsFromIPFS", async (req: Request, res: Response) => {
             contentCosts: ipfsData.contentCosts,
             creatorMessage: ipfsData.creatorMessage,
             contentShortDescription: ipfsData.contentShortDescription,
-            contentLongDescription: ipfsData.contentLongDescription,
+            contentLongDescription: parsedLongDescription,
             contentTags: ipfsData.contentTags,
             contentComments: ipfsData.contentComments,
           };
@@ -209,6 +215,8 @@ app.get("/getAllContentPostsFromIPFS", async (req: Request, res: Response) => {
 
     // Filter out null results and send response
     const validContent = contentDataIPFS.filter((content) => content !== null);
+
+    console.log(validContent)
 
     res.status(200).json(validContent);
   } catch (error) {
@@ -371,7 +379,9 @@ app.put("/updateSupporters/:id", async (req: Request, res: Response) => {
   }
 });
 
-app.get("/getContentPerSupporter/:contentSupporter", async (req: Request, res: Response) => {
+app.get(
+  "/getContentPerSupporter/:contentSupporter",
+  async (req: Request, res: Response) => {
     const contentSupporter = req.params.contentSupporter;
 
     try {
@@ -402,7 +412,8 @@ app.get("/getContentPerSupporter/:contentSupporter", async (req: Request, res: R
       console.error("Error fetching content IDs:", error);
       res.status(500).json({ error: error.message });
     }
-});
+  }
+);
 
 // Endpoint to get aggregated data for all contentSupporters
 app.get("/aggregateSocialLeaderboard", async (req: Request, res: Response) => {
