@@ -26,15 +26,14 @@ const serviceAccountPath = isRender
 // Read the service account key file
 const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
 
-const corsOptions = {
-  origin: 'https://lukso-micropaymentapp.onrender.com', // Allow specific origin
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-};
-
 const app = express();
 app.use(express.json());
-app.use(cors(corsOptions));
+
+app.use(cors({
+  origin: 'https://lukso-micropaymentapp.onrender.com',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Initialize Firebase
 initializeApp({
