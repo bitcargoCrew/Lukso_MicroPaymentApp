@@ -35,6 +35,7 @@ const CreateContentPage: React.FC = () => {
     numberOfComments: 0,
     contentComments: [],
     contentSupporters: [],
+    postCID: "",
   });
   const [imageData, setImageData] = useState<ImageDataInterface>({
     ipfsImage: null,
@@ -179,10 +180,6 @@ const CreateContentPage: React.FC = () => {
         if (response.ok) {
           const result = await response.json();
           console.log("POST CID submitted successfully!", result);
-
-          // const contentCreator = formData.contentCreator;
-          // const postCID = postCIDValue;
-          // deployAndSetCollectionMetadata(postCID, contentCreator);
 
           setLoading(false);
 

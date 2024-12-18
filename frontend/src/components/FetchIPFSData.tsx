@@ -11,7 +11,6 @@ export const fetchAllIpfsData = async (): Promise<ContentDataInterface[]> => {
     );
     if (ipfsResponse.ok) {
       const ipfsData: ContentDataInterface[] = await ipfsResponse.json();
-      console.log(ipfsData)
       return ipfsData;
     } else {
       throw new Error(

@@ -1,6 +1,6 @@
 import styles from "./contentPage.module.css";
 import { Button, Row, Image, Spinner } from "react-bootstrap";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import RootLayout from "../app/layout";
 import { useRouter } from "next/router";
 import NavBar from "../components/NavBar";
@@ -13,14 +13,11 @@ import { Editor, EditorState, convertFromRaw } from "draft-js";
 import "draft-js/dist/Draft.css";
 import { config, pinata } from "../../config";
 import { setSupporterArray } from "../components/PageAccess";
+import { fetchAllIpfsData } from "@/components/FetchIPFSData"; // Import the functions
 
 const ContentPage: React.FC = () => {
   const [account, setAccount] = useState("");
   const [contentData, setContentData] = useState<ContentDataInterface | null>(
-    null
-  );
-  const [contentCid, setContentCid] = useState("");
-  const [ipfsResponse, setIpfsResponse] = useState<ContentDataInterface | null>(
     null
   );
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +25,8 @@ const ContentPage: React.FC = () => {
   const [isLikeButtonDisabled, setIsLikeButtonDisabled] = useState(false);
   const [transactionMessage, setTransactionMessage] = useState("");
   const [accessGranted, setAccessGranted] = useState<boolean>(false); // Track access
+  const [loading, setLoading] = useState<boolean>(true);
+
   const router = useRouter();
   const { query } = router;
   const { contentId } = query;
@@ -39,90 +38,42 @@ const ContentPage: React.FC = () => {
     }
   }, [router.query, account]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      await fetchContentData();
-      if (contentCid) {
-        await fetchContentFromIPFS(contentCid); // Wait for IPFS data after CID is set
-      }
-      setIsLikeButtonDisabled(false);
-    };
-    fetchData();
-  }, [contentId, contentCid]); // Added contentCid as a dependency
-
-  const fetchContentData = async () => {
-    if (contentId) {
-      try {
-        const response = await fetch(
-          `${config.apiUrl}/getContent/${contentId}`
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setContentData(data);
-          setContentCid(data.postCID);
-
-          // Send contentSupporter to getAccessPerson
-          const supporterArray = data.contentSupporters;
-          await setSupporterArray(supporterArray, (access) => {
-            setAccessGranted(access); // Set access based on result
-          });
-        } else {
-          setError(`Failed to fetch content data: ${response.statusText}`);
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          setError(`An error occurred: ${error.message}`);
-        } else {
-          setError("An unknown error occurred.");
-        }
-      }
-    }
-  };
-
-  const fetchContentFromIPFS = async (contentCid: string) => {
+  const fetchData = useCallback(async () => {
     try {
-      const response = await pinata.gateways.get(contentCid);
-      let ipfsData: any = response?.data;
+      setError(null);
+      setLoading(true);
+      setIsLikeButtonDisabled(false);
 
-      if (ipfsData instanceof Blob) {
-        ipfsData = await ipfsData.text();
-      }
+      const contentDataIPFS: ContentDataInterface[] = await fetchAllIpfsData();
 
-      if (typeof ipfsData === "string") {
-        ipfsData = JSON.parse(ipfsData);
-      }
+      if (contentDataIPFS && contentDataIPFS.length > 0) {
+        // Select the first item from the array
+        const selectedContent = contentDataIPFS[0];
+        setContentData(selectedContent);
 
-      if (typeof ipfsData !== "object" || ipfsData === null) {
-        console.error(`Invalid data format for CID ${contentCid}`);
-        return;
-      }
-
-      const ipfsResponse: ContentDataInterface = {
-        contentId: ipfsData.contentId || "",
-        contentTitle: ipfsData.contentTitle || "",
-        contentMedia: ipfsData.contentMedia || "",
-        contentCreator: ipfsData.contentCreator || "",
-        contentCosts: ipfsData.contentCosts || 0,
-        creatorMessage: ipfsData.creatorMessage || "",
-        contentShortDescription: ipfsData.contentShortDescription || "",
-        contentLongDescription: ipfsData.contentLongDescription || "",
-        contentTags: ipfsData.contentTags || [],
-        numberOfRead: ipfsData.numberOfRead || 0,
-        numberOfLikes: ipfsData.numberOfLikes || 0,
-        numberOfComments: ipfsData.numberOfComments || 0,
-        contentComments: ipfsData.contentComments || [],
-        contentSupporters: ipfsData.contentSupporters || [],
-      };
-
-      setIpfsResponse(ipfsResponse);
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(`An error occurred: ${error.message}`);
+        // Check access based on supporters
+        await setSupporterArray(
+          selectedContent.contentSupporters || [],
+          (access) => setAccessGranted(access)
+        );
       } else {
-        setError("An unknown error occurred.");
+        setContentData(null);
+        throw new Error("No content found");
       }
+    } catch (error) {
+      console.error("Failed to fetch content", error);
+      setContentData(null);
+      setError(error instanceof Error ? error.message : "Unknown error");
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []); // Dependency array
+
+  useEffect(() => {
+    if (contentId) {
+      fetchData();
+    }
+  }, [contentId, fetchData]);
 
   const handleLike = async () => {
     if (isLikeButtonDisabled || !contentData) return;
@@ -214,7 +165,7 @@ const ContentPage: React.FC = () => {
     );
   }
 
-  if (!contentData || !ipfsResponse) {
+  if (!contentData) {
     return (
       <div>
         <NavBar account={account}></NavBar>
@@ -234,7 +185,7 @@ const ContentPage: React.FC = () => {
 
   // Convert the raw content state to EditorState
   const contentState = convertFromRaw(
-    JSON.parse(ipfsResponse.contentLongDescription)
+    JSON.parse(contentData.contentLongDescription)
   );
   const editorState = EditorState.createWithContent(contentState);
 
@@ -244,12 +195,12 @@ const ContentPage: React.FC = () => {
       <RootLayout>
         <div>
           <Row className={styles.rowSpace}>
-            <h1>{ipfsResponse.creatorMessage}</h1>
+            <h1>{contentData.creatorMessage}</h1>
           </Row>
           <Row className={styles.rowSpace}>
             <div className={styles.imageContainer}>
               <Image
-                src={ipfsResponse.contentMedia}
+                src={contentData.contentMedia}
                 alt="Creator Quote Image"
                 fluid
                 className={styles.contentImage}
@@ -257,10 +208,10 @@ const ContentPage: React.FC = () => {
             </div>
           </Row>
           <Row className={styles.rowSpace}>
-            <h1>{ipfsResponse.contentTitle}</h1>
+            <h1>{contentData.contentTitle}</h1>
           </Row>
           <Row>
-            <CreatedBy contentCreator={ipfsResponse.contentCreator} />
+            <CreatedBy contentCreator={contentData.contentCreator} />
           </Row>
           <Row className={styles.rowSpace}>
             <div>

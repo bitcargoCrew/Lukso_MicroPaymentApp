@@ -8,14 +8,14 @@ import transferTokenLike from "./services/transferTokenLike";
 const { initializeApp, cert } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
 const { getStorage } = require("firebase-admin/storage");
-const { PinataSDK } = require("pinata-web3")
-require("dotenv").config()
+const { PinataSDK } = require("pinata-web3");
+require("dotenv").config();
 
 const pinata = new PinataSDK({
   pinataJwt: process.env.API_JWT_PINATA,
   pinataGateway: process.env.GATEWAY_URL,
-  pinataGatewayKey: process.env.GATEWAY_KEY_PINATA
-})
+  pinataGatewayKey: process.env.GATEWAY_KEY_PINATA,
+});
 
 // Determine the path to the service account key file
 const isRender = process.env.RENDER || false;
@@ -43,7 +43,7 @@ const bucket = storage.bucket();
 export { db };
 
 interface UrlObject {
-	url: string;
+  url: string;
 }
 
 app.post("/postContentDatabase", async (req: Request, res: Response) => {
@@ -77,7 +77,7 @@ app.post("/postContentDatabase", async (req: Request, res: Response) => {
         numberOfLikes,
         numberOfComments,
         contentComments,
-        contentSupporters
+        contentSupporters,
       });
 
     console.log("Content stored successfully", contentRef);
@@ -148,7 +148,7 @@ app.get("/getAllContentPostsFromIPFS", async (req: Request, res: Response) => {
     const cidList = snapshot.docs.map((doc: any) => ({
       contentId: doc.id,
       postCID: doc.data().postCID, // Assuming postCID is stored in Firestore
-      ...doc.data()
+      ...doc.data(),
     }));
 
     // Fetch IPFS content for all CIDs
@@ -183,25 +183,28 @@ app.get("/getAllContentPostsFromIPFS", async (req: Request, res: Response) => {
           // Map to consistent content interface
           return {
             ...item, // Spread original Firestore document data
-              contentTitle: ipfsData.contentTitle,
-              contentMedia: ipfsData.contentMedia,
-              contentCreator: ipfsData.contentCreator,
-              contentCosts: ipfsData.contentCosts,
-              creatorMessage: ipfsData.creatorMessage,
-              contentShortDescription: ipfsData.contentShortDescription,
-              contentLongDescription: ipfsData.contentLongDescription,
-              contentTags: ipfsData.contentTags,
-              contentComments: ipfsData.contentComments,
+            contentTitle: ipfsData.contentTitle,
+            contentMedia: ipfsData.contentMedia,
+            contentCreator: ipfsData.contentCreator,
+            contentCosts: ipfsData.contentCosts,
+            creatorMessage: ipfsData.creatorMessage,
+            contentShortDescription: ipfsData.contentShortDescription,
+            contentLongDescription: ipfsData.contentLongDescription,
+            contentTags: ipfsData.contentTags,
+            contentComments: ipfsData.contentComments,
           };
         } catch (error) {
-          console.error(`Error fetching IPFS content for CID ${item.postCID}:`, error);
+          console.error(
+            `Error fetching IPFS content for CID ${item.postCID}:`,
+            error
+          );
           return null;
         }
       })
     );
 
     // Filter out null results and send response
-    const validContent = contentDataIPFS.filter(content => content !== null);
+    const validContent = contentDataIPFS.filter((content) => content !== null);
 
     res.status(200).json(validContent);
   } catch (error) {
@@ -223,7 +226,58 @@ app.get("/getContent/:id", async (req: Request, res: Response) => {
     }
 
     const contentData = doc.data();
-    res.status(200).json(contentData);
+
+    // Check if postCID exists
+    if (!contentData?.postCID) {
+      return res
+        .status(400)
+        .json({ error: "No IPFS CID associated with this content" });
+    }
+
+    try {
+      const response = await pinata.gateways.get(contentData.postCID);
+      let ipfsData: any = response?.data;
+
+      // Handle Blob data if necessary
+      if (ipfsData instanceof Blob) {
+        ipfsData = await ipfsData.text();
+      }
+
+      // Parse JSON if it's a string
+      if (typeof ipfsData === "string") {
+        ipfsData = JSON.parse(ipfsData);
+      }
+
+      // Validate data
+      if (typeof ipfsData !== "object" || ipfsData === null) {
+        return res.status(500).json({
+          error: "Invalid IPFS content format",
+          cid: contentData.postCID,
+        });
+      }
+
+      // Merge Firestore data with IPFS data
+      const mergedContent = {
+        ...contentData, // Original Firestore data
+        contentTitle: ipfsData.contentTitle,
+        contentMedia: ipfsData.contentMedia,
+        contentCreator: ipfsData.contentCreator,
+        contentCosts: ipfsData.contentCosts,
+        creatorMessage: ipfsData.creatorMessage,
+        contentShortDescription: ipfsData.contentShortDescription,
+        contentLongDescription: ipfsData.contentLongDescription,
+        contentTags: ipfsData.contentTags,
+        contentComments: ipfsData.contentComments,
+      };
+
+      res.status(200).json(mergedContent);
+    } catch (error) {
+      console.error(
+        `Error fetching IPFS content for CID ${contentData.postCID}:`,
+        error
+      );
+      return null;
+    }
   } catch (error) {
     console.error("Error fetching document:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -295,7 +349,9 @@ app.put("/updateSupporters/:id", async (req: Request, res: Response) => {
 
     // Check if supporter is already in the list
     if (currentSupporters.includes(supporter)) {
-      return res.status(200).json({ message: "Supporter already exists, no update required." });
+      return res
+        .status(200)
+        .json({ message: "Supporter already exists, no update required." });
     }
 
     // Add new supporter
@@ -311,7 +367,9 @@ app.put("/updateSupporters/:id", async (req: Request, res: Response) => {
   }
 });
 
-app.get("/getContentPerSupporter/:contentSupporter",async (req: Request, res: Response) => {
+app.get(
+  "/getContentPerSupporter/:contentSupporter",
+  async (req: Request, res: Response) => {
     const contentSupporter = req.params.contentSupporter;
 
     try {
