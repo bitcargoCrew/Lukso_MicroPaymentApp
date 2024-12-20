@@ -1,8 +1,9 @@
 import { View, Text, Image, ScrollView, StyleSheet } from "react-native";
 import React, { useState } from 'react';
-const backgroundImage = require("@/assets/images/profile_background.jpeg");
 import ContentList from "../components/ContentList";
 import Login from "@/components/Login";
+
+const backgroundImage = require("@/assets/images/profile_background.jpeg");
 
 const App = () => {
   const [userAddress, setUserAddress] = useState<string | undefined>(undefined);

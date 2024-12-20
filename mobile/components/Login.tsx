@@ -1,3 +1,4 @@
+import "@walletconnect/react-native-compat";
 import { View, Text } from "react-native";
 import {
   createAppKit,
