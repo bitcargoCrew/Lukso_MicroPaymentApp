@@ -14,7 +14,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
-    "../mobile/components/Login.tsx",
-    "../mobile/components/ContentList.tsx",
   ]
 }
