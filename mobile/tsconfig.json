@@ -1,7 +1,6 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "typeRoots": ["./node_modules/@types", "./node_modules/react-native-dotenv"],
     "strict": true,
     "paths": {
       "@/*": [
@@ -13,6 +12,6 @@
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts",
+    "expo-env.d.ts"
   ]
 }

@@ -1,5 +1,3 @@
-// _layout.tsx
-import React, { useEffect } from "react";
 import { View, Text } from "react-native";
 import {
   createAppKit,
@@ -8,12 +6,14 @@ import {
   AppKit,
   useAppKitAccount,
 } from "@reown/appkit-ethers-react-native";
-import { useAddress } from "@/components/AddressContext"; // Import the context
+import React, { useEffect } from "react";
 
-export const Login: React.FC = () => {
-  const { setAddress } = useAddress(); // Access the context's setAddress function
+interface LoginProps {
+  onAddressChange?: (address: string | undefined) => void;
+}
+
+const Login: React.FC<LoginProps> = ({ onAddressChange }) => {
   const projectId = process.env.EXPO_PUBLIC_PROJECT_ID as string;
-
   const metadata = {
     name: "Quill Lukso App",
     description: "Quill Lukso App",
@@ -51,9 +51,12 @@ export const Login: React.FC = () => {
 
   const { address, isConnected } = useAppKitAccount();
 
-  useEffect(() => {
-    setAddress(address); // Update the global address state
-  }, [address, setAddress]);
+    // Use useEffect to call the onAddressChange prop when address changes
+    useEffect(() => {
+      if (onAddressChange) {
+        onAddressChange(address);
+      }
+    }, [address, onAddressChange]);
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>

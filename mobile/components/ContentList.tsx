@@ -1,29 +1,20 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-  StyleSheet,
-} from "react-native";
-import ChangePagePayment from "@/components/ChangePagePayment";
-import { setContentSupporter } from "@/components/PageAccess";
-import { useAddress } from "@/components/AddressContext";
+import React, { useEffect, useState } from 'react';
+import { 
+  View, 
+  Text, 
+  Image, 
+  ScrollView, 
+  TouchableOpacity, 
+  ActivityIndicator, 
+  StyleSheet 
+} from 'react-native';
 import { ContentDataInterface } from "@/components/ContentDataInterface";
 
-// Define the type for the props for ContentList
-interface ContentListProps {
-  onNavigate: (route: "/ContentPage" | "/", params?: Record<string, any>) => void;
-}
-
-const ContentList: React.FC<ContentListProps> = ({ onNavigate }) => {
+const ContentList: React.FC = () => {
   const [contentList, setContentList] = useState<ContentDataInterface[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [transactionInProgress, setTransactionInProgress] = useState(false);
-  const { address } = useAddress();
 
   useEffect(() => {
     fetchAllIpfsData();
@@ -33,101 +24,59 @@ const ContentList: React.FC<ContentListProps> = ({ onNavigate }) => {
     try {
       setError(null);
       setLoading(true);
-      const response = await fetch(
-        `https://lukso-micropaymentapp-1.onrender.com/getAllContentPostsFromIPFS`
-      );
+      const response = await fetch(`https://lukso-micropaymentapp-1.onrender.com/getAllContentPostsFromIPFS`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log(response)
 
       if (response.ok) {
         const ipfsData: ContentDataInterface[] = await response.json();
-        setContentList(ipfsData);
+        console.log(ipfsData)
+        setContentList(ipfsData)
       } else {
-        throw new Error(`Failed to fetch content data: ${response.statusText}`);
+        throw new Error(
+          `Failed to fetch content data: ${response.statusText}`
+        );
       }
     } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "An unknown error occurred"
-      );
+      setError(error instanceof Error ? error.message : 'An unknown error occurred');
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePayment = async (
-    contentId: string,
-    contentCreator: string,
-    contentCosts: number,
-    numberOfRead: number
-  ) => {
+  const handlePayment = async (content: ContentDataInterface) => {
     try {
       setTransactionInProgress(true);
-      const { contentSupporter } = await ChangePagePayment.transactionModule(
-        contentCreator,
-        contentCosts
-      );
+      const response = await fetch(`https://lukso-micropaymentapp-1.onrender.com/makePayment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contentId: content.contentId,
+          contentCreator: content.contentCreator,
+          contentCosts: content.contentCosts
+        }),
+      });
 
-      await setContentSupporter(contentSupporter);
-
-      const updatedNumberOfRead = (numberOfRead || 0) + 1;
-
-      // Update the number of reads on the server
-      const readUpdateResponse = await fetch(
-        `https://lukso-micropaymentapp-1.onrender.com/updateContent/${contentId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            numberOfRead: updatedNumberOfRead,
-            contentCreator,
-            contentCosts,
-            contentSupporter,
-          }),
-        }
-      );
-
-      if (!readUpdateResponse.ok) {
-        throw new Error(
-          `Failed to update the number of reads: ${readUpdateResponse.statusText}`
-        );
+      if (!response.ok) {
+        throw new Error('Payment failed');
       }
 
-      // Update supporters on the server
-      const supporterUpdateResponse = await fetch(
-        `https://lukso-micropaymentapp-1.onrender.com/updateSupporters/${contentId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            supporter: contentSupporter,
-          }),
-        }
-      );
-
-      if (!supporterUpdateResponse.ok) {
-        throw new Error(
-          `Failed to update supporters: ${supporterUpdateResponse.statusText}`
-        );
-      }
-
-      onNavigate("/ContentPage", { contentId });
+      // Handle successful payment
+      // You might want to navigate to content page or show content
     } catch (error) {
-      console.error("Payment failed:", error);
-      setError(
-        error instanceof Error
-          ? error.message
-          : "An unexpected error occurred during payment."
-      );
+      console.error('Payment failed', error);
+      setError('Payment failed');
     } finally {
       setTransactionInProgress(false);
     }
   };
-
-  if (!address) {
-    return (
-      <View style={styles.centerContainer}>
-        <Text>Please connect your wallet to view content.</Text>
-      </View>
-    );
-  }
 
   if (loading) {
     return (
@@ -155,45 +104,30 @@ const ContentList: React.FC<ContentListProps> = ({ onNavigate }) => {
           {transactionInProgress && (
             <View style={styles.overlayLoading}>
               <ActivityIndicator size="large" color="#ffffff" />
-              <Text style={styles.loadingText}>
-                Processing... Waiting for confirmation
-              </Text>
+              <Text style={styles.loadingText}>Processing... Waiting for confirmation</Text>
             </View>
           )}
-
-          <Image
-            source={{ uri: content.contentMedia }}
-            style={styles.contentImage}
+          
+          <Image 
+            source={{ uri: content.contentMedia }} 
+            style={styles.contentImage} 
             resizeMode="cover"
           />
-
+          
           <View style={styles.contentDetails}>
             <Text style={styles.contentTitle}>{content.contentTitle}</Text>
-            <Text style={styles.contentCreator}>
-              Created by: {content.contentCreator}
-            </Text>
-            <Text style={styles.contentCost}>
-              Costs: {content.contentCosts} LYX
-            </Text>
-            <Text style={styles.contentDescription}>
-              {content.contentShortDescription}
-            </Text>
+            <Text style={styles.contentCreator}>Created by: {content.contentCreator}</Text>
+            <Text style={styles.contentCost}>Costs: {content.contentCosts} LYX</Text>
+            <Text style={styles.contentDescription}>{content.contentShortDescription}</Text>
             <Text style={styles.contentTags}>Tags: {content.contentTags}</Text>
-
-            <TouchableOpacity
+            
+            <TouchableOpacity 
               style={styles.readMoreButton}
-              onPress={() =>
-                handlePayment(
-                  content.contentId,
-                  content.contentCreator,
-                  content.contentCosts,
-                  content.numberOfRead
-                )
-              }
+              onPress={() => handlePayment(content)}
               disabled={transactionInProgress}
             >
               <Text style={styles.readMoreButtonText}>
-                {transactionInProgress ? "Processing..." : "Read More"}
+                {transactionInProgress ? 'Processing...' : 'Read More'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -206,26 +140,26 @@ const ContentList: React.FC<ContentListProps> = ({ onNavigate }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: '#f5f5f5',
   },
   centerContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   contentCard: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     marginVertical: 10,
     marginHorizontal: 15,
     borderRadius: 10,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
   contentImage: {
-    width: "100%",
+    width: '100%',
     height: 200,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
@@ -235,61 +169,61 @@ const styles = StyleSheet.create({
   },
   contentTitle: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 5,
   },
   contentCreator: {
-    color: "#666",
+    color: '#666',
     marginBottom: 5,
   },
   contentCost: {
-    fontWeight: "bold",
-    color: "#4a4a4a",
+    fontWeight: 'bold',
+    color: '#4a4a4a',
     marginBottom: 5,
   },
   contentDescription: {
-    color: "#333",
+    color: '#333',
     marginBottom: 5,
   },
   contentTags: {
-    color: "#666",
+    color: '#666',
     marginBottom: 10,
   },
   readMoreButton: {
-    backgroundColor: "#000",
+    backgroundColor: '#000',
     padding: 12,
     borderRadius: 6,
-    alignItems: "center",
+    alignItems: 'center',
   },
   readMoreButtonText: {
-    color: "white",
-    fontWeight: "bold",
+    color: 'white',
+    fontWeight: 'bold',
   },
   errorText: {
-    color: "red",
+    color: 'red',
     marginBottom: 10,
   },
   retryButton: {
-    backgroundColor: "red",
+    backgroundColor: 'red',
     padding: 10,
     borderRadius: 5,
   },
   retryButtonText: {
-    color: "white",
+    color: 'white',
   },
   overlayLoading: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
     zIndex: 1000,
   },
   loadingText: {
-    color: "white",
+    color: 'white',
     marginTop: 10,
   },
 });

@@ -1,45 +1,46 @@
-import React from 'react';
-import { View, Text, Image, ScrollView, StyleSheet } from 'react-native';
-import { router } from 'expo-router';
-import ContentList from "@/components/ContentList";
+import { View, Text, Image, ScrollView, StyleSheet } from "react-native";
+import React, { useState } from 'react';
+const backgroundImage = require("@/assets/images/profile_background.jpeg");
+import ContentList from "../components/ContentList";
 import Login from "@/components/Login";
 
-// Path for the background image
-const backgroundImage = require("@/assets/images/profile_background.jpeg");
+const App = () => {
+  const [userAddress, setUserAddress] = useState<string | undefined>(undefined);
 
-// Define the valid routes for navigation
-type ValidRoute = "/ContentPage" | "/";  // Add more valid routes if needed
-
-const Profile: React.FC = () => {
-  // Updated function to handle navigation with a more specific type for route
-  const handleNavigation = (route: ValidRoute, params?: Record<string, any>) => {
-    router.push({ pathname: route, params });
+  const handleAddressChange = (address: string | undefined) => {
+    setUserAddress(address);
   };
 
+  console.log(userAddress)
+
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <Image source={backgroundImage} style={styles.backgroundImage} />
-        <Login />
-        <Text style={styles.title}>Explore the content of Quill</Text>
-       {/* <ContentList onNavigate={handleNavigation} /> */}
+    <View style={{ flex: 1 }}>
+      <ScrollView style={{ backgroundColor: "#ffebee" }}>
+        <Image
+          source={backgroundImage}
+          style={{ width: "auto", height: 100 }}
+        ></Image>
+        <Login onAddressChange={handleAddressChange}/>
+        <Text style={{ paddingTop: 30, paddingBottom: 20, fontSize: 24, fontWeight: 'bold', textAlign: 'center', color: '#333' }}>
+          Explore the content of Quill
+        </Text>
+        <ContentList/>
       </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  scrollView: { backgroundColor: "#ffebee" },
-  backgroundImage: { width: "100%", height:200 },
-  title: {
-    paddingTop: 30,
-    paddingBottom: 20,
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    color: "#333",
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
   },
 });
 
-export default Profile;
+export default App;
