@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useLocalSearchParams } from 'expo-router'; // Correct hook for route params
+import { useLocalSearchParams } from 'expo-router';
 
 const ContentPage: React.FC = () => {
   // Using useSearchParams to retrieve the parameters from the URL
-  const { contentId } = useLocalSearchParams(); // Retrieve the contentId from the URL params
+  const { contentId } = useLocalSearchParams<{ contentId: string }>();
+
+  console.log("contentPage")
 
   return (
     <View style={styles.container}>

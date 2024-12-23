@@ -1,37 +1,63 @@
-import { View, Text, Image, ScrollView, StyleSheet } from "react-native";
-import React, { useState } from 'react';
-import ContentList from "../components/ContentList";
-import Login from "@/components/Login";
+import {
+  View,
+  Text,
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+} from "react-native";
+import React, { useState } from "react";
+import ContentList from "./components/ContentList";
+import Login from "@/app/components/Login";
 
 const backgroundImage = require("@/assets/images/profile_background.jpeg");
 
-const App = () => {
-  const [userAddress, setUserAddress] = useState<string | undefined>(undefined);
+export default function Home() {
+  const [address, setAddress] = useState<string | undefined>(undefined);
 
   const handleAddressChange = (address: string | undefined) => {
-    setUserAddress(address);
+    setAddress(address);
   };
 
-  console.log(userAddress)
+  console.log("index", address)
 
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView style={{ backgroundColor: "#ffebee" }}>
-        <Image
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <ImageBackground
           source={backgroundImage}
-          style={{ width: "auto", height: 100 }}
-        ></Image>
-        <Login onAddressChange={handleAddressChange}/>
-        <Text style={{ paddingTop: 30, paddingBottom: 20, fontSize: 24, fontWeight: 'bold', textAlign: 'center', color: '#333' }}>
-          Explore the content of Quill
-        </Text>
+          style={styles.backgroundImage}
+          resizeMode="cover"
+        >
+          {/* Overlay content */}
+        </ImageBackground>
+        <Login onAddressChange={handleAddressChange} />
+        <Text style={styles.titleText}>Explore the content of Quill</Text>
         <ContentList/>
       </ScrollView>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    backgroundColor: "#ffebee",
+    padding: 16,
+  },
+  backgroundImage: {
+    width: "100%",
+    height: 100,
+  },
+  titleText: {
+    paddingTop: 30,
+    paddingBottom: 20,
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#333",
+  },
   overlay: {
     position: "absolute",
     top: 0,
@@ -40,8 +66,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
 });
-
-export default App;
