@@ -1,6 +1,6 @@
 import styles from "./reputationPage.module.css";
-import { Row, Col, Spinner, Card } from "react-bootstrap";
-import React, { useEffect, useState, useCallback } from "react";
+import { Row, Col, Spinner, Card, Image } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import RootLayout from "../app/layout";
 import NavBar from "../components/NavBar";
@@ -21,7 +21,7 @@ interface TransactionDetailsInterface {
 }
 
 const Reputation = () => {
-  const [account, setAccount] = useState("");
+  const [account, setAccount] = useState<string>("");
   const [addressCounters, setAddressCounters] =
     useState<AddressCountersInterface | null>(null);
   const [addressInfo, setAddressInfo] = useState<AddressInfoInterface | null>(
@@ -30,7 +30,7 @@ const Reputation = () => {
   const [transactionDetails, setTransactionDetails] =
     useState<TransactionDetailsInterface | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const router = useRouter();
 
@@ -38,158 +38,120 @@ const Reputation = () => {
   useEffect(() => {
     const accountQuery = router.query.account;
     if (accountQuery && accountQuery !== account) {
-      const accountValue = accountQuery as string;
-      setAccount(accountValue);
+      setAccount(accountQuery as string);
     }
   }, [router.query, account]);
 
-  // Fetch address counters
-  const fetchAddressCounters = useCallback(async () => {
-    if (!account) return;
-
-    try {
-      const response = await fetch(
-        `https://explorer.execution.mainnet.lukso.network/api/v2/addresses/${account}/counters`
-      );
-      if (response.ok) {
-        const data: AddressCountersInterface = await response.json();
-        setAddressCounters(data);
-      } else {
-        setError(`Failed to fetch counters: ${response.statusText}`);
-      }
-    } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "An unknown error occurred."
-      );
-    }
-  }, [account]);
-
-  // Fetch address info
-  const fetchAddressInfo = useCallback(async () => {
-    if (!account) return;
-
-    try {
-      const response = await fetch(
-        `https://explorer.execution.mainnet.lukso.network/api/v2/addresses/${account}`
-      );
-      if (response.ok) {
-        const data: AddressInfoInterface = await response.json();
-        setAddressInfo(data);
-      } else {
-        setError(`Failed to fetch address info: ${response.statusText}`);
-      }
-    } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "An unknown error occurred."
-      );
-    }
-  }, [account]);
-
-  // Fetch transaction details
-  const fetchTransactionDetails = useCallback(async () => {
-    if (!addressInfo?.creation_tx_hash) return;
-
-    try {
-      const response = await fetch(
-        `https://explorer.execution.mainnet.lukso.network/api/v2/transactions/${addressInfo.creation_tx_hash}`
-      );
-      if (response.ok) {
-        const data: TransactionDetailsInterface = await response.json();
-        setTransactionDetails(data);
-      } else {
-        setError(`Failed to fetch transaction details: ${response.statusText}`);
-      }
-    } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "An unknown error occurred."
-      );
-    }
-  }, [addressInfo?.creation_tx_hash]);
-
-  // Load all data
+  // Fetch address counters and info concurrently
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      await fetchAddressCounters();
-      await fetchAddressInfo();
-      setLoading(false);
+    const fetchData = async () => {
+      if (!account) return;
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [countersResponse, infoResponse] = await Promise.all([
+          fetch(
+            `https://explorer.execution.mainnet.lukso.network/api/v2/addresses/${account}/counters`
+          ),
+          fetch(
+            `https://explorer.execution.mainnet.lukso.network/api/v2/addresses/${account}`
+          ),
+        ]);
+
+        if (countersResponse.ok && infoResponse.ok) {
+          const countersData: AddressCountersInterface =
+            await countersResponse.json();
+          const infoData: AddressInfoInterface = await infoResponse.json();
+          console.log(countersData);
+          console.log(infoData);
+          setAddressCounters(countersData);
+          setAddressInfo(infoData);
+        } else {
+          setError(
+            `Failed to fetch: ${
+              countersResponse.statusText || infoResponse.statusText
+            }`
+          );
+        }
+      } catch (error) {
+        setError(
+          error instanceof Error ? error.message : "An unknown error occurred."
+        );
+      } finally {
+        setLoading(false);
+      }
     };
 
-    loadData();
-  }, [fetchAddressCounters, fetchAddressInfo]);
+    fetchData();
+  }, [account]);
 
+  // Fetch transaction details when creation hash is available
   useEffect(() => {
-    if (addressInfo?.creation_tx_hash) {
-      fetchTransactionDetails();
-    }
-  }, [addressInfo?.creation_tx_hash, fetchTransactionDetails]);
+    const fetchTransactionDetails = async () => {
+      if (!addressInfo?.creation_tx_hash) return;
 
-  // Calculate reputation points based on transaction count
+      try {
+        const response = await fetch(
+          `https://explorer.execution.mainnet.lukso.network/api/v2/transactions/${addressInfo.creation_tx_hash}`
+        );
+
+        if (response.ok) {
+          const data: TransactionDetailsInterface = await response.json();
+          console.log(data);
+          setTransactionDetails(data);
+        } else {
+          setError(
+            `Failed to fetch transaction details: ${response.statusText}`
+          );
+        }
+      } catch (error) {
+        setError(
+          error instanceof Error ? error.message : "An unknown error occurred."
+        );
+      }
+    };
+
+    fetchTransactionDetails();
+  }, [addressInfo?.creation_tx_hash]);
+
+  // Helper functions for reputation calculations
   const calculateTransactionPoints = (transactionsCount: number): string => {
-    let points = 0;
-    if (transactionsCount >= 1000) {
-      points = 1.0;
-    } else {
-      points = Math.min(Math.floor(transactionsCount / 100) * 0.1, 1.0);
-    }
-    return points.toFixed(2); // Return as a string with 2 decimals
+    let points =
+      transactionsCount >= 1000
+        ? 1.0
+        : Math.min(Math.floor(transactionsCount / 100) * 0.1, 1.0);
+    return points.toFixed(2);
   };
 
-  // Calculate reputation points based on token transfers count
   const calculateTokenTransferPoints = (
     tokenTransfersCount: number
   ): string => {
-    let points = 0;
-    if (tokenTransfersCount >= 500) {
-      points = 1.0;
-    } else {
-      points = Math.min(Math.floor(tokenTransfersCount / 10) * 0.1, 1.0);
-    }
-    return points.toFixed(2); // Return as a string with 2 decimals
+    let points =
+      tokenTransfersCount >= 500
+        ? 1.0
+        : Math.min(Math.floor(tokenTransfersCount / 10) * 0.1, 1.0);
+    return points.toFixed(2);
   };
 
-  // Calculate reputation points based on creation timestamp
   const calculateTimestampPoints = (timestamp: string): string => {
     const date = new Date(timestamp);
     const year = date.getFullYear();
-    const month = date.getMonth() + 1; // Months are 0-based
+    const month = date.getMonth() + 1;
 
     let points = 0;
-    if (year < 2024) {
-      points = 1.0; // Before 2024
-    } else if (year === 2024) {
-      if (month >= 1 && month <= 3) {
-        points = 0.9; // Q1 2024 (Jan - Mar)
-      } else if (month >= 4 && month <= 6) {
-        points = 0.8; // Q2 2024 (Apr - Jun)
-      } else if (month >= 7 && month <= 9) {
-        points = 0.7; // Q3 2024 (Jul - Sep)
-      } else if (month >= 10 && month <= 12) {
-        points = 0.6; // Q4 2024 (Oct - Dec)
-      }
-    } else {
-      points = 0.5; // 2025 or later
-    }
-    return points.toFixed(2); // Return as a string with 2 decimals
+    if (year < 2024) points = 1.0;
+    else if (year === 2024) {
+      if (month <= 3) points = 0.9;
+      else if (month <= 6) points = 0.8;
+      else if (month <= 9) points = 0.7;
+      else points = 0.6;
+    } else points = 0.5;
+
+    return points.toFixed(2);
   };
 
-  // Format timestamp to a more readable format
-  const formatTimestamp = (timestamp: string): string => {
-    const date = new Date(timestamp);
-    const options: Intl.DateTimeFormatOptions = {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      timeZoneName: "short",
-    };
-    return date.toLocaleDateString("en-US", options);
-  };
-
-  // Calculate final reputation score by multiplying the points
   const calculateFinalReputationScore = (): string => {
     const transactionPoints = addressCounters
       ? calculateTransactionPoints(addressCounters.transactions_count)
@@ -205,27 +167,45 @@ const Reputation = () => {
       parseFloat(transactionPoints) *
       parseFloat(tokenTransferPoints) *
       parseFloat(timestampPoints);
-    return finalScore.toFixed(2); // Return as a string with 2 decimals
+    return finalScore.toFixed(2);
+  };
+
+  const getRank = (finalScore: number): string => {
+    if (finalScore > 0.5) return "Lukso Legend";
+    if (finalScore >= 0.3) return "Lukso Elite";
+    if (finalScore >= 0.2) return "Lukso Pro";
+    if (finalScore >= 0.1) return "Lukso Member";
+    return "Lukso Novice";
   };
 
   const finalReputationScore = calculateFinalReputationScore();
+  const userRank = getRank(parseFloat(finalReputationScore));
 
-  // Determine the rank based on final score
-  const getRank = (finalScore: number): string => {
-    if (finalScore > 0.5) {
-      return "Lukso Legend"; // Above 0.5 is "Lukso Legend"
-    } else if (finalScore >= 0.3) {
-      return "Lukso Elite";
-    } else if (finalScore >= 0.2) {
-      return "Lukso Pro";
-    } else if (finalScore >= 0.1) {
-      return "Lukso Member";
-    } else {
-      return "Lukso Novice";
-    }
+  // Helper function to determine which image to display based on final score
+  const getReputationImage = (score: number): string => {
+    if (score > 0.5) return "/Lukso_Legend.png";
+    if (score >= 0.3) return "/Lukso_Elite.png";
+    if (score >= 0.2) return "/Lukso_Pro.png";
+    if (score >= 0.1) return "/Lukso_Member.png";
+    return "/Lukso_Novice.png";
   };
 
-  const userRank = getRank(parseFloat(finalReputationScore));
+  const reputationImage = getReputationImage(parseFloat(finalReputationScore));
+
+  // Format timestamps for display
+  const formatTimestamp = (timestamp: string): string => {
+    const date = new Date(timestamp);
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      timeZone: "UTC",
+    };
+    return date.toLocaleDateString("en-US", options);
+  };
 
   return (
     <div>
@@ -239,94 +219,81 @@ const Reputation = () => {
           <div className={styles.errorMessage}>{error}</div>
         ) : (
           <>
-            {addressCounters && (
-              <div>
-                <h1>Transaction Reputation</h1>
-                <Row className={styles.rowSpace}>
+            <h1>Reputation Calculation</h1>
+            <Row className={styles.rowSpace}>
+              {addressCounters && (
+                <>
                   <Col>
-                    <Card style={{ width: "18rem" }}>
+                    <Card>
                       <Card.Body>
-                        <Card.Title style={{ paddingBottom: "10px" }}>Transaction Reputation I</Card.Title>
-                        <Card.Text>
-                          <p>
-                            Transactions Count UP:{" "}
-                            {addressCounters.transactions_count}
-                          </p>
-                          <p>
-                            Reputation Points:{" "}
-                            {calculateTransactionPoints(
-                              addressCounters.transactions_count
-                            )}
-                          </p>
-                        </Card.Text>
+                        <Card.Title>Transaction Reputation</Card.Title>
+                        <p>
+                          Transactions: {addressCounters.transactions_count}
+                        </p>
+                        <p>
+                          Reputation Score:{" "}
+                          {calculateTransactionPoints(
+                            addressCounters.transactions_count
+                          )}
+                        </p>
                       </Card.Body>
                     </Card>
                   </Col>
                   <Col>
-                    <Card style={{ width: "18rem" }}>
+                    <Card>
                       <Card.Body>
-                        <Card.Title style={{ paddingBottom: "10px" }}>Transaction Reputation II</Card.Title>
-                        <Card.Text>
-                          <p>
-                            Token Transfers Count UP:{" "}
-                            {addressCounters.token_transfers_count}
-                          </p>
-                          <p>
-                            Reputation Points:{" "}
-                            {calculateTokenTransferPoints(
-                              addressCounters.token_transfers_count
-                            )}
-                          </p>
-                        </Card.Text>
+                        <Card.Title>Token Transfer Reputation</Card.Title>
+                        <p>
+                          Token Transfers:{" "}
+                          {addressCounters.token_transfers_count}
+                        </p>
+                        <p>
+                          Reputation Score:{" "}
+                          {calculateTokenTransferPoints(
+                            addressCounters.token_transfers_count
+                          )}
+                        </p>
                       </Card.Body>
                     </Card>
                   </Col>
-                  <Col></Col>
-                </Row>
-              </div>
-            )}
-            {transactionDetails && (
-              <div>
-                <h1>Creation Reputation</h1>
-                <Row className={styles.rowSpace}>
-                  <Col>
-                    <Card style={{ width: "18rem" }}>
-                      <Card.Body>
-                        <Card.Title style={{ paddingBottom: "10px" }}>Creation Date</Card.Title>
-                        <Card.Text>
-                          <p>
-                            Creation Timestamp:{" "}
-                            {formatTimestamp(transactionDetails.timestamp)}
-                          </p>
-                          <p>
-                            Reputation Points:{" "}
-                            {calculateTimestampPoints(
-                              transactionDetails.timestamp
-                            )}
-                          </p>
-                        </Card.Text>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                </Row>
-              </div>
-            )}
-            <div className={styles.reputationSection}>
-              <h1>Final Reputation</h1>
-              <p className={styles.finalScore}>
-                Final Reputation Score: {finalReputationScore}
-              </p>
-              <p className={styles.rank}>
-                User Rank:
-                <span
-                  className={`${styles.rankBadge} ${
-                    styles[userRank.replace(" ", "")]
-                  }`}
-                >
-                  {userRank}
-                </span>
-              </p>
-            </div>
+                </>
+              )}
+              {transactionDetails && (
+                <Col>
+                  <Card>
+                    <Card.Body>
+                      <Card.Title>Creation Date Reputation</Card.Title>
+                      <p>
+                        Created: {formatTimestamp(transactionDetails.timestamp)}
+                      </p>
+                      <p>
+                        Reputation Score:{" "}
+                        {calculateTimestampPoints(transactionDetails.timestamp)}
+                      </p>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              )}
+            </Row>
+            <h1>Your Universal Reputation</h1>
+            <Row className={styles.rowSpace}>
+              <Col>
+                <Card>
+                  <Card.Img
+                    variant="top"
+                    src={reputationImage}
+                    alt="Reputation Image"
+                    className={styles.badge}
+                  />
+                  <Card.Body>
+                    <h4>You are a {userRank}</h4>
+                    <p>Reputation Score: {finalReputationScore}</p>
+                  </Card.Body>
+                </Card>
+              </Col>
+              <Col></Col>
+              <Col></Col>
+            </Row>
           </>
         )}
       </RootLayout>
