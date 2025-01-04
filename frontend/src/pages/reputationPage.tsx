@@ -230,7 +230,7 @@ const Reputation = () => {
                         <p>
                           Transactions: {addressCounters.transactions_count}
                         </p>
-                        <p>
+                        <p style={{marginBottom: "0px"}}>
                           Reputation Score:{" "}
                           {calculateTransactionPoints(
                             addressCounters.transactions_count
@@ -247,7 +247,7 @@ const Reputation = () => {
                           Token Transfers:{" "}
                           {addressCounters.token_transfers_count}
                         </p>
-                        <p>
+                        <p style={{marginBottom: "0px"}}>
                           Reputation Score:{" "}
                           {calculateTokenTransferPoints(
                             addressCounters.token_transfers_count
@@ -266,7 +266,7 @@ const Reputation = () => {
                       <p>
                         Created: {formatTimestamp(transactionDetails.timestamp)}
                       </p>
-                      <p>
+                      <p style={{marginBottom: "0px"}}>
                         Reputation Score:{" "}
                         {calculateTimestampPoints(transactionDetails.timestamp)}
                       </p>
@@ -287,7 +287,7 @@ const Reputation = () => {
                   />
                   <Card.Body>
                     <h4>You are a {userRank}</h4>
-                    <p>Reputation Score: {finalReputationScore}</p>
+                    <p >Reputation Score: {finalReputationScore}</p>
                   </Card.Body>
                 </Card>
               </Col>
