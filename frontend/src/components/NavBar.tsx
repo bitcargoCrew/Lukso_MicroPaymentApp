@@ -59,6 +59,17 @@ const NavBar: React.FC<NavBarProps> = ({ account }) => {
               <Nav.Item>
                 <Link
                   href={{
+                    pathname: "/reputationPage",
+                    query: { account: account },
+                  }}
+                  style={{ textDecoration: "none" }}
+                >
+                  <div className={styles.navLinkSocial}>Reputation</div>
+                </Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Link
+                  href={{
                     pathname: "/createContentPage",
                     query: { account: account },
                   }}

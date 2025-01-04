@@ -11,11 +11,9 @@ interface ProfileViewProps {}
 
 const Profile: React.FC<ProfileViewProps> = ({}) => {
   const [account, setAccount] = useState("");
-  const [showModal, setShowModal] = useState(false); // State to control the modal visibility
   const router = useRouter();
 
   useEffect(() => {
-    setShowModal(true);
     const accountQuery = router.query.account;
     if (accountQuery && accountQuery !== account) {
       const accountValue = accountQuery as string;

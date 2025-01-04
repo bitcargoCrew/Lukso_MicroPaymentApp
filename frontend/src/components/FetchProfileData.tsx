@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import { ERC725, ERC725JSONSchema } from "@erc725/erc725.js";
 import lsp3ProfileSchema from "@erc725/erc725.js/schemas/LSP3ProfileMetadata.json";
 
@@ -22,6 +21,7 @@ const fetchProfileData = async ({
 
   try {
     const metaData = await erc725js.fetchData("LSP3Profile");
+    console.log(metaData)
     onDataFetched(metaData);
   } catch (error) {
     console.error("Error fetching data:", error);
